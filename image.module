@@ -1565,11 +1565,11 @@ function theme_image_gallery_album($images, $subalbums = NULL) {
       $n++;
 	}
 
-    // fill in the remaining cells for this row.
-    for(;$z < $thumbs_cols; $z++){
-        $td_top .= "\n<td></td>";
-        $td_bottom .= "\n<td></td>";
-    }
+	// fill in the remaining cells for this row.
+	for(--$z; $z > 0 && $z < $thumbs_cols; $z++){
+		$td_top .= "\n<td>&nbsp;</td>";
+		$td_bottom .= "\n<td>&nbsp;</td>";
+	}
 
     // if we started a last row, close it.
     if ($td_bottom != ""){
