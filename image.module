@@ -542,8 +542,8 @@ function _image_process($node) {
       }
     }
   }
-  $obj->image_id = $edit["image_id"];
-  return _image_tempname($obj);
+  $node->image_id = $edit->image_id;
+  return _image_tempname($node);
 }
 
 
