@@ -1320,7 +1320,7 @@ function _image_dir_upload($edit, $type = "slow") {
 
           // build a node with intelligent defaults
           // make sure we designate an unused filename as image_name.
-          $node = array ("title" => $file, "type" => "image", "uid" => $user->uid, "taxonomy" => $edit['taxonomy'], "image_id" => $node->image_id, "image_name" => time(). $file, "personal" => 0, "weight" => 5, "moderate" => 0);
+          $node = array ("title" => basename($file, ".jpg"), "type" => "image", "uid" => $user->uid, "taxonomy" => $edit['taxonomy'], "image_id" => $node->image_id, "image_name" => time(). $file, "personal" => 0, "weight" => 5, "moderate" => 0);
           
           //override defaults with any data specified in iptc header
           $node = array_merge($node, _image_iptc_map(_image_tempname($node)));
