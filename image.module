@@ -1344,6 +1344,7 @@ function image_gallery_album($parents, $subalbums, $images, $data, $galleryuser 
 
       $n++;
     }
+    if ($n % $thumbs_cols != 0) $output .= "</tr>";
     $output .= "</table>\n</div> <!-- end of IMAGE div -->";
   }
 
