@@ -930,40 +930,59 @@ function image_delete(&$node) {
  * static image that is the next size up.
  */
 function image_display() {
+
   $node = node_load(array("nid" => arg(2)));
   if ($_GET['res']) {
+  
     list($w, $h) = explode("x", $_GET['res']);
     $valid_res = explode(",", variable_get("image_default_resolutions", "640x400,800x600,1024x768,1600x1200"));
-    foreach ($valid_res as $v) {
-      list($width, $height) = explode("x", $v);
-      if ($w > $width || $h > $height) {
-        // if this image has not been created then create image.
-        if (!$node->image_list[$v]) {
-          $fname = _image_make_static($node, $v);
-          if ($fname) {
-            $node->image_list[$v]["fname"] = $fname;
-            if (!$_GET["op"]) {
-              // we are just displaying the node so we need to save the new
-              // resolution
-              $node->image_list[$v]["fname"] = _image_add_static($node, $v);
+
+    // See if the original size if sufficent for this resolution. If so, no need to go through
+    // the generate loop.
+
+    list($max_width, $max_height) = split('x', variable_get('image_default_max_size', '1024x768'));
+
+    if ($w < $max_width && $h < $max_height) {
+
+      foreach (array_reverse($valid_res) as $v) {
+        list($width, $height) = explode("x", $v);
+        if ($w > $width || $h > $height) {
+          // if this image has not been created then create image.
+          if (!$node->image_list[$v] || !file_exists($node->image_list[$v]["fname"])) {
+            $fname = _image_make_static($node, $v);
+            if ($fname) {
+              $node->image_list[$v]["fname"] = $fname;
+              if (!$_GET["op"]) {
+                // we are just displaying the node so we need to save the new
+                // resolution
+                $node->image_list[$v]["fname"] = _image_add_static($node, $v);
+              }
+            }
+            else {
+              $v = array_keys($node->image_list);
+              $v = $v[0];
             }
           }
-          else {
-            $v = array_keys($node->image_list);
-            $v = $v[0];
-          }
+          $imgname = $node->image_list[$v]["fname"];
+          break;
         }
-        $imgname = $node->image_list[$v]["fname"];
-        break;
       }
     }
   }
+
+  // Use original size if no suitable smaller size has been identified.
+
   if (!$imgname) {
     $imgname = $node->image_path;
   }
+
+  // Set up headers for output.
+
   $header[] = "Expires: ". gmdate("D, d M Y H:i:s") ." GMT";
   $header[] = "Content-Type: image/$node->img_format";
   $header[] = "Content-Length: ". filesize($imgname);
+
+  // Send the file.
 
   file_transfer(realpath($imgname), $header);
 }
