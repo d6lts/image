@@ -13,7 +13,7 @@ image editing:
 - trasparent
 - blur
 - sharp
-avanzate:
+advanced:
 - watermark
 - montage
 - border
@@ -43,7 +43,7 @@ what you should see:
 (* = urgent; + = done)
 
 - should be both a way to have galleries AND a repository for the cms
-*- galleries should be based on taxonomy, possibly supporting hierarchy
++ galleries should be based on taxonomy, possibly supporting hierarchy
 - other terms in taxonomy could define more metadata, but picture.module should also
 have textfields meta data such as name, description, "other keywords", ??
 - picture upload
@@ -56,7 +56,7 @@ have textfields meta data such as name, description, "other keywords", ??
 + basic editing (thumbs, rotate, resize, crop)
 - to crop use gallery applet
 + admins should be able to add, mode, del images (most done as normal nodes)
-*- order images (weight?)
++ order images (weight?)
 - image mirroring (as gallery, have images on other sites)
 - look at gallery remote, be compatible with?
 + have meaningful errors to explain permissions for files; command to check permissions
@@ -68,35 +68,38 @@ have textfields meta data such as name, description, "other keywords", ??
 - a sort of dialog to choose an image in the repository and add it to the text? integrate this with some sort of extended textarea
 *- api to help other modules to support images. for ex a module could want to have
 an image submitted (like events, profile); temp upload, preview, cron to delete existing files ecc; see gerhard's post in ml
-*- let a user edit his own pictures; personal picture gallery
++ let a user edit his own pictures; personal picture gallery
 + have a cron delete temp images
 - change die() in trigger_error()
 - send postcard (dedicated module)
 - images could have a property: public (in galleries), personal (in personal gallery), private (exists but does not appear any gallery)
 - blocks: last image, random image
 - large blocks: last images, random images
-- save iptc and exif data; load them in node data
-- permission to edit (rotate, resize etc) images; can give too much power to a user (imagine uploading a large image and keeping on rotating it)
++ save iptc and exif data; load them in node data
+*- permission to edit (rotate, resize etc) images; can give too much power to a user (imagine uploading a large image and keeping on rotating it)
 - paging in photo galleries
 - integrate history (new photo)
 - browse bar in node view (next, prev, up and controls like filter, order etc)
 - other thumb orders: size (width x height), filesize, format, number of comments, last comment, some sort of algorithm to see what are most discussed images
-- implement search
+- implement search (not needed, I think)
 - personal photo gallery "white pages"
 - limit personal gallery size (number and kb)
-- option to disable convert
-- complete permission check
++ complete permission check
+- as additional security, you should disallow php and cgi execution in image directories
+- xhtml
+
 
 security:
-- verify file extension and format; change blanks to underscores
-- check format of image edit: size should be just numbers, etc; use escapeshellcmd
++ verify file extension and format; change blanks to underscores
++ check format of image edit: size should be just numbers, etc; use escapeshellcmd
 
 general options:
-- convert path
+- option to disable convert
++ convert path
 + temp dir
 - default options for every container; you can override these options in admin
 - hashing of images (mask.jpg -> m/a/s/mask.jpg)
-- flag per aggiungere un random in fondo alle immagini, per evitare il caching
++ flag to add a random value attached to image path, to avoid caching
 
 
 CREATE TABLE image (
@@ -125,4 +128,21 @@ add:
 
 BUGS:
 - editing an image is a bit weird: you must preview before submitting, only previewed changes are saved
-- as additional security, you should disallow php and cgi execution in image directories
+
+TODO:
++ clean code
++ check queries, too many?
++ in photo gallery, incorrect number of images reported
++ filter
++ permission to edit with convert
++ support teaser
+- limit personal images
+- image count should not consider personal images
+- implement moshe's suggestions
+- paging & browser bar
+- integrate history
+- blocks
+- hashing of files
+- change die() in trigger_error()?
+- disable convert: no convert -> file upload to upload thumb
+

@@ -1,3 +1,15 @@
+20 May 2002 - "Attack of the clones"
+------------------
+- can now considered beta
+- filter, customizable, uses thumb and teaser; I now understand the problems of the filter system
+- you now need a specific permission ("manipulate images") to have convert work; I was not easy with the idea of people uploading huge pictures and spending their time rotating them one degree every time
+- many less query when showing gallery, now we do
+- flag to add a random prefix to images while viewing, to prevent caching
+- for jhead and convert path check, too
+- cleaned up, code has been
+- in Italian comments no more are ;)
+- Force used, always
+
 17 May 2002 - "la cala"
 ------------------
 - first alpha

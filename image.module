@@ -8,13 +8,16 @@ function image_node($field) {
   return $info[$field];
 }
 
+
 function image_help() {
   echo "tbd";
 }
 
+
 function image_perm() {
-  return array("can have personal photo gallery");
+  return array("has personal photo gallery", "manipulate images");
 }
+
 
 function image_conf_options() {
   $output .= form_textfield("Default image path", "image_default_path", variable_get("image_default_path", "images/"), 30, 255, "Default path for uploaded images; it must be writeable and visible from the web.");
@@ -40,11 +43,11 @@ function image_conf_options() {
   
   $output .= form_select("Personal photo gallery", "image_personal_gallery", variable_get("image_personal_gallery", "1"),   array("enabled", "disabled"), "Activate/deactivate personal photo gallery; use permission to control who can have it.");
   
-  #$number = array(5 => 5, 10 => 10, 15 => 15, 20 => 20, 25 => 25, 30 => 30, 35 => 35, 40 => 40, 50 => 50, 60 => 60, 80 => 80, 100 => 100, 10000=>10000);
-  #$output .= form_select("Hot topic threshold", "image_hot_topic", variable_get("image_hot_topic", 15), $number, "Number of posts a topic must have to be \"hot\".");
-
+  $output .= form_select("Random prefix", "image_random_suffix", variable_get("image_random_suffix", "0"), array("0" => "disabled", "1" => "enabled"), "A random prefix added to images while viewing; to prevent caching by browsers.");
+  
   return $output;
 }
+
 
 function image_cron() {
   // Clean up temp dir
@@ -62,13 +65,14 @@ function image_cron() {
   closedir($handle); 
 }
 
+
 function image_save($op, $node) {
   if ($op == "approve") {
     return array("status" => 1);
   }
 
   if ($op == "create") {
-    return array("image_id", "image_name", "personal", "weight");
+    return array("body" => filter($node->body), "teaser" => filter($node->teaser), "image_id", "image_name", "personal", "weight");
   }
 
   if ($op == "decline") {
@@ -76,9 +80,10 @@ function image_save($op, $node) {
   }
 
   if ($op == "update") {
-    return array("image_id", "image_name", "personal", "weight");
+    return array("body" => filter($node->body), "teaser" => filter($node->teaser), "image_id", "image_name", "personal", "weight");
   }
 }
+
 
 function image_load($node) {
   $image = db_fetch_object(db_query("SELECT * FROM image WHERE nid = '%s'", $node->nid));
@@ -87,6 +92,7 @@ function image_load($node) {
 
   return $image;
 }
+
 
 function image_link($type, $node) {
   global $user;
@@ -123,6 +129,7 @@ function image_link($type, $node) {
   return $links ? $links : array();
 }
 
+
 function image_user($type, $ahem, &$user) {
   if (user_access("access content")) {
     if ($type == "view_public") {
@@ -132,6 +139,7 @@ function image_user($type, $ahem, &$user) {
     return $output;
   }
 }
+
 
 function image_access($op, $node) {
   global $user;
@@ -154,6 +162,7 @@ function image_access($op, $node) {
 
 }
 
+
 function image_view($node) {
   global $theme, $op, $file, $image_not_uploaded;
   
@@ -170,13 +179,232 @@ function image_view($node) {
     $image_path = $node->image_path;
   }
   
-  $output .= "<p align='center'><b>". check_output($node->title) ."</b></p><p align='center'><img src=\"$image_path?".rand()."\"></p><p align='center'>". check_output($node->body) ."</p>";
+  $output .= "<p align='center'><b>". check_output($node->title) ."</b></p><p align='center'><img src=\"$image_path?".(variable_get("image_random_suffix", "0") ? rand() : "")."\"></p><p align='center'>". check_output($node->body) ."</p>";
   
   if ($op != t("Preview")) {
     $output .= "<p>". $theme->links(link_node($node, $main)) ."</p>";
   }
   $theme->box(t("Image"), $output);
 }
+
+
+function image_form(&$node, &$help, &$error, &$param) {
+  global $tid, $op, $file, $HTTP_POST_FILES, $PHP_SELF;
+  
+  /*
+    we can be here if:
+    - we try to add a new image
+    - we are previewing a new image
+    - we edit an existing image
+    - we are editing an existing image and we are previewing
+    
+    I sort these cases, it's much simpler
+  */  
+  
+  if (!$node->nid) {
+    // we are adding an new node
+    if ($op == "add") {
+      // **** first form in a new image ****
+      $output .= implode("<p>", taxonomy_node_form("image", $node));
+      $output .= form_textarea("Description", "body", $node->body, 60, 5);
+      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, "Weight of image; can be used to sort thumbnails.");
+      
+      if (_image_can_personal()) {
+        $output .= form_select("Personal", "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), "A personal image can only be seen in the user's photo gallery.");
+      }
+      
+      if ($file) {
+        $output .= form_hidden("file", $file);
+        $output .= "File: $file<br>";
+        $output .= "<img src=\"$file\"><br>";
+      }
+      else {
+        $output .= form_file("Image", "image", 50, t("Click \"Browse...\" to select an image to upload."));
+      }
+      
+      srand ((double) microtime() * 1000000);
+      $node->image_id = md5(rand());
+      $output .= form_hidden("image_id", $node->image_id);
+      
+      // don't show "submit" button
+      $error[] = 1;
+    }
+    else {
+      // **** preview of a new image ****
+      
+      if (!$node->image_id) {
+        $upload_text = "<div style=\"color: red;\">". t("You must upload an image.") ."</div>";
+        $error[] = 1;
+      }
+      else {
+        $upload_text = t("Click \"Browse...\" to select an image to upload. If you don't want to change the image you don't need to upload again.");
+        if (!$node->image_name) {
+          if ($HTTP_POST_FILES["edit"]["name"]["image"]) {
+            $node->image_name = _image_secure_strip_name($HTTP_POST_FILES["edit"]["name"]["image"]);
+          }
+          else if($file) {
+            $node->image_name = basename($file);
+          }
+        }
+      }
+      
+      if ($error_string = _image_max_filesize(_image_tempname($node))) {
+        $error[] = 1;
+        echo $error_string;
+      }
+      
+      $size = getimagesize(_image_tempname($node), &$ipct_info);
+      if (user_access("manipulate images")) {
+        $output .= _images_transform_form($size, filesize(_image_tempname($node)));
+      }
+      
+      $output .= implode("<p>", taxonomy_node_form("image", $node));
+      $output .= _image_render_iptc_exif(_image_get_exif(_image_tempname($node)), "EXIF data");
+      $output .= _image_render_iptc_exif(_image_iptc($ipct_info), "IPTC data");
+      $output .= form_textarea("Description", "body", $node->body, 60, 5);
+      $output .= form_textarea(t("Teaser"), "teaser", $node->teaser, 60, 5);
+      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, "Weight of image; can be used to sort thumbnails.");
+      
+      if (_image_can_personal()) {
+        $output .= form_select("Personal", "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), "A personal image can only be seen in the user's photo gallery.");
+      }
+      
+      $output .= form_file("Image", "image", 50, $upload_text);
+      $output .= form_hidden("image_id", $node->image_id);
+      
+      if (file_exists(_image_filename($node)) && ($node->image_name)) {
+        $error[] = 1;
+        $filename_desc = "<div style=\"color: red;\">".t("Warning: this filename already exists.")."</div>";
+      }
+      else {
+        $filename_desc = t("If you want, you can change the name this file will have on the server.");
+      }
+      if ($node->image_name) {
+        $output .= form_textfield(t("Filename"), "image_name", $node->image_name, 30, 255, $filename_desc);
+      }
+    }
+  }
+  else {
+    // we are editing an existing node
+    if ($op == "edit") {
+      // **** first form ****
+      $output .= implode("<p>", taxonomy_node_form("image", $node));
+      $output .= form_textarea("Description", "body", $node->body, 60, 5);
+      $output .= form_textarea(t("Teaser"), "teaser", $node->teaser, 60, 5);
+      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, "Weight of image; can be used to sort thumbnails.");
+      
+      if (_image_can_personal()) {
+        $output .= form_select("Personal", "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), "A personal image can only be seen in the user's photo gallery.");
+      }
+      
+      $output .= "<div align=\"center\"><img src=\"$node->thumb_path\" /></div>";
+      $output .= form_file("Image", "image", 50, t("Click \"Browse...\" to select an image to upload. If you don't want to change the image you don't need to upload again."));
+      
+      srand ((double) microtime() * 1000000);
+      $node->image_id = md5(rand());
+      $output .= form_hidden("image_id", $node->image_id);
+      $output .= form_hidden("image_name", basename($node->image_path));
+      
+      if (!copy($node->image_path, _image_tempname($node))) {
+        echo ("cannot copy image to edit.");
+      }
+      $error[] = 1;
+    }
+    else {
+      // **** edit preview ****
+      if ($error_string = _image_max_filesize(_image_tempname($node))) {
+        $error[] = 1;
+        echo $error_string;
+      }
+
+      $size = getimagesize(_image_tempname($node), &$ipct_info);
+      if (user_access("manipulate images")) {
+        $output .= _images_transform_form($size, filesize(_image_tempname($node)));
+      }
+      
+      $output .= implode("<p>", taxonomy_node_form("image", $node));
+      $output .= _image_render_iptc_exif(_image_get_exif(_image_tempname($node)), "EXIF data");
+      $output .= _image_render_iptc_exif(_image_iptc($ipct_info), "IPTC data");
+      
+      $output .= form_textarea("Description", "body", $node->body, 60, 5);
+      $output .= form_textarea(t("Teaser"), "teaser", $node->teaser, 60, 5);
+      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, "Weight of image; can be used to sort thumbnails.");
+      
+      if (_image_can_personal()) {
+        $output .= form_select("Personal", "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), "A personal image can only be seen in the user's photo gallery.");
+      }
+      
+      if (is_uploaded_file($HTTP_POST_FILES["edit"]["tmp_name"]["image"])) {
+        $node->image_name = _image_secure_strip_name($HTTP_POST_FILES["edit"]["name"]["image"]);
+      }
+      
+      $original_node = db_fetch_object(db_query("SELECT image_path, thumb_path FROM image WHERE nid = '%s'", $node->nid));
+      $output .= "<div align=\"center\"><img src=\"$original_node->thumb_path\" /></div>";
+      $output .= form_file("Image", "image", 50, t("Click \"Browse...\" to select an image to upload. If you don't want to change the image you don't need to upload again."));
+      
+      $output .= form_hidden("image_id", $node->image_id);
+      $output .= form_hidden("image_name", basename($node->image_path));
+      
+      // if the file exists and is not associated with this node I have to rename it
+      if (file_exists(_image_filename($node)) && ($node->image_name)) {
+        $filename_desc = "<b>".t("Warning: this filename already exists; file will be overwritten.")."</b>";
+      }
+      else {
+        $filename_desc = t("If you want, you can change the name this file will have on the server.");
+      }
+
+      if ($node->image_name) {
+        $output .= form_textfield(t("Filename"), "image_name", $node->image_name, 30, 255, $filename_desc);
+      }      
+    }
+  }
+  
+  // the guy who thought about this $param array is a genius
+  $param["options"] = 'enctype="multipart/form-data" name="image_forms"';
+
+  return $output;
+}
+
+
+function image_delete(&$node) {
+  db_query("DELETE FROM image WHERE nid = '%s'", $node->nid);
+  unlink($node->image_path);
+  unlink($node->thumb_path);
+}
+
+
+function image_conf_filters() {
+  $output = form_select("Image filter", "image_filter_enabled", variable_get("image_filter_enabled", 0), array("Disabled", "Enabled"), "When enabled, image codes will be replaced by thumb linked to real node. Syntax: [image:node_id,(left|center|right)]");
+  return $output;
+}
+
+
+function image_filter($text) {
+  #echo "entro";
+  if (variable_get("image_filter_enabled", 0)) {
+    // *** [image:NID,(left|center|right)] ***
+    // first we find every tag
+    if (preg_match_all("/\[image:(\d+),(left|center|right)\]/i", $text, $match)) {
+      // then we make the html
+      $result = db_query("SELECT n.nid, teaser, thumb_path FROM image i, node n WHERE i.nid = n.nid AND n.nid IN ('".implode("','", array_map("check_query", $match[1]))."')");
+      $n = 0;
+      while ($img = db_fetch_object($result)) {
+        $img->align = $match[2][$n];
+        $match[3][] = method_exists($theme, "gallery_inline_img") ? $theme->gallery_inline_img($img) : _gallery_inline_img($img);
+        $n++;
+      }
+
+      $text = str_replace($match[0], $match[3], $text);
+    }
+  }
+  return $text;
+}
+
+
+
+/****
+***** helper functions
+****/
 
 function _image_process($node) {
   global $HTTP_POST_FILES, $edit;
@@ -202,13 +430,14 @@ function _image_process($node) {
     // let's start with gif, jpg, png
     
     if ((!in_array($size[2], array(1,2,3))) || (!_image_check_ext($HTTP_POST_FILES["edit"]["name"]["image"]))) {
-    #if (!in_array($size[2], array(1,2,3))) {
       echo "<div style=\"color: red;\">uploaded file was not an image.</div>";
       $HTTP_POST_FILES = array();
-    } else if (!copy($image_file, _image_tempname($node))) {
+    }
+    else if (!copy($image_file, _image_tempname($node))) {
       echo "error in file upload";
     }
-  } else {
+  }
+  else if (user_access("manipulate images")) {
     if ($edit["image_id"]) {
       // eventually we transform the image
       global $sizex, $originalx, $sizey, $originaly, $rotate, $background, $cropx, $cropy, $cropw, $croph, $quality, $revert;
@@ -217,12 +446,17 @@ function _image_process($node) {
         if (!copy($image_path, _image_tempname($node))) {
           echo ("cannot revert to original image.");
         }
-      } else {
+      }
+      else {
         if ($sizex != $originalx || $sizey != $originaly) {
           $trasform_string .= " -resize ".$sizex."x".$sizey ." -filter QUADRATIC";
         }
         if ($rotate) {
-          $trasform_string .= " -rotate ".$rotate; #." -background ".$background;
+          $trasform_string .= " -rotate ".$rotate;
+          if ($background) {
+            // make this work, I can't
+            #$trasform_string .= " -background \"#".$background."\"";
+          }
         }
         if ($cropx || $cropy || $cropw || $croph) {
           $trasform_string .= " -crop ".$cropw."x".$croph."+".$cropx."+".$cropy;
@@ -240,166 +474,6 @@ function _image_process($node) {
   return _image_tempname($obj);
 }
 
-function image_form(&$node, &$help, &$error, &$param) {
-  global $tid, $op, $file, $HTTP_POST_FILES, $PHP_SELF;
-  
-  /*
-    qui arrivo se:
-    - voglio aggiungere una immagine nuova
-    - sto aggiungendo una immagine nuova e sto facendo la preview
-    - voglio editare una immagine esistente
-    - sto editando una immagine esistente e sto facendo la preview
-    
-    se sto trasformando l'immagine, lo farò su una immagine già uploadata
-  */  
-  
-  #print_r($node); echo "***"; print_r($HTTP_POST_FILES); echo "***";
-
-  if (!$node->nid) {
-    // we are adding an new node
-    if ($op == "add") {
-      // first form in a new image
-      #$output .= "new add";
-      $output .= implode("<p>", taxonomy_node_form("image", $node));
-      $output .= form_textarea("Description", "body", $node->body, 60, 5);
-      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, "Weight of image; can be used to sort thumbnails.");
-      if (_image_can_personal()) {
-        $output .= form_select("Personal", "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), "A personal image can only be seen in the user's photo gallery.");
-      }
-      if ($file) {
-        $output .= form_hidden("file", $file);
-        $output .= "File: $file<br>";
-        $output .= "<img src=\"$file\"><br>";
-      } else {
-        $output .= form_file("Image", "image", 50, t("Click \"Browse...\" to select an image to upload."));
-      }
-      
-      srand ((double) microtime() * 1000000);
-      $node->image_id = md5(rand());
-      $output .= form_hidden("image_id", $node->image_id);
-      
-      // don't show "submit" button
-      $error[] = 1;
-    } else {
-      // preview of a new image
-      #$output .= "new preview";
-      
-      #if (!is_uploaded_file($HTTP_POST_FILES["edit"]["tmp_name"]["image"])) {
-      if (!$node->image_id) {
-        $upload_text = "<div style=\"color: red;\">". t("You must upload an image.") ."</div>";
-        $error[] = 1;
-      } else {
-        $upload_text = t("Click \"Browse...\" to select an image to upload. If you don't want to change the image you don't need to upload again.");
-        if (!$node->image_name) {
-          if ($HTTP_POST_FILES["edit"]["name"]["image"]) {
-            $node->image_name = _image_secure_strip_name($HTTP_POST_FILES["edit"]["name"]["image"]);
-          } else if($file) {
-            $node->image_name = basename($file);
-          }
-        }
-      }
-      
-      if ($error_string = _image_max_filesize(_image_tempname($node))) {
-        $error[] = 1;
-        echo $error_string;
-      }
-      
-      $output .= _images_transform_form(getimagesize(_image_tempname($node), &$ipct_info), filesize(_image_tempname($node)));
-      
-      $output .= implode("<p>", taxonomy_node_form("image", $node));
-      $output .= _image_render_iptc_exif(_image_get_exif(_image_tempname($node)), "EXIF data");
-      $output .= _image_render_iptc_exif(_image_iptc($ipct_info), "IPTC data");
-      $output .= form_textarea("Description", "body", $node->body, 60, 5);
-      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, "Weight of image; can be used to sort thumbnails.");
-      if (_image_can_personal()) {
-        $output .= form_select("Personal", "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), "A personal image can only be seen in the user's photo gallery.");
-      }
-      $output .= form_file("Image", "image", 50, $upload_text);
-      $output .= form_hidden("image_id", $node->image_id);
-      
-      if (file_exists(_image_filename($node)) && ($node->image_name)) {
-        $error[] = 1;
-        $filename_desc = "<div style=\"color: red;\">".t("Warning: this filename already exists.")."</div>";
-      } else {
-        $filename_desc = t("If you want, you can change the name this file will have on the server.");
-      }
-      if ($node->image_name) {
-        $output .= form_textfield(t("Filename"), "image_name", $node->image_name, 30, 255, $filename_desc);
-      }
-    }
-  } else {
-    // we are editing an existing node
-    if ($op == "edit") {
-      // first form
-      #$output .= "edit first";
-      $output .= implode("<p>", taxonomy_node_form("image", $node));
-      $output .= form_textarea("Description", "body", $node->body, 60, 5);
-      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, "Weight of image; can be used to sort thumbnails.");
-      if (_image_can_personal()) {
-        $output .= form_select("Personal", "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), "A personal image can only be seen in the user's photo gallery.");
-      }
-      $output .= "<div align=\"center\"><img src=\"$node->thumb_path\" /></div>";
-      $output .= form_file("Image", "image", 50, t("Click \"Browse...\" to select an image to upload. If you don't want to change the image you don't need to upload again."));
-      
-      srand ((double) microtime() * 1000000);
-      $node->image_id = md5(rand());
-      $output .= form_hidden("image_id", $node->image_id);
-      $output .= form_hidden("image_name", basename($node->image_path));
-      if (!copy($node->image_path, _image_tempname($node))) {
-        echo ("cannot copy image to edit.");
-      }
-      $error[] = 1;
-    } else {
-      // edit preview
-      #$output .= "edit preview";
-      if ($error_string = _image_max_filesize(_image_tempname($node))) {
-        $error[] = 1;
-        echo $error_string;
-      }
-      $output .= _images_transform_form(getimagesize(_image_tempname($node), &$ipct_info), filesize(_image_tempname($node)));
-      #print_r(iptcparse($info));
-      
-      #print_r(_image_get_exif(_image_tempname($node)));
-      #getExif(_image_tempname($node));
-      
-      $output .= implode("<p>", taxonomy_node_form("image", $node));
-      $output .= _image_render_iptc_exif(_image_get_exif(_image_tempname($node)), "EXIF data");
-      $output .= _image_render_iptc_exif(_image_iptc($ipct_info), "IPTC data");
-      
-      $output .= form_textarea("Description", "body", $node->body, 60, 5);
-      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, "Weight of image; can be used to sort thumbnails.");
-      if (_image_can_personal()) {
-        $output .= form_select("Personal", "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), "A personal image can only be seen in the user's photo gallery.");
-      }
-      if (is_uploaded_file($HTTP_POST_FILES["edit"]["tmp_name"]["image"])) {
-        $node->image_name = _image_secure_strip_name($HTTP_POST_FILES["edit"]["name"]["image"]);
-      }
-      $original_node = db_fetch_object(db_query("SELECT image_path, thumb_path FROM image WHERE nid = '%s'", $node->nid));
-      $output .= "<div align=\"center\"><img src=\"$original_node->thumb_path\" /></div>";
-      $output .= form_file("Image", "image", 50, t("Click \"Browse...\" to select an image to upload. If you don't want to change the image you don't need to upload again."));
-      
-      $output .= form_hidden("image_id", $node->image_id);
-      $output .= form_hidden("image_name", basename($node->image_path));
-      
-      // if the file exists and is not associated with this node I have to rename it
-      if (file_exists(_image_filename($node)) && ($node->image_name)) {
-        #$error[] = 1;
-        $filename_desc = "<b>".t("Warning: this filename already exists; file will be overwritten.")."</b>";
-      } else {
-        $filename_desc = t("If you want, you can change the name this file will have on the server.");
-      }
-
-      if ($node->image_name) {
-        $output .= form_textfield(t("Filename"), "image_name", $node->image_name, 30, 255, $filename_desc);
-      }      
-    }
-  }
-  
-  // the guy who thought about this $param array is a genius
-  $param["options"] = 'enctype="multipart/form-data"';
-
-  return $output;
-}
 
 function _image_filename($node) {
   if (!_image_check_ext($node->image_name)) {
@@ -408,6 +482,7 @@ function _image_filename($node) {
   }
   return variable_get("image_default_path", "images/")._image_secure_strip_name($node->image_name);
 }
+
 
 function _image_thumbname($node) {
   if (!_image_check_ext($node->image_name)) {
@@ -420,19 +495,21 @@ function _image_thumbname($node) {
   return variable_get("image_default_thumb_path", "images/thumbs/")._image_secure_strip_name($thumbname);
 }
 
+
 function _image_tempname($node) {
   return variable_get("image_temp_path", "./")."/tmpimg_"._image_secure_strip_name($node->image_id);
 }
+
 
 function _image_check_ext($filename) {
   return in_array(strtolower(strrchr($filename, ".")), array(".gif", ".jpg", ".png", ".jpeg"));
 }
 
+
 function _image_iptc(&$info) {
   // credit to pkrohn@daemonize.com from php online manual for this
   if (isset($info["APP13"])) {
     $iptc = iptcparse($info["APP13"]);
-    #print_r($iptc);
     if (is_array($iptc)) {
       $result["caption"] = $iptc["2#120"][0];
       $result["graphic_name"] = $iptc["2#005"][0];
@@ -459,6 +536,7 @@ function _image_iptc(&$info) {
   return $result;
 }
 
+
 function _image_render_iptc_exif($iptc, $title) {
   if (is_array($iptc)) {
     $n = 0;
@@ -479,9 +557,11 @@ function _image_render_iptc_exif($iptc, $title) {
   return $output;
 }
 
+
 function _image_can_personal() {
-  return (user_access("can have personal photo gallery") && variable_get("image_personal_gallery", "1"));
+  return (user_access("has personal photo gallery") && variable_get("image_personal_gallery", "1"));
 }
+
 
 function _image_get_exif($file) {
   // ripped from gallery 1.2.5
@@ -502,6 +582,7 @@ function _image_get_exif($file) {
     #}
   }
 }
+
 
 function image_insert($node) {
   // save image, del temp image, insert into database extra data
@@ -525,10 +606,9 @@ function image_insert($node) {
   db_query("INSERT INTO image (nid, image_path, thumb_path, format, width, height, filesize, iptc, exif, personal, weight) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", $node->nid, $image_path, _image_thumbname($node), $formats[$size[2]], $size[0], $size[1], filesize($image_path), serialize($iptc), serialize($exif), $node->personal, $node->weight);
 }
 
+
 function image_update($node) {
   global $HTTP_POST_FILES;
-
-  #print_r($node);
 
   if (is_uploaded_file($HTTP_POST_FILES["edit"]["tmp_name"]["image"])) {
     echo t("<div style=\"color: red;\">"."Warning: you must preview an image before submitting; new file has not been saved.")."</div><br/>"; 
@@ -536,15 +616,15 @@ function image_update($node) {
   
   if ($node->image_name) {
     $old_files = db_fetch_object(db_query("SELECT image_path, thumb_path FROM image WHERE nid = '%s'", $node->nid));
-    #echo "cancello ". $old_file;
+
     if (!unlink($old_files->image_path)) {
       echo ("cannot delete old image.");
     };
     if (!unlink($old_files->thumb_path)) {
       echo ("cannot delete old thumb.");
     };
+    
     $image_path = _image_filename($node);
-    #echo $node->image_id.", $image_path";
     if (!rename(_image_tempname($node), $image_path)) {
       die("cannot save image.");
     }
@@ -564,9 +644,11 @@ function image_update($node) {
   }
 }
 
+
 function _image_make_thumbnail($node) {
   echo _image_convert(_image_filename($node), _image_thumbname($node), "-resize ".variable_get("image_default_thumb_size", "100")." -filter QUADRATIC");     
 }
+
 
 function _image_convert($source, $dest, $filter) {
   $_imagick_convert = variable_get("image_convert_path", "misc/image/convert.exe");
@@ -579,9 +661,9 @@ function _image_convert($source, $dest, $filter) {
   $source = _image_escape_shell($source);
   $dest = _image_escape_shell($dest);
   $err = exec("$_imagick_convert $filter $source $dest");
-  #echo "$_imagick_convert $filter $source $dest";
   return $err;
 }
+
 
 function _image_escape_shell($filename) {
   global $HTTP_SERVER_VARS;
@@ -589,10 +671,12 @@ function _image_escape_shell($filename) {
   // I can't make escapeshellarg work on windows, it adds a '
   // this should be safe enough
     return '"'.addslashes(_image_strip_name($filename)).'"';
-  } else {
+  }
+  else {
     return escapeshellarg(_image_strip_name($filename));
   }
 }
+
 
 function _image_strip_name($filename) {
   // we don't allow filenames with strange characters
@@ -604,6 +688,7 @@ function _image_strip_name($filename) {
   return strtolower(preg_replace("/[^A-Za-z0-9\.\-\+\/_]/","",$filename));
 }
 
+
 function _image_secure_strip_name($filename) {
   // we don't allow filenames with strange characters
   // we try to convert some characters, and strip others
@@ -614,6 +699,7 @@ function _image_secure_strip_name($filename) {
   return strtolower(preg_replace("/[^A-Za-z0-9\.\-\+_]/","",$filename));
 }
 
+
 function _image_max_filesize($image_file, $tid = 0, $personal = 0) {
   // check whether uploaded file is too big (kbytes or physical size)
   $max_weight = variable_get("image_default_max_weight", "200");
@@ -623,7 +709,6 @@ function _image_max_filesize($image_file, $tid = 0, $personal = 0) {
   
   $size = getimagesize($image_file);
   $max_size = split("x", variable_get("image_default_max_size", "1024x768"));
-  #print_r($size);print_r($max_size);
   if ($size[0] > $max_size[0] || $size[1] > $max_size[1]) {
     $error .= "<div style=\"color: red; text-align: center\">file is too big (max ".variable_get("image_default_max_size", "1024x768").").</div>";
   }
@@ -631,322 +716,6 @@ function _image_max_filesize($image_file, $tid = 0, $personal = 0) {
   return $error;
 }
 
-function image_delete(&$node) {
-  db_query("DELETE FROM image WHERE nid = '%s'", $node->nid);
-  unlink($node->image_path);
-  unlink($node->thumb_path);
-  #unlink();
-}
-
-function image_page() {
-  global $theme, $vid, $tid, $uid, $sortby, $image_per_page, $nf;
-
-  if (user_access("access content") && variable_get("image_nav_vocabulary", "")) {
-    if ($uid) {
-    // view user personal gallery
-      $sql = "
-        SELECT n.nid, title, body, thumb_path
-        FROM node n, image i, users u
-        WHERE n.nid = i.nid
-        AND i.personal = 1
-        AND n.uid = u.uid
-        AND u.uid = '%s'
-        ORDER BY 
-      ";
-      
-      $order = variable_get("image_gallery_thumb_order", "title");
-      if ($order == "title") {
-        $sql .= "n.title";
-      } else if ($order == "time") {
-        $sql .= "n.created";
-      } else if ($order == "time desc") {
-        $sql .= "n.created DESC";
-      } else if ($order == "weight") {
-        $sql .= "i.weight";
-      } else if ($order == "weight desc") {
-        $sql .= "i.weight DESC";
-      } else {
-        $sql .= "RAND()";
-      }
-
-      $result = db_query($sql, $uid);
-      while ($image = db_fetch_object($result)) {
-        $images[] = $image;
-      }
-      
-      $null = array();
-      $theme->header();
-      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_album") ? $theme->gallery_album($parents, $subalbums, $images) : _image_gallery_album($null, $null, $images));
-      $theme->footer();    
-    } else if (!$tid) {
-      // show albums
-      $albums = taxonomy_get_children(0, variable_get("image_nav_vocabulary", ""));
-      
-      foreach (array_keys($albums) as $term_id) {
-        _image_album_properties($albums, $term_id);
-      }
-            
-      $theme->header();
-      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_home") ? $theme->gallery_home($albums) : _image_gallery_home($albums));
-      $theme->footer();
-    } else {
-      // browse albums; show subalbums and thumbs
-      $subalbums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
-      foreach (array_keys($subalbums) as $term_id) {
-        _image_album_properties($subalbums, $term_id);
-      }
-      
-      
-      $sql = "
-        SELECT n.nid, title, body, thumb_path
-        FROM node n, term_node t, image i
-        WHERE n.nid = t.nid
-        AND n.nid = i.nid
-        AND t.tid = '%s'
-        AND i.personal = 0
-        ORDER BY 
-      ";
-      
-      $order = variable_get("image_gallery_thumb_order", "title");
-      if ($order == "title") {
-        $sql .= "n.title";
-      } else if ($order == "time") {
-        $sql .= "n.created";
-      } else if ($order == "time desc") {
-        $sql .= "n.created DESC";
-      } else if ($order == "weight") {
-        $sql .= "i.weight";
-      } else if ($order == "weight desc") {
-        $sql .= "i.weight DESC";
-      } else {
-        $sql .= "RAND()";
-      }
-
-      $result = db_query($sql, $tid);
-      while ($image = db_fetch_object($result)) {
-        $images[] = $image;
-      }
-      #print_r($images);
-      
-      $parents[] = taxonomy_get_term($tid);
-      $n = 0;
-      while ($parent = taxonomy_get_parents($parents[$n]->tid)) {
-        $parents = array_merge($parents, $parent);
-        $n++;
-      }
-      
-      $theme->header();
-      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_album") ? $theme->gallery_album($parents, $subalbums, $images) : _image_gallery_album($parents, $subalbums, $images));
-      $theme->footer();
-    }
-  }
-  else {
-    $theme->header();
-    $theme->box(t("Access denied"), message_access());
-    $theme->footer();
-  }  
-}
-
-function _image_get_subalbums($tid, $recurse = 0) {
-  // returns array of term ids of children, recursive
-  static $subalbums;
-  if (!$recurse) {
-    $subalbums = array();
-  }
-  
-  $_children = taxonomy_get_children($tid);
-  foreach ($_children as $tid => $album) {
-    $subalbums[$tid] = $album->name;
-    _image_get_subalbums($tid, 1);
-  }
-  return $subalbums;
-}
-
-function _image_album_properties(&$albums, $term_id) {
-  // to every album add: how many images, last update, path of a thumbnail (, number of views, date of first image, something about comments)
-  $albums[$term_id]->photocount = taxonomy_term_count_nodes($term_id);
-  $subalbums = _image_get_subalbums($term_id);
-  $albums[$term_id]->subalbums = $subalbums;
-  $last_update = db_fetch_object(db_query("SELECT created, thumb_path FROM node n, image i LEFT JOIN term_node t ON n.nid = t.nid WHERE n.nid = i.nid AND t.tid IN (".implode(",", array_merge($term_id, array_keys($subalbums))).") AND type = 'image' ORDER BY created DESC LIMIT 1"));
-  $albums[$term_id]->last_updated = $last_update->created;
-  
-  if (variable_get("image_gallery_thumb", "last") == "random") {
-    $albums[$term_id]->thumb = db_result(db_query("SELECT thumb_path FROM node n, image i LEFT JOIN term_node t ON n.nid = t.nid WHERE n.nid = i.nid AND t.tid IN (".implode(",", array_merge($term_id, array_keys($subalbums))).") AND type = 'image' ORDER BY RAND() LIMIT 1"));
-  } else {
-    $albums[$term_id]->thumb = $last_update->thumb_path;
-  }
-}
-
-function _image_gallery_home(&$albums) {
-  // passed as references merely for performance
-  $output .= "<table>";
-  foreach ($albums as $tid => $album) {
-    $output .= "<tr><td align=\"center\">";
-    if ($album->thumb) {
-      $output .= lm("<img src=\"".$album->thumb."\" border=\"0\">", array("mod" => "image", "tid" => $album->tid));
-    }
-    $output .= "</td><td>";
-    $output .= lm($album->name, array("mod" => "image", "tid" => $album->tid))."<br>";
-    $output .= check_output($album->description)."<br>There are ".$album->photocount." images in this album.";
-    if ($album->last_updated) {
-      $output .= "<br>Last updated: ".format_date($album->last_updated);
-    }
-    $output .= "</td></tr>";
-  }
-  $output .= "</table>";
-  return $output;
-}
-
-function _image_gallery_album(&$parents, &$subalbums, &$images) {
-  foreach (array_reverse(array_values($parents)) as $p) {
-    $t[] = lm($p->name, array("mod" => "image", "tid" => $p->tid));;
-  }
-  if ($t) {
-    $output .= implode(":", $t);
-    $output .= "<hr>";
-  }
-
-  $output .= method_exists($theme, "gallery_home") ? $theme->gallery_home($subalbums) : _image_gallery_home($subalbums);
-
-  if ($output) {
-    $output .= "<hr>";
-  }
-  $n = 0;
-  $thumbs_row = variable_get("image_gallery_thumb_row", "5");
-  if ($images) {
-    $output .= "<table width=\"100%\" cellpadding=\"10\">";
-    foreach ($images as $image) {
-      if ($n % $thumbs_row == 0) {
-        $output .= "<tr>";
-      }
-      #print_r($image);
-      $output .= "<td valign=\"bottom\"><div align=\"center\">".l("<img src=\"".$image->thumb_path."\" border=\"0\">", array("id" => $image->nid))."<br>".$image->title."</div></td>";
-
-      if ($n % $thumbs_row == $thumbs_row - 1) {
-        $output .= "</tr>";
-      }
-
-      $n++;
-    }
-    $output .= "</table>";
-  }
-  
-  return $output;
-}
-
-function image_dir_upload($edit) {
-  global $HTTP_SERVER_VARS;
-  
-  if (!$edit["dir"]) {
-    $output .= form_textfield("Directory to scan", "dir", variable_get("image_last_upload_dir", ""), 30, 255, "Directory must be visible from the web server.");
-    #$output .= form_checkbox("Delete images after insert", "del_images", $value = 1, $checked = 1);
-    $output .= form_checkbox("Thumbnail", "thumb", $value = 1, $checked = 0, "Show resized image. Use only if you have large bandwidth. <div style=\"color: white;\">so Momar don't activate this. UHAHAHAHA</div>");
-    $output .= form_submit("Directory upload");
-    echo form($output, "post");
-  } else {
-    // check for tricks
-    $dir = str_replace ("../", "", "./".$edit["dir"]);
-    if (!is_dir($dir)) {
-      echo $edit["dir"] ." is not a directory";
-      exit();
-    }
-
-    variable_set("image_last_upload_dir", $edit["dir"]);
-
-    $handle = opendir($dir);
-    while (($file = readdir($handle))!==false) {
-      if ($file != "." && $file != "..") { 
-        if ($edit["thumb"]) {
-          echo lm($file, array("mod" => "node", "op" => "add", "type" => "image", "file" => $dir."/".$file));
-          echo " <img src=\"$dir/$file\" height=\"100\">";
-        } else {
-          echo lm($file, array("mod" => "node", "op" => "add", "type" => "image", "file" => $dir."/".$file));
-        }
-        echo "<br>";
-      }
-    }
-    closedir($handle); 
-  }
-}
-
-function _image_check_configuration() {
-  // since we have to deal with a different directories, we check for correct permissions
-  $dirs = array(
-    "Default image path" => array("image_default_path", "images/"),
-    "Default thumb path" => array("image_default_thumb_path", "images/thumbs/"),
-    "Temporary image path" => array("image_temp_path", "./") 
-    );
-  foreach ($dirs as $description => $key) {
-    echo $description.": <b>";
-    if (!file_exists(variable_get($key[0], $key[1]))) {
-      echo "<div style=\"color: red;\">DOES NOT EXISTS</div> - fix in ".la("settings and filters", array("mod" => "system"));
-    } else if (!is_writable(variable_get($key[0], $key[1]))) {
-      echo "<div style=\"color: red;\">NOT WRITABLE</div> - change permissions on server";
-    } else {
-      echo "<div style=\"color: green;\">OK</div>";
-    }
-    echo "</b><br>";
-  }
-  
-  // finally we also check for convert
-  $convert = variable_get("image_convert_path", "misc/image/convert.exe");
-  if (!file_exists($convert)) {
-  } else if (!is_executable($convert)) {
-  } else {
-  }
-    
-}
-
-function _image_test() {
-  echo method_exists("theme", "box");
-}
-
-function _image_gallery_admin() {
-  if (!variable_get("image_nav_vocabulary", "")) {
-    echo "Error: you must assign a vocabulary to navigation before. Fix in ".la("settings and filters", array("mod" => "system"));
-    exit();
-  }
-  
-  echo "tbd";
-  exit();
-}
-
-function image_admin() {
-  global $op, $edit;
-
-  if (user_access("administer images")) {
-    
-    $links[] = la(t("directory upload"), array("mod" => "image", "op" => "dir_upload"));
-    $links[] = la(t("gallery admin"), array("mod" => "image", "op" => "gallery"));
-    $links[] = la(t("check configuration"), array("mod" => "image", "op" => "check_configuration"));
-    $links[] = la(t("help"), array("mod" => "image", "op" => "help"));
-    $links[] = la(t("test"), array("mod" => "image", "op" => "test"));
-    
-    print "<small>".  implode(" | ", $links) ."</small><hr>\n";
-
-    #echo $op;
-
-    switch ($op) {
-      case "test":
-      _image_test();
-      case "help":
-        image_help();
-        break;
-      case "dir_upload":
-      case "Directory upload":
-        image_dir_upload($edit);
-        break;
-      case "gallery":
-        _image_gallery_admin($edit);
-        // fall through
-      default:
-        _image_check_configuration();
-    }
-  }
-  else {
-    print message_access();
-  }
-}
 
 function _images_transform_form($size, $bytes) {
   return '
@@ -968,8 +737,8 @@ function _images_transform_form($size, $bytes) {
       <div align="left"><b>rotate:</b><br>
         <input type="text" name="rotate" size="7">
         <br>
-        (clockwise)<!--<br>
-        <input type="text" name="background" size="7" value="#FFFFFF"><br>background-->
+        (clockwise)<br><!--
+        <input type="text" name="background" size="7" value="FFFFFF"><br>background<br>(<a onclick="javascript:image_forms.background.value=\'FFFFFF\'; return false" href=\'#\'>white</a> - <a onclick="javascript:image_forms.background.value=\'000000\'; return false" href=\'#\'>black</a>)-->
       </div>
     </td>
     <td> 
@@ -1007,6 +776,423 @@ function _images_transform_form($size, $bytes) {
   </tr>
 </table>
 ';
+}
+
+
+/****
+***** page function and friends
+****/
+
+function image_page() {
+  global $theme, $vid, $tid, $uid, $sortby, $image_per_page, $nf;
+
+  if (user_access("access content") && variable_get("image_nav_vocabulary", "")) {
+    if ($uid) {
+    // view user personal gallery
+      $sql = "
+        SELECT n.nid, title, body, thumb_path
+        FROM node n, image i, users u
+        WHERE n.nid = i.nid
+        AND i.personal = 1
+        AND n.uid = u.uid
+        AND u.uid = '%s'
+        ORDER BY 
+      ";
+      
+      $order = variable_get("image_gallery_thumb_order", "title");
+      if ($order == "title") {
+        $sql .= "n.title";
+      }
+      else if ($order == "time") {
+        $sql .= "n.created";
+      }
+      else if ($order == "time desc") {
+        $sql .= "n.created DESC";
+      }
+      else if ($order == "weight") {
+        $sql .= "i.weight";
+      }
+      else if ($order == "weight desc") {
+        $sql .= "i.weight DESC";
+      }
+      else {
+        $sql .= "RAND()";
+      }
+
+      $result = db_query($sql, $uid);
+      while ($image = db_fetch_object($result)) {
+        $images[] = $image;
+      }
+      
+      $null = array();
+      $theme->header();
+      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_album") ? $theme->gallery_album($parents, $subalbums, $images) : _image_gallery_album($null, $null, $images));
+      $theme->footer();    
+    }
+    else if (!$tid) {
+      // show albums
+      $albums = taxonomy_get_children(0, variable_get("image_nav_vocabulary", ""));
+      
+      #print_r($albums);
+      foreach (array_keys($albums) as $term_id) {
+        _image_album_properties($albums, $term_id);
+      }
+            
+      $theme->header();
+      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_home") ? $theme->gallery_home($albums) : _image_gallery_home($albums));
+      $theme->footer();
+    }
+    else {
+      // browse albums; show subalbums and thumbs
+      $subalbums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
+      foreach (array_keys($subalbums) as $term_id) {
+        _image_album_properties($subalbums, $term_id);
+      }
+      
+      $sql = "
+        SELECT n.nid, title, teaser, body, thumb_path
+        FROM node n, term_node t, image i
+        WHERE n.nid = t.nid
+        AND n.nid = i.nid
+        AND t.tid = '%s'
+        AND i.personal = 0
+        ORDER BY 
+      ";
+      
+      $order = variable_get("image_gallery_thumb_order", "title");
+      if ($order == "title") {
+        $sql .= "n.title";
+      }
+      else if ($order == "time") {
+        $sql .= "n.created";
+      }
+      else if ($order == "time desc") {
+        $sql .= "n.created DESC";
+      }
+      else if ($order == "weight") {
+        $sql .= "i.weight";
+      }
+      else if ($order == "weight desc") {
+        $sql .= "i.weight DESC";
+      }
+      else {
+        $sql .= "RAND()";
+      }
+
+      $result = db_query($sql, $tid);
+      while ($image = db_fetch_object($result)) {
+        $images[] = $image;
+      }
+      
+      $parents[] = taxonomy_get_term($tid);
+      $n = 0;
+      while ($parent = taxonomy_get_parents($parents[$n]->tid)) {
+        $parents = array_merge($parents, $parent);
+        $n++;
+      }
+      
+      $theme->header();
+      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_album") ? $theme->gallery_album($parents, $subalbums, $images) : _image_gallery_album($parents, $subalbums, $images));
+      $theme->footer();
+    }
+  }
+  else {
+    $theme->header();
+    $theme->box(t("Access denied"), message_access());
+    $theme->footer();
+  }  
+}
+
+function _image_get_subalbums($tid, $recurse = 0) {
+  // returns array of term ids of children, recursive
+  static $subalbums;
+  if (!$recurse) {
+    $subalbums = array();
+  }
+  
+  $_children = taxonomy_get_children($tid);
+  foreach ($_children as $tid => $album) {
+    $subalbums[$tid] = $album->name;
+    _image_get_subalbums($tid, 1);
+  }
+  return $subalbums;
+}
+
+function _image_album_properties(&$albums, $term_id) {
+  // to every album add: how many images, last update, path of a thumbnail (, number of views, date of first image, something about comments)
+  $albums[$term_id]->photocount = taxonomy_term_count_nodes($term_id, "image");
+  $subalbums = _image_get_subalbums($term_id);
+  $albums[$term_id]->subalbums = $subalbums;
+  
+  $thumb_choice = (variable_get("image_gallery_thumb", "last") == "random" ? "RAND()" : "created DESC");
+
+  $last_update = db_fetch_object(db_query("
+      SELECT created, thumb_path
+      FROM node n, image i
+      LEFT JOIN term_node t ON n.nid = t.nid
+      WHERE n.nid = i.nid
+      AND t.tid IN (".implode(",", array_merge($term_id, array_keys($subalbums))).")
+      AND type = 'image'
+      ORDER BY $thumb_choice
+      LIMIT 1
+    "));
+  $albums[$term_id]->last_updated = $last_update->created;
+  $albums[$term_id]->thumb = $last_update->thumb_path;
+}
+
+function _image_gallery_home(&$albums) {
+  // passed as references merely for performance
+  $output .= "<table>";
+  
+  foreach ($albums as $tid => $album) {
+    $output .= "<tr><td align=\"center\">";
+    if ($album->thumb) {
+      $output .= lm("<img src=\"".$album->thumb."\" border=\"0\">", array("mod" => "image", "tid" => $album->tid));
+    }
+    $output .= "</td><td>";
+    $output .= lm($album->name, array("mod" => "image", "tid" => $album->tid))."<br>";
+    $output .= check_output($album->description)."<br>There are ".$album->photocount." images in this album.";
+    if ($album->last_updated) {
+      $output .= "<br>Last updated: ".format_date($album->last_updated);
+    }
+    $output .= "</td></tr>";
+  }
+  
+  $output .= "</table>";
+  return $output;
+}
+
+function _image_gallery_album(&$parents, &$subalbums, &$images) {
+  foreach (array_reverse(array_values($parents)) as $p) {
+    $t[] = lm($p->name, array("mod" => "image", "tid" => $p->tid));;
+  }
+  if ($t) {
+    $output .= implode(":", $t);
+    $output .= "<hr>";
+  }
+
+  $output .= method_exists($theme, "gallery_home") ? $theme->gallery_home($subalbums) : _image_gallery_home($subalbums);
+
+  if ($output) {
+    $output .= "<hr>";
+  }
+  $n = 0;
+  $thumbs_row = variable_get("image_gallery_thumb_row", "5");
+  if ($images) {
+    $output .= "<table width=\"100%\" cellpadding=\"10\">";
+    foreach ($images as $image) {
+      if ($n % $thumbs_row == 0) {
+        $output .= "<tr>";
+      }
+      $output .= "<td valign=\"bottom\"><div align=\"center\">".l("<img src=\"".$image->thumb_path."\" border=\"0\">", array("id" => $image->nid))."<br><b>".$image->title."</b><br>".$image->teaser."</div></td>";
+
+      if ($n % $thumbs_row == $thumbs_row - 1) {
+        $output .= "</tr>";
+      }
+
+      $n++;
+    }
+    $output .= "</table>";
+  }
+  
+  return $output;
+}
+
+function _gallery_inline_img($img) {
+return '
+  <table border="0" cellspacing="0" cellpadding="5" align="'.$img->align.'">
+    <tr>
+      <td>
+        <div align="center">'.l("<img src=\"".$img->thumb_path."\" border=\"0\">", array("id" => $img->nid)).'</div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div align="center"><i>'.check_output($img->teaser).'</i></div>
+      </td>
+    </tr>
+  </table>
+  ';
+}
+
+/****
+***** admin function and friends
+****/
+
+function _image_dir_upload($edit) {
+  global $HTTP_SERVER_VARS;
+  
+  if (!$edit["dir"]) {
+    $output .= form_textfield("Directory to scan", "dir", variable_get("image_last_upload_dir", ""), 30, 255, "Directory must be visible from the web server.");
+    #$output .= form_checkbox("Delete images after insert", "del_images", $value = 1, $checked = 1);
+    $output .= form_checkbox("Thumbnail", "thumb", $value = 1, $checked = 0, "Show resized image. Use only if you have large bandwidth. <div style=\"color: white;\">so Momar don't activate this. UHAHAHAHA</div>");
+    $output .= form_submit("Directory upload");
+    echo form($output, "post");
+  }
+  else {
+    // check for tricks
+    $dir = str_replace ("../", "", "./".$edit["dir"]);
+    if (!is_dir($dir)) {
+      echo $edit["dir"] ." is not a directory";
+      exit();
+    }
+
+    variable_set("image_last_upload_dir", $edit["dir"]);
+
+    $handle = opendir($dir);
+    while (($file = readdir($handle))!==false) {
+      if ($file != "." && $file != "..") { 
+        if ($edit["thumb"]) {
+          echo lm($file, array("mod" => "node", "op" => "add", "type" => "image", "file" => $dir."/".$file));
+          echo " <img src=\"$dir/$file\" height=\"100\">";
+        }
+        else {
+          echo lm($file, array("mod" => "node", "op" => "add", "type" => "image", "file" => $dir."/".$file));
+        }
+        echo "<br>";
+      }
+    }
+    closedir($handle); 
+  }
+}
+
+function _image_check_configuration() {
+  // since we have to deal with a different directories, we check for correct permissions
+  $dirs = array(
+    "Default image path" => array("image_default_path", "images/"),
+    "Default thumb path" => array("image_default_thumb_path", "images/thumbs/"),
+    "Temporary image path" => array("image_temp_path", "./") 
+    );
+  foreach ($dirs as $description => $key) {
+    echo $description.": <b>";
+    if (!file_exists(variable_get($key[0], $key[1]))) {
+      echo "<div style=\"color: red;\">DOES NOT EXISTS - fix in ".la("settings and filters", array("mod" => "system"));
+    }
+    else if (!is_writable(variable_get($key[0], $key[1]))) {
+      echo "<div style=\"color: red;\">NOT WRITABLE - change permissions on server";
+    }
+    else {
+      echo "<div style=\"color: green;\">OK";
+    }
+    echo "</div></b><br>";
+  }
+  
+  // finally we also check for convert
+  $convert = variable_get("image_convert_path", "misc/image/convert.exe");
+  echo "ImageMagick convert :<b>";
+  if ($convert) {
+    if (!is_executable($convert)) {
+      echo "<div style=\"color: red;\">DOES NOT EXISTS - fix in ".la("settings and filters", array("mod" => "system"));
+    }
+    else {
+      echo "<div style=\"color: green;\">OK";
+    }
+  }
+  else {
+    echo "<div style=\"color: black;\">disabled";
+  }
+  echo "</div></b><br>";
+  
+  // and jhead
+  $jhead = variable_get("image_jhead_path", "misc/image/jhead.exe");
+  echo "jhead :<b>";
+  if ($jhead) {
+    if (!is_executable($jhead)) {
+      echo "<div style=\"color: red;\">DOES NOT EXISTS - fix in ".la("settings and filters", array("mod" => "system"));
+    }
+    else {
+      echo "<div style=\"color: green;\">OK";
+    }
+  }
+  else {
+    echo "<div style=\"color: black;\">disabled";
+  }
+  echo "</div></b><br>";
+  
+  // check if he assigned a vocabulary, for photo album navigation
+  if (!variable_get("image_nav_vocabulary", "")) {
+    echo "Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ".la("settings and filters", array("mod" => "system"));
+  }  
+}
+
+function _image_test() {
+  $text = "[image:86,left] e non solo: [image:87,right]"; echo "OK";
+  // first we find every tag
+  if (preg_match_all("/\[image:(\d+),(left|right)\]/i", $text, $match)) {
+    // then we make the html
+    $result = db_queryd("SELECT n.nid, body, thumb_path FROM image i, node n WHERE i.nid = n.nid AND n.nid IN ('".implode("','", array_map("check_query", $match[1]))."')");
+    $n = 0;
+    while ($img = db_fetch_object($result)) {
+      $img->align = $match[2][$n];
+      $match[3][] = method_exists($theme, "gallery_inline_img") ? $theme->gallery_inline_img($img) : _gallery_inline_img($img);
+      $n++;
+    }
+
+    $text = str_replace($match[0], $match[3], $text);
+  }
+  
+  
+  #$text = eregi_replace("\[image:(\n+),(left|right)\]", "nodo \1 posizione \2", $text);
+  /*
+  $text = preg_replace("/\[image:(\d+),(left|right)\]/ie", "'<table border=\"0\" cellspacing=\"0\" cellpadding=\"5\"><tr><td><div align=\"center\">\<img src=\"'.db_result(db_queryd("SELECT thumb_path FROM image WHERE nid = '%s'", '\\1')).'\"></div></td></tr><tr><td><div align=\"center\"><i>'.db_result(db_queryd("SELECT body FROM node WHERE nid = '%s'", "\\1")).'</i></div></td></tr></table>", $text);
+  $text = preg_replace("/\[image:(\d+),(left|right)\]/ie", "'<table border=\"0\" cellspacing=\"0\" cellpadding=\"5\"><tr><td><div align=\"center\">\<img src=\"'.strtolower('\\1')")), $text);*/
+  /*
+  if (preg_match ("/\[image:(\d+),(left|right)\]/i", $text, $m)) {
+    echo "ok";
+    print_r($m);
+  }
+  else {
+    echo "no";
+  }
+  */
+  echo $text;
+}
+
+function _image_gallery_admin() {
+  if (!variable_get("image_nav_vocabulary", "")) {
+    echo "Error: you must assign a vocabulary to navigation before. Fix in ".la("settings and filters", array("mod" => "system"));
+    exit();
+  }
+  
+  echo "tbd";
+  exit();
+}
+
+function image_admin() {
+  global $op, $edit;
+
+  if (user_access("administer images")) {
+    
+    $links[] = la(t("directory upload"), array("mod" => "image", "op" => "dir_upload"));
+    $links[] = la(t("gallery admin"), array("mod" => "image", "op" => "gallery"));
+    $links[] = la(t("check configuration"), array("mod" => "image", "op" => "check_configuration"));
+    $links[] = la(t("help"), array("mod" => "image", "op" => "help"));
+    $links[] = la(t("test"), array("mod" => "image", "op" => "test"));
+    
+    print "<small>".  implode(" | ", $links) ."</small><hr>\n";
+
+    #echo $op;
+
+    switch ($op) {
+      case "test":
+      _image_test();
+      case "help":
+        image_help();
+        break;
+      case "dir_upload":
+      case "Directory upload":
+        _image_dir_upload($edit);
+        break;
+      case "gallery":
+        _image_gallery_admin($edit);
+        // fall through
+      default:
+        _image_check_configuration();
+    }
+  }
+  else {
+    print message_access();
+  }
 }
 
 ?>
