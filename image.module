@@ -1261,7 +1261,7 @@ function _image_dir_upload($edit, $type = "slow") {
   global $HTTP_SERVER_VARS, $type, $user;
   
   if (!$edit["dir"]) {
-    $output .= form_textfield("Directory to scan", "dir", variable_get("image_last_upload_dir", ""), 30, 255, "The path to the directory which holds the source image files. This path should be relative to Drupal root directory - don't forget the slash at the endAlso it should be writeable by the web server. Files in this directory will be deleted after moving into the <b>images</b> directory.");    
+    $output .= form_textfield("Directory to scan", "dir", variable_get("image_last_upload_dir", ""), 30, 255, "The path to the directory which holds the source image files. This path should be relative to Drupal root directory - don't forget the slash at the end.");    
     if ($type == "slow") {  
       $output .= form_checkbox("Thumbnail", "thumb", $value = 1, $checked = 0, "Show resized image. Use only if you have large bandwidth.");
     }
