@@ -444,7 +444,7 @@ function image_validate(&$node) {
 
   // For some reason, we're getting here without having passed through image_load.
   // We need extra data from the node to operate properly.
-  
+
   if ($node->nid) {
     $extra = image_load($node);
     foreach ($extra as $key => $value) {
@@ -495,7 +495,7 @@ function image_validate(&$node) {
   // If user attempted to upload a file, make sure it was valid.
 
   if (!$bulk_upload && !$node->existing && !$node->image_id) {
-    
+
     if (!is_uploaded_file($upload_file)) {
 
       switch ($_FILES['edit']['error']['image']) { // Note: error code is returned only since PHP 4.2.0
@@ -537,7 +537,7 @@ function image_validate(&$node) {
   if ($bulk_upload) {
 
     // Exception: Work with bulk uploaded files where they sit.
-    
+
     $temp_file = $upload_file;
 
     if (!_image_validate_uploaded_file($node, $temp_file, $upload_name))
@@ -577,9 +577,9 @@ function image_validate(&$node) {
     if (!$node->existing || $build_derivatives) {
 
       $build_derivatives = true;
-      
+
       $node->image_details = image_get_info($node->image_path);
-      
+
       if ($proposed = _image_iptc_map($node->image_details['iptc_info'])) {
         foreach ($proposed as $key => $value) {
           if (!$node->$key) {
@@ -663,7 +663,7 @@ function _image_validate_uploaded_file(&$node, $temp_file, $upload_name) {
   }
 
   // Ensure that this uploaded file is an image and is supported by the image library.
-  
+
   $image_details = image_get_info($temp_file);
 
   if ((!image_type_is_supported($image_details['type'])) || (!_is_valid_image_ext($temp_file))) {
@@ -707,7 +707,7 @@ function _image_validate_uploaded_file(&$node, $temp_file, $upload_name) {
   }
 
   // If image is still too large (i.e. unable to resize to fit), bail out now.
-  
+
   if ($image_details['width'] > $max_dim[0] || $image_details['height'] > $max_dim[1]) {
     form_set_error('form', t('The uploaded image(%ax%b) is too large (max %cx%d).', array('%a' => $image_details['width'], '%b' => $image_details['height'], '%c' => $max_dim[0], '%d' => $max_dim[1])));
     return false;
@@ -933,7 +933,7 @@ function image_display() {
 
   $node = node_load(array("nid" => arg(2)));
   if ($_GET['res']) {
-  
+
     list($w, $h) = explode("x", $_GET['res']);
     $valid_res = explode(",", variable_get("image_default_resolutions", "640x400,800x600,1024x768,1600x1200"));
 
@@ -1110,15 +1110,17 @@ function _image_make_thumbnail($imagename, $thumbname) {
   $error = '';
   $lib = variable_get('image_lib', 'imagemagick');
   if (($image = image_open($imagename)) != false) {
-    list($thx, $thy) = split('x', variable_get('image_default_thumb_size', '100x100'));
-    if (!is_numeric($thy)) {
-      $thy = $thx;
-    }
+    list($thx, $thy) = split('x', variable_get('image_default_thumb_size', '100'));
     $size = getimagesize($imagename);
-    if ($thx < round($size[0]*$thy/$size[1])) {
-      $thy = round($size[1]*$thx/$size[0]);
-    } else if ($thy < round($size[1]*$thx/$size[0])){
-      $thx = round($size[0]*$thy/$size[1]);
+    if (!is_numeric($thy)) {
+      // Set default thumbnail width to 100 if nothing was specified
+      $thx = is_numeric($thx) ? $thx : 100;
+      // Compute thumbnail height to keep aspect ratio
+      $thy = round($size[1] * $thx / $size[0]);
+    }
+    else if (!is_numeric($thx)){
+      // Compute thumbnail width to keep aspect ratio
+      $thx = round($size[0] * $thy / $size[1]);
     }
     image_scale($image, $thx, $thy);
     image_close($image, $thumbname);
@@ -1137,7 +1139,7 @@ function _image_add_static($node, $res) {
   if (file_exists(_image_tempname($node, $res))) {
     rename(_image_tempname($node, $res), $fname);
     $image->image_list[$res]["fname"] = $fname;
-  
+
     db_query("UPDATE {image} SET image_list = '%s' WHERE nid = '%s'",serialize($image->image_list), $node->nid);
 
     return $fname;
@@ -1816,3 +1818,4 @@ function _image_id($filename = '', $nid = 0) {
 }
 
 ?>
+
