@@ -66,6 +66,22 @@ function image_help($section = "admin/help#image") {
 }
 
 /**
+ * Image block
+ */
+function image_block($op = "list", $delta = 0) {
+    // listing of blocks, such as on the admin/system/block page
+    if ($op == "list") {
+	$blocks[0]["info"] = t("Image Gallery");
+    } else {
+	// our block content
+	$blocks["subject"] = t(variable_get("image_block_title", "Image Galleries"));
+	$albums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
+	$blocks["content"] = theme_image_block($albums);
+    }
+    return $blocks;
+}
+
+/**
  * Node descriptor
  */
 function image_node_name() {
@@ -151,6 +167,8 @@ function image_settings() {
   }
 
   $output .= form_select(t("Disable Image Caching"), "image_random_suffix", variable_get("image_random_suffix", "0"), array("0" => "disabled", "1" => "enabled"), t("Enabling this will add random parameters to image URIs which will prevent the browser from caching."));
+
+  $output .= form_textfield(t("Title for image block"), "image_block_title", variable_get("image_block_title", "Image Galleries"), 20, 80, t("The title to display in the image block, if enabled"));
 
   return $output;
 }
@@ -1399,6 +1417,18 @@ function theme_image_inline_img($img) {
 function theme_image_pager($tags = "", $limit = 10, $element = 0, $attributes = array()) {
   $tags = array('|&lt;', '&lt;&lt;', '', '&gt;&gt;', '&gt;|');
   return '<hr>' . theme("pager", $tags, $limit, $element, $attributes);
+}
+
+/**
+ * Theme function to render the image block contents
+ */
+function theme_image_block($albums) {
+    $output = "<div class=\"menu\"><ul>";
+    foreach ($albums as $album) {
+	$output .= "<li class=\"collapsed\">" . l($album->name, "image/tid/" . $album->tid) . "</li>";
+    }
+    $output .= "</ul></div>";
+    return $output;
 }
 
 /****
