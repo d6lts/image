@@ -1515,7 +1515,7 @@ You may do this by creating an image node in Drupal for the target image, and th
 referencing that image in your story, blog, etc. To enable this feature and learn the
 proper syntax, visit <b>admin -> site configuration -> content filters</b>
 
-<?
+<?php
 }
 
 
