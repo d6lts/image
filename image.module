@@ -27,10 +27,9 @@ function image_perm() {
 
 function image_conf_options() {
   $output .= "<a name=\"image_default_path\"></a>";
-  $output .= form_textfield("Default image path", "image_default_path", variable_get("image_default_path", "images/"), 30, 255, "Default path for uploaded images; it must be writeable and visible from the web.");
-  
+  $output .= form_textfield("Default image path", "image_default_path", variable_get("image_default_path", "images/"), 30, 255, "Default path for uploaded images relative to your drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end.");
   $output .= "<a name=\"image_default_thumb_path\"></a>";
-  $output .= form_textfield("Default thumb path", "image_default_thumb_path", variable_get("image_default_thumb_path", "images/thumbs/"), 30, 255, "Default path for thumbnails; it must be writeable and visible from the web.");
+  $output .= form_textfield("Default thumb path", "image_default_thumb_path", variable_get("image_default_thumb_path", "images/thumbs/"), 30, 255, "Default path for thumbnails relative to your drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end.");
   $output .= form_textfield("Default thumb name format", "image_default_thumb_name", variable_get("image_default_thumb_name", "%file_th%ext"), 30, 255, "Default format of thumbnails; you can use \"%file\" and \"%ext\" placeholders.");
   $output .= form_textfield("Default thumb size", "image_default_thumb_size", variable_get("image_default_thumb_size", "100"), 10, 255, "Default size of thumbnails: format will be the same as original image. Use just one dimension, put an \"x\" to specify height; example: \"100\" for width to 100; \"x200\" for height to 200.");
   
@@ -38,15 +37,15 @@ function image_conf_options() {
   $output .= form_textfield("Default max image size", "image_default_max_size", variable_get("image_default_max_size", "1024x768"), 10, 255, "Example: 800x600.");
   
   $output .= "<a name=\"image_temp_path\"></a>";
-  $output .= form_textfield("Temporary image path", "image_temp_path", variable_get("image_temp_path", "./"), 30, 255, "Path for working directory; it must be writeable and visible from the web.");
+  $output .= form_textfield("Temporary image path", "image_temp_path", variable_get("image_temp_path", "./"), 30, 255, "Path for working directory relative to your drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end.");
   
   if (function_exists("imageCreateTrueColor")) {
     $output .= form_select("Image library", "image_lib", variable_get("image_lib", "imagemagick"), array("imagemagick" => "imagemagick", "gd" => "gd"), "Use Imagemagick if you can; GD produces worse thumbnails, does not support GIF and this module doesn't support image editing (rotate, crop etc) through it.");
   }
   $output .= "<a name=\"image_convert\"></a>";
-  $output .= form_textfield("Convert path", "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, "Path of ImageMagick convert.");
+  $output .= form_textfield("Convert path", "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, "Absolute path to ImageMagick convert.");
   $output .= "<a name=\"image_jhead\"></a>";
-  $output .= form_textfield("jhead path", "image_jhead_path", variable_get("image_jhead_path", ""), 50, 255, "Path of jhead, for EXIF parsing; blank to disable.");
+  $output .= form_textfield("jhead path", "image_jhead_path", variable_get("image_jhead_path", ""), 50, 255, "Absolute path of jhead, for EXIF parsing; blank to disable.");
   
   foreach (taxonomy_get_vocabularies("image") as $vid => $voc) {
     $vocs[$vid] = $voc->name;
@@ -1115,7 +1114,12 @@ function image_render_node($node, $image_path, $main = 0) {
   $theme->box(check_output($node->title), $output);
   */
   
-  $node->body = "<p align='center'><img src=\"$image_path?".$rand."\"></p><p align='center'>". check_output($node->body) ."</p>";
+  if(variable_get("image_random_suffix", "0")){
+    $node->body = "<p align='center'><img src=\"$image_path?".$rand."\"></p><p align='center'>". check_output($node->body) ."</p>";
+  }
+  else {
+    $node->body = "<p align='center'><img src=\"$image_path\"></p><p align='center'>". check_output($node->body) ."</p>";
+  }
   $theme->node($node);
 }
 
