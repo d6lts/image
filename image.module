@@ -1,12 +1,59 @@
 <?php
 // $Id$
 
+function image_help($section = "admin/image/help") {
+  global $base_url;
+  $output = "";
+  $common = "<p>Admins may create many image nodes at once by uploading all images to a folder on the server. This upload happens outside of Drupal, usually using an FTP client.</p>";
+
+  switch ($section) {
+    case 'admin/help':
+      $output = "Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced.";
+      break;
+    case 'admin/image':
+      $output = "";
+      break;
+    case 'admin/image/help':
+      $output  = "<h4>Configuration</h4><h5>Image Library</h5>";
+      $output .= "<p><a href=\"http://www.imagemagick.org/\">Imagemagick</a> and <a href=\"http://www.boutell.com/gd/\">GD</a> are supported image libraries. Imagemagick is required for full image manipulation features and is suggested for better thumbnail quality.</p>";
+      $output .= "<p>Many ISPs already have Imagemagick installed and available for your use. If you are hosted on Linux and have shell access, type <i>which convert</i> at the command prompt This will tell you where the binary is, if it is in the path. The name of the binary on most unixoid systems is simply <i>convert</i>.</p>";
+      $output .= "<p>If you choose to use the GD library, you should install version 2.0 or higher. However, version 1.x of the GD library is supported, even if it produces lower quality images. In order to use GD PHP must be compiled with GD enabled.</p>";
+      $output .= "<a name=\"iptc\"><h5>IPTC</h5></a>";
+      $output .= "<p>JPEG images may be tagged with information about the image. This information talks about the caption, headline, creation date, location, and many other parameters about the image. To embed IPTC data in your images, use an IPTC aware editor like <a href=\"http://www.pixvue.com\">PixVue</a> (free, Windows only), <a href=\"http://www.adobe.com/products/photoshop/main.html\">Photoshop</a> (commercial, Windows/Mac), or <a href=\"http://www.photo.net/bboard/q-and-a-fetch-msg?msg_id=001Lso\">possibly GIMP</a> (Linux, Unix, Windows).</p>";
+      $output .= "<p>This module reads any IPTC info in your image, and uses it appropriately. Fast directory upload of IPTC images is the quickest and most complete way to add lots of images into Drupal. Further, you may tag your images while offline and only go online to do the upload/creation in Drupal.</p>";
+      $output .= "<h5>EXIF</h5>";
+      $output .= "<p>JPEG images may also be tagged with information about the camera settings used to take the picture.</p>";
+      $output .= "<p>This module can read EXIF information about your images via <a href=\"http://www.sentex.net/~mwandel/jhead/\">jhead</a>.</p>";
+      $output .= "<h5>Image Storage</h5>";
+      $output .= "<p>All directories must be readable and writeable for the user id that the web server runs under.</p>";
+      $output .= "<h5>Verifiying Configuration</h5>";
+      $output .= "<p>You can verify your directory and image library application configuration by visiting the <a href=". $base_url . "/?q=admin/image\">image management administration screen</a>.</p>";
+      $output .= "<h4>Adding images into other nodes</h4>";
+      $output .= "<p>Sometimes, you want to add an image to another node like a blog entry or a story. You may do this by creating an image node in Drupal for the target image, and then referencing that image in your story, blog, etc. To enable this feature and learn the proper syntax, visit the <a href=\"" . $base_url . "/?q=admin/system/filters\">filters configuration screen</a>.</p>";
+      break;
+    case 'admin/image/dir_upload/fast':
+      $output  = $common . "<h4>Fast Mode</h4><ul>";
+      $output .= "<li>Creates all image nodes at once without user interaction.</li>";
+      $output .= "<li>Applies the same taxonomy term(s) to each node, thus creating a gallery.</li>";
+      $output .= "<li>If $l_iptc data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>";
+      $output .= "<li>If the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li></ul>";
+      break;
+    case 'admin/image/dir_upload/slow':
+      $output  = $common . "<h4>Slow Mode</h4><ul>";
+      $output .= "<li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>";
+      $output .= "<li>Add custom titles, descriptions, etc.</li></ul>";
+      break;
+  }
+
+  return t($output);
+}
+
 /**
  * System description used in the master module admin screen.
  */
 function image_system($field) {
   $system["description"] = t("Provides shared and personal photo galleries.");
-  $system["admin_help"] = t("Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced.");
+  $system["admin_help"] = image_help("admin/help");
   return $system[$field];
 }
 
@@ -130,25 +177,10 @@ function image_link($type, $node, $main = 0) {
   // Add admin items if the user has administer permission
   if ($type == "admin" && user_access("administer images")) {
     $l_iptc = l("IPTC", "admin/image/help#iptc");
-    $dir_help = "<p>Admins may create many image nodes at once by uploading all images to a folder on the server. This upload happens outside of Drupal, usually using an FTP client.</p>";
-    $fast_help = "<h4>Fast Mode</h4>
-      <ul>
-       <li>Creates all image nodes at once without user interaction.</li>
-       <li>Applies the same taxonomy term(s) to each node, thus creating a gallery.</li>
-       <li>If $l_iptc data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>
-       <li>If the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li>
-      </ul>
-    ";
 
-    $slow_help = "<h4>Slow Mode</h4>
-      <ul>
-        <li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>
-        <li>Add custom titles, descriptions, etc.</li>
-      </ul>
-    ";
     menu("admin/image", "image management", "_image_check_configuration", NULL, 8);
-    menu("admin/image/dir_upload/slow", "directory upload: slow", "_image_dir_upload", $dir_help. $slow_help, 2);
-    menu("admin/image/dir_upload/fast", "directory upload: fast", "_image_dir_upload_fast", $dir_help. $fast_help, 4);
+    menu("admin/image/dir_upload/slow", "directory upload: slow", "_image_dir_upload", image_help("admin/image/dir_upload/slow"), 2);
+    menu("admin/image/dir_upload/fast", "directory upload: fast", "_image_dir_upload_fast", image_help("admin/image/dir_upload/fast"), 4);
     menu("admin/image/help", "help", "image_help", NULL, 12);
   }
 
@@ -157,7 +189,7 @@ function image_link($type, $node, $main = 0) {
     $links[] = l(t("create image"), "node/add/image", array("title" => t("Add a new image.")));
   }
 
-  // Add view personaol gallery link if the user has personal gallery permission
+  // Add view personal gallery link if the user has personal gallery permission
   if ($type == "menu.view" && user_access("access images") && _image_can_personal()) {
     $links[] = l(t("view photo gallery"), "image/uid/$user->uid", array("title" => t("View your personal photo gallery.")));
   }
@@ -1239,7 +1271,7 @@ function _image_album_properties($albums) {
     if (variable_get("image_gallery_thumb", "last") == "random") {
       $nodes = db_fetch_object(db_query("SELECT MIN(nid) as min, MAX(nid) as max FROM {node} WHERE type = 'image'"));
       $id = rand($nodes->min, $nodes->max);
-      $random = db_fetch_object(db_query_range("SELECT i.thumb_path FROM {node} n INNER JOIN {image} i ON n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (". implode(",", $terms) .") AND n.type = 'image' AND i.personal = 0 AND n.nid >= ". $id), 0, 1);
+      $random = db_fetch_object(db_query_range("SELECT i.thumb_path FROM {node} n INNER JOIN {image} i ON n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (". implode(",", $terms) .") AND n.type = 'image' AND i.personal = 0 AND n.nid >= ". $id, 0, 1));
       $albums[$term_id]->thumb = $random->thumb_path;
     }
   }
@@ -1607,63 +1639,6 @@ function _image_check_configuration() {
   }
 }
 
-
-function image_help() {
-  global $base_url;
-
-?>
-
-<h4>Configuration</h4>
-
-<h5>Image Library</h5>
-
-<p><a href="http://www.imagemagick.org/">Imagemagick</a> and <a href="http://www.boutell.com/gd/">GD</a> are supported image libraries. 
-Imagemagick is required for full image manipulation features and is suggested for better thumbnail quality.</p>
-
-<p>Many ISPs already have Imagemagick installed and available for your use.
- If you are hosted on Linux and have shell access, type <i>which convert</i>
- at the command prompt This will tell you where the binary is, if it is in the path.
- The name of the binary on most unixoid systems is simply <i>convert</i>.</p>
-
-<p>If you choose to use the GD library, you should install version 2.0 or higher.
- However, version 1.x of the GD library is supported, even if it produces lower quality images.
- In order to use GD PHP must be compiled with GD enabled.</p>
-
-<a name="iptc"><h5>IPTC</h5></a>
-
-<p>JPEG images may be tagged with information about the image. This information talks about the
- caption, headline, creation date, location, and many other parameters about the image. To
- embed IPTC data in your images, use an IPTC aware editor like
- <a href="http://www.pixvue.com">PixVue</a> (free, Windows only),
- <a href="http://www.adobe.com/products/photoshop/main.html">Photoshop</a>
- (commercial, Windows/Mac), or <a href="http://www.photo.net/bboard/q-and-a-fetch-msg?msg_id=001Lso">possibly GIMP</a> (Linux, Unix, Windows).</p>
-
-<p>This module reads any IPTC info in your image, and uses it appropriately. Fast directory upload of IPTC
- images is the quickest and most complete way to add lots of images into Drupal. Further, you may tag
- your images while offline and only go online to do the upload/creation in Drupal.</p>
-
-<h5>EXIF</h5>
-
-<p>JPEG images may also be tagged with information about the camera settings used to take the picture.</p>
-
-<p>This module can read EXIF information about your images via <a href="http://www.sentex.net/~mwandel/jhead/">jhead</a>.</p>
-
-<h5>Image Storage</h5>
-
-<p>All directories must be readable and writeable for the user id that the web server runs under.</p>
-
-<h5>Verifiying Configuration</h5>
-
-<p>You can verify your directory and image library application configuration by visiting the <a href="<?php echo $base_url; ?>/?q=admin/image">image mangagement administration scrren</a>.</p>
-
-<h4>Adding images into other nodes</h4>
-<p>Sometimes, you want to add an image to another node like a blog entry or a story.
- You may do this by creating an image node in Drupal for the target image, and then
- referencing that image in your story, blog, etc. To enable this feature and learn the
- proper syntax, visit the <a href="<?php echo $base_url; ?>/?q=admin/system/filters">filters configuration screen</a>.</p>
-
-<?php
-}
 
 // Alternative function to GD 1.x imageCopyResized which produce better results
 // (found on www.php.net)
