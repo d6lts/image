@@ -395,7 +395,7 @@ function image_form(&$node, &$param) {
   $output .= implode("", taxonomy_node_form("image", $node));
 
   if ($node->image_path) {
-    $output .= form_item(t("Thumbnail"), "<img src=\"$base_url/$node->thumb_path\">");
+    $output .= form_item(t("Thumbnail"), "<img src=\"$base_url/$node->thumb_path\" />");
   }
 
   if ($node->exif) {
@@ -1410,10 +1410,10 @@ function node_image_content(&$node, $rand, $main = 0, $page = 0) {
 
   if ($main) {
     if($rand) {
-      $node->teaser = "<img class=\"thumb\" src=\"$base_url/$node->thumb_path?".$rand."\">" . $node->teaser;
+      $node->teaser = "<img class=\"thumb\" src=\"$base_url/$node->thumb_path?".$rand."\" />" . $node->teaser;
     }
     else {
-      $node->teaser = "<img class=\"thumb\" src=\"$base_url/$node->thumb_path\">" . $node->teaser;
+      $node->teaser = "<img class=\"thumb\" src=\"$base_url/$node->thumb_path\" />" . $node->teaser;
     }
   }
   else {
@@ -1457,10 +1457,10 @@ function node_image_content(&$node, $rand, $main = 0, $page = 0) {
       $fname = $node->image_list[$res][fname];
     }
     if($rand) {
-      $node->body = "<img class=\"image\" src=\"$base_url/$fname?".$rand."\">". $node->body;
+      $node->body = "<img class=\"image\" src=\"$base_url/$fname?".$rand."\" />". $node->body;
     }
     else {
-      $node->body = "<img class=\"image\" src=\"$base_url/$fname\">". $node->body;
+      $node->body = "<img class=\"image\" src=\"$base_url/$fname\" />". $node->body;
     }
   }
 }
@@ -1482,7 +1482,7 @@ function theme_image_gallery_home($albums, $gallery_description = '') {
     foreach ($albums as $tid => $album) {
       $output .= "<tr>\n<td align=\"left\">";
       if ($album->thumb) {
-        $output .= l("<img src=\"$base_url/". $album->thumb ."\" border=\"0\">", "image/tid/$album->tid");
+        $output .= l("<img src=\"$base_url/". $album->thumb ."\" border=\"0\" />", "image/tid/$album->tid");
       }
       $output .= "</td>\n<td>";
       $output .= "<p class=\"album-name\">". l($album->name, "image/tid/$album->tid") ."</p>";
@@ -1529,7 +1529,7 @@ function theme_image_gallery_album($images, $subalbums = NULL) {
       if ($n % $thumbs_cols == 0) {
         $output .= "<tr>";
       }
-      $output .= "<td valign=\"top\"><div align=\"center\">".l("<img src=\"$base_url/".$image->thumb_path."\" border=\"0\">", "node/$image->nid")."</div><p class=\"title\">".$image->title."</p><p class=\"teaser\">".$image->teaser."</p></td>\n";
+      $output .= "<td valign=\"top\"><div align=\"center\">".l("<img src=\"$base_url/".$image->thumb_path."\" border=\"0\" />", "node/$image->nid")."</div><p class=\"title\">".$image->title."</p><p class=\"teaser\">".$image->teaser."</p></td>\n";
 
       if ($n % $thumbs_cols == $thumbs_cols - 1) {
         $output .= "</tr>";
@@ -1632,7 +1632,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
           if ($type == "slow") {
             if ($edit["thumb"]) {
               $output .= l($file, "node/add/image/file/". $dir.$file);
-              $output .= " <img src=\"$base_url/$dir$file\" height=\"100\">";
+              $output .= " <img src=\"$base_url/$dir$file\" height=\"100\" />";
             }
             else {
               $output .= l($file, "node/add/image/file/". $dir.$file);
@@ -1818,4 +1818,3 @@ function _image_id($filename = '', $nid = 0) {
 }
 
 ?>
-
