@@ -180,7 +180,7 @@ function image_link($type, $node, $main = 0) {
   }
 
   // Add admin items if the user has administer permission
-  if ($type == "admin" && user_access("administer images")) {
+  if ($type == "system" && user_access("administer images")) {
     $l_iptc = l("IPTC", "admin/image/help#iptc");
 
     menu("admin/image", "image management", "_image_check_configuration", NULL, 8);
@@ -190,13 +190,13 @@ function image_link($type, $node, $main = 0) {
   }
 
   // Add a create link for images if the user has create permission
-  if ($type == "menu.create" && (user_access("create images") || _image_can_personal())) {
-    $links[] = l(t("create image"), "node/add/image", array("title" => t("Add a new image.")));
+  if ($type == "system" && (user_access("create images") || _image_can_personal())) {
+    menu("node/add/image", t("create image"), "image_page", NULL, 0);
   }
 
   // Add view personal gallery link if the user has personal gallery permission
-  if ($type == "menu.view" && user_access("access images") && _image_can_personal()) {
-    $links[] = l(t("view photo gallery"), "image/uid/$user->uid", array("title" => t("View your personal photo gallery.")));
+  if ($type == "system" && user_access("access images") && _image_can_personal()) {
+    menu("image/uid/$user->uid", t("view photo gallery"), "image_page", NULL, 1);
   }
 
   // Add links to an image node
@@ -1603,65 +1603,71 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
 }
 
 function _image_check_configuration() {
+
+  $output = "";
+
   // since we have to deal with a different directories, we check for correct permissions
   $dirs = array(
     "Default image path" => array("image_default_path", "images/"),
     "Default thumb path" => array("image_default_thumb_path", "images/thumbs/"),
     "Temporary image path" => array("image_temp_path", "./")
     );
+
   foreach ($dirs as $description => $key) {
-    print $description.":";
+    $output .= $description.":";
     if (!file_exists(variable_get($key[0], $key[1]))) {
-      print "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#$key[0]");
+      $output .= "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#$key[0]");
     }
     else if (!is_writable(variable_get($key[0], $key[1]))) {
-      print "<div class=\"error\">NOT WRITABLE - change permissions on server";
+      $output .= "<div class=\"error\">NOT WRITABLE - change permissions on server";
     }
     else if (substr(variable_get($key[0], $key[1]), -1) != "/") {
-      print "<div class=\"error\">PATH DOES NOT END in SLASH (/) - fix in ". l("Site Configuration", "admin/system/modules/image#$key[0]");
+      $output .= "<div class=\"error\">PATH DOES NOT END in SLASH (/) - fix in ". l("Site Configuration", "admin/system/modules/image#$key[0]");
     }
     else {
-      echo "<div class=\"ok\">OK";
+      $output .= "<div class=\"ok\">OK";
     }
-    echo "</div>";
+    $output .= "</div>";
   }
 
   // finally we also check for convert
   $convert = variable_get("image_convert_path", "misc/image/convert.exe");
-  echo "ImageMagick convert:";
+  $output .= "ImageMagick convert:";
   if ($convert) {
     if (!file_exists($convert)) {
-      echo "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#image_convert");
+      $output .= "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#image_convert");
     }
     else {
-      echo "<div class=\"ok\">OK";
+      $output .= "<div class=\"ok\">OK";
     }
   }
   else {
-    echo "<div class=\"disabled\">disabled";
+    $output .= "<div class=\"disabled\">disabled";
   }
-  echo "</div>";
+  $output .= "</div>";
 
   // and jhead
   $jhead = variable_get("image_jhead_path", "");
-  echo "jhead:";
+  $output .= "jhead:";
   if ($jhead) {
     if (!file_exists($jhead)) {
-      echo "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#image_jhead");
+      $output .= "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#image_jhead");
     }
     else {
-      echo "<div class=\"ok\">OK";
+      $output .= "<div class=\"ok\">OK";
     }
   }
   else {
-    echo "<div class=\"disabled\">disabled";
+    $output .= "<div class=\"disabled\">disabled";
   }
-  echo "</div>";
+  $output .= "</div>";
 
   // check if he assigned a vocabulary, for photo album navigation
   if (!variable_get("image_nav_vocabulary", "")) {
-    echo "<div class=\"error\">Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ". l("Site Configuration", "admin/system/modules/image#image_nav_vocabulary"). "</div>";
+    $output .= "<div class=\"error\">Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ". l("Site Configuration", "admin/system/modules/image#image_nav_vocabulary"). "</div>";
   }
+  
+  return $output;
 }
 
 
