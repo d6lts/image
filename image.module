@@ -84,7 +84,7 @@ function image_node_name() {
  * Permissions this module exposes.
  */
 function image_perm() {
-  return array("has personal image gallery", "manipulate images", "create images", "administer images");
+  return array('access images', 'has personal image gallery', 'manipulate images', 'create images', 'administer images');
 }
 
 /**
