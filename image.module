@@ -504,7 +504,7 @@ function image_validate(&$node) {
             }
 
             // Pull out iptc data and populate any node elements that are not already set.
-            if ($proposed = _image_iptc_map($image_details['ipct_info'])) {
+            if ($proposed = _image_iptc_map($image_details['iptc_info'])) {
               foreach ($proposed as $key => $value) {
                 if (!$node->$key) {
                   $node->$key = $value;
@@ -557,7 +557,7 @@ function image_validate(&$node) {
       $image_details = _get_image_details($node->image_path);
     }
 
-    $node->iptc = $image_details['ipct_info'];
+    $node->iptc = $image_details['iptc_info'];
     $node->exif = _image_get_exif($node->image_path);
 
     $node->format = strtolower($image_details['type']);
@@ -1491,7 +1491,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
             $node->image_path = _image_tempname($node);
             $node->thumb_path = _image_tempthumbname($node);
 
-            $node->iptc = $image_details['ipct_info'];
+            $node->iptc = $image_details['iptc_info'];
             $node->exif = _image_get_exif($node->image_path);
 
             $node->format = strtolower($image_details['type']);
