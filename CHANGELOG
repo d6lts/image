@@ -53,7 +53,7 @@ added some Help, particularly for IPTC and directory upload functions. much more
 
 12 June 2002
 ------------------
-- temporary revert back to method_exists instead of theme_invoke()s, which are still there but commented
+- temporary revert back to method_exists instead of theme()s, which are still there but commented
 - fixed taxonomy_get_tree calls
 
 
@@ -63,7 +63,7 @@ added some Help, particularly for IPTC and directory upload functions. much more
 - applied patch to cron (infinite loop) by Stefano
 - applied patch to filter (more options) by Stefano, but params are now optional
 - applied patch to _gallery_inline_img (simpler html) by Stefano
-- used theme_invoke everywhere, and cleaned up some references
+- used theme everywhere, and cleaned up some references
 - fixed two bugs in _image_album_properties (found by Simon): that function was completely wrong.
 
 

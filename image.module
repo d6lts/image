@@ -18,7 +18,7 @@ function image_perm() {
 }
 
 
-function image_conf_options() {
+function image_settings() {
   $output .= "<a name=\"image_default_path\"></a>";
   $output .= form_textfield("Default image path", "image_default_path", variable_get("image_default_path", "images/"), 30, 255, "Default path for uploaded images relative to your drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end.");
   $output .= "<a name=\"image_default_thumb_path\"></a>";
@@ -235,7 +235,7 @@ function image_view($node, $main = 0) {
 
   // the following line should really be deleted and replaced with the line after that. but doing so would kill 4.0 compatibility
   method_exists($theme, "image_render_node") ? $theme->image_view_node($node, $image_path, $main) : image_render_node($node, $image_path, $main);
-  //theme_invoke("image_render_node", $node, $image_path, $main);
+  //theme("image_render_node", $node, $image_path, $main);
 }
 
 function image_form(&$node, &$help, &$error, &$param) {
@@ -462,7 +462,7 @@ function image_filter($text) {
         $img->vspace = $match[7][$n];
         $img->border = $match[9][$n];
         $match[10][] = method_exists($theme, "image_inline_img") ? $theme->image_inline_img($img) : image_inline_img($img);
-        //$match[10][] = theme_invoke("image_inline_img", $img);
+        //$match[10][] = theme("image_inline_img", $img);
         $n++;
       }
 
@@ -956,7 +956,7 @@ function image_page() {
       $null = array();
       $theme->header();
       $theme->box(t("Photo galleries"), method_exists($theme, "image_gallery_album") ? $theme->image_gallery_album($null, $null, $images, array()) : image_gallery_album($null, $null, $images, array()));
-      //$theme->box(t("Photo galleries"), theme_invoke("image_gallery_album", $null, $null, $images, array()));
+      //$theme->box(t("Photo galleries"), theme("image_gallery_album", $null, $null, $images, array()));
 
       $theme->footer();
     }
@@ -967,7 +967,7 @@ function image_page() {
 
       $theme->header();
       $theme->box(t("Photo galleries"), method_exists($theme, "image_gallery_home") ? $theme->image_gallery_home($albums) : image_gallery_home($albums));
-      //$theme->box(t("Photo galleries"), theme_invoke("image_gallery_home", $albums));
+      //$theme->box(t("Photo galleries"), theme("image_gallery_home", $albums));
       $theme->footer();
     }
     else {
@@ -1012,7 +1012,7 @@ function image_page() {
 
       $theme->header();
       $theme->box(t("Photo galleries"), method_exists($theme, "image_gallery_album") ? $theme->image_gallery_album($parents, $subalbums, $images, $data) : image_gallery_album($parents, $subalbums, $images, $data));
-      //$theme->box(t("Photo galleries"), theme_invoke("image_gallery_album", $parents, $subalbums, $images, $data));
+      //$theme->box(t("Photo galleries"), theme("image_gallery_album", $parents, $subalbums, $images, $data));
       $theme->footer();
     }
   }
@@ -1180,7 +1180,7 @@ function image_gallery_album($parents, $subalbums, $images, $data) {
   }
 
   $sub = method_exists($theme, "image_gallery_home") ? $theme->image_gallery_home($subalbums) : image_gallery_home($subalbums);
-  //$sub = theme_invoke("image_gallery_home", $subalbums);
+  //$sub = theme("image_gallery_home", $subalbums);
   if ($sub) {
     $output .= $sub."<hr>";
   }
