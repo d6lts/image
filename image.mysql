@@ -12,3 +12,5 @@ CREATE TABLE image (
   personal tinyint not null,
   weight tinyint not null
 );
+
+ALTER TABLE image ADD INDEX(nid);
