@@ -1,3 +1,8 @@
+22 June 2004
+---------------
+[Matt Westgate]
+- Updated to be compatible with latest menu and path changes.
+
 7 February 2004
 ---------------
 [Steven Wittens]
@@ -59,7 +64,7 @@ applied by Gerhard Killesreiter
 added image.pgsql contributed by James Arthur <j_a_arthur@yahoo.com>.
 
 
-3 October 2002 
+3 October 2002
 ----------------------
 [Gerhard Killesreiter]
 
@@ -129,7 +134,7 @@ added some Help, particularly for IPTC and directory upload functions. much more
 
 3 June 2002
 ------------------
-- correct syntax (without &) in getimagesize 
+- correct syntax (without &) in getimagesize
 - misc cleanup and fixes
 
 

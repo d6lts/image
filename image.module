@@ -43,10 +43,10 @@ function image_help($section = "admin/help#image") {
       <li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>
       <li>Add custom titles, descriptions, etc.</li></ul>");
       break;
-    case 'admin/system/modules#description':
+    case 'admin/modules#description':
       $output = t("Allow users to upload images and to display them in shared and personal image galleries.");
       break;
-    case 'admin/system/modules/image':
+    case 'admin/modules/image':
       $output = t("Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced.");
       break;
     case 'node/add#image':
@@ -71,12 +71,12 @@ function image_help($section = "admin/help#image") {
 function image_block($op = "list", $delta = 0) {
     // listing of blocks, such as on the admin/system/block page
     if ($op == "list") {
-	$blocks[0]["info"] = t("Image Gallery");
+        $blocks[0]["info"] = t("Image Gallery");
     } else {
-	// our block content
-	$blocks["subject"] = t(variable_get("image_block_title", "Image Galleries"));
-	$albums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
-	$blocks["content"] = theme_image_block($albums);
+        // our block content
+        $blocks["subject"] = t(variable_get("image_block_title", "Image Galleries"));
+        $albums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
+        $blocks["content"] = theme_image_block($albums);
     }
     return $blocks;
 }
@@ -205,42 +205,8 @@ function image_link($type, $node, $main = 0) {
 
   $links = array();
 
-  // Add page level link if the user has access permissions and a vocabulary has been selected for navigation
-  if ($type == "page") {
-    if (user_access("access images") && variable_get("image_nav_vocabulary", "")) {
-      $links[] = l(t("image galleries"), "image");
-    }
-  }
-
-  if ($type == "system") {
-    // Add admin items if the user has administer permission
-    if (user_access("administer images")) {
-      menu("admin/image", t("images"), "_image_check_configuration");
-      menu("admin/image/dir_upload/slow", t("directory upload: slow"), "_image_dir_upload");
-      menu("admin/image/dir_upload/fast", t("directory upload: fast"), "_image_dir_upload_fast");
-    }
-
-    // Add a create link for images if the user has create permission
-    if ((user_access("create images") || _image_can_personal())) {
-      menu("node/add/image", t("image"), "node_page");
-    }
-
-    // Add view personal gallery link if the user has personal gallery permission
-    if (user_access("access images") && _image_can_personal()) {
-      menu("image/uid/$user->uid", t("my image gallery"), "image_page");
-    }
-
-    if (user_access("access images") && variable_get("image_nav_vocabulary","")) {
-      menu("image", t("image galleries"), "image_page", 0, 1);
-    }
-  }
-
   // Add links to an image node
   if ($type == "node" && $node->type == "image") {
-    // If you have access to update this node display update link
-    if (image_access("update", $node)) {
-      $links[] = l(t("edit this image"), "node/edit/$node->nid", array("title" => t("Edit this image.")));
-    }
 
     // Display personal gallery links if this is a personal gallery image and personal image gallery is enabled
     if ($node->personal && _image_can_personal()) {
@@ -303,17 +269,46 @@ function image_link($type, $node, $main = 0) {
       }
 
       if ($prev) {
-        $links[] = l(t("previous image"), "node/view/$prev->nid", array("title" => $prev->title));
+        $links[] = l(t("previous image"), "node/$prev->nid", array("title" => $prev->title));
       }
 
       if ($next) {
-        $links[] = l(t("next image"), "node/view/$next->nid", array("title" => $next->title));
+        $links[] = l(t("next image"), "node/$next->nid", array("title" => $next->title));
       }
     }
 
   }
 
   return $links;
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function image_menu() {
+  global $user;
+
+  $items = array();
+  $access = user_access('access images');
+
+  // Add page level link if user has access permissions
+ // and a vocabulary has been selected for navigation
+ if (variable_get('image_nav_vocabulary', '')) {
+   $items[] = array('path' => 'image', 'title' => t('image galleries'), 'callback' => 'image_page', 'access' => $access, 'type' => MENU_SUGGESTED_ITEM);
+ }
+
+  if (_image_can_personal()) {
+    $items[] = array('path' => "image/uid/$user->uid", 'title' => t('my image gallery'), 'access' => $access);
+    $items[] = array('path' => 'node/add/image', 'title' => t('image'), 'callback' => '_image_check_configuration', 'access' => user_access('create images'));
+  }
+
+  // Add admin items if the user has administer permission
+  $access = user_access('administer images');
+  $items[] = array('path' => 'admin/image', 'title' => t('images'), 'callback' => '_image_check_configuration', 'access' => $access);
+  $items[] = array('path' => 'admin/image/dir_upload/slow', 'title' => t('directory upload: slow'), 'callback' => '_image_dir_upload', 'access' => $access, 'type' => MENU_LOCAL_TASK);
+  $items[] = array('path' => 'admin/image/dir_upload/fast', 'title' => t('directory upload: fast'), 'callback' => '_image_dir_upload_fast','access' => $access, 'type' => MENU_LOCAL_TASK);
+
+  return $items;
 }
 
 /**
@@ -1380,7 +1375,7 @@ function theme_image_gallery_album($images, $subalbums = NULL) {
       if ($n % $thumbs_cols == 0) {
         $output .= "<tr>";
       }
-      $output .= "<td valign=\"top\"><div align=\"center\">".l("<img src=\"$base_url/".$image->thumb_path."\" border=\"0\">", "node/view/$image->nid")."</div><p class=\"title\">".$image->title."</p><p class=\"teaser\">".$image->teaser."</p></td>\n";
+      $output .= "<td valign=\"top\"><div align=\"center\">".l("<img src=\"$base_url/".$image->thumb_path."\" border=\"0\">", "node/$image->nid")."</div><p class=\"title\">".$image->title."</p><p class=\"teaser\">".$image->teaser."</p></td>\n";
 
       if ($n % $thumbs_cols == $thumbs_cols - 1) {
         $output .= "</tr>";
@@ -1408,7 +1403,7 @@ function theme_image_gallery_album($images, $subalbums = NULL) {
  */
 function theme_image_inline_img($img) {
   global $base_url;
-  return l("<img src=\"$base_url/$img->thumb_path\" align=\"$img->align\" border=\"$img->border\" hspace=\"$img->hspace\" vspace=\"$img->vspace\" alt=\"$img->teaser\" />", "node/view/$img->nid");
+  return l("<img src=\"$base_url/$img->thumb_path\" align=\"$img->align\" border=\"$img->border\" hspace=\"$img->hspace\" vspace=\"$img->vspace\" alt=\"$img->teaser\" />", "node/$img->nid");
 }
 
 /**
@@ -1425,7 +1420,7 @@ function theme_image_pager($tags = "", $limit = 10, $element = 0, $attributes = 
 function theme_image_block($albums) {
     $output = "<div class=\"menu\"><ul>";
     foreach ($albums as $album) {
-	$output .= "<li class=\"collapsed\">" . l($album->name, "image/tid/" . $album->tid) . "</li>";
+        $output .= "<li class=\"collapsed\">" . l($album->name, "image/tid/" . $album->tid) . "</li>";
     }
     $output .= "</ul></div>";
     return $output;
@@ -1577,7 +1572,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
               }
               $alreadyprinted = true;
             }
-            $output .= "--  ". t("image") .": ". l($node->title, "node/view/$nid"). "<br />";
+            $output .= "--  ". t("image") .": ". l($node->title, "node/$nid"). "<br />";
           }
         }
         else {
