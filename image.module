@@ -108,13 +108,13 @@ function image_settings() {
   $output .= form_textfield(t("Default max image size"), "image_default_max_weight", variable_get("image_default_max_weight", "200"), 6, 255, t("KBytes."));
   $output .= form_textfield(t("Default max image resolution"), "image_default_max_size", variable_get("image_default_max_size", "1024x768"), 10, 255, t("Example: 800x600."));
 
-  $output .= form_textfield(t("List of valid resolutions"), "image_default_resolutions", variable_get("image_default_resolutions", "640x400,800x600,1024x768,1600x1200"), 60, 255, t("This is a list of resolutions that the image can be displayed at as well as its original size"));
+  $output .= form_textfield(t("List of valid resolutions"), "image_default_resolutions", variable_get("image_default_resolutions", "640x480,800x600,1024x768,1600x1200"), 60, 255, t("This is a list of resolutions that the image can be displayed at as well as its original size"));
   // build array of resolutions
-  foreach (explode(",", variable_get("image_default_resolutions", "640x400,800x600,1024x768,1600x1200")) as $v) {
+  foreach (explode(",", variable_get("image_default_resolutions", "640x480,800x600,1024x768,1600x1200")) as $v) {
     $resolution[$v] = $v;
   }
-  $output .= form_select(t("Default image display resolution"), "image_default_resolution", variable_get("image_default_resolution", "640x400"), $resolution, t("Select a resolution that you wish the image to be displayed at if no resolution is specified."));
-  $output .= form_select(t("Specify resolutions that will be generated at time of editing."), "image_static_resolution", variable_get("image_static_resolution", array("640x400")), $resolution, t("This is a list of the resolutions that will be created at the time of editing. Ones not selected will generated and saved the first time they are displayed."), array("size" => "4"), 1);
+  $output .= form_select(t("Default image display resolution"), "image_default_resolution", variable_get("image_default_resolution", "640x480"), $resolution, t("Select a resolution that you wish the image to be displayed at if no resolution is specified."));
+  $output .= form_select(t("Specify resolutions that will be generated at time of editing."), "image_static_resolution", variable_get("image_static_resolution", array("640x480")), $resolution, t("This is a list of the resolutions that will be created at the time of editing. Ones not selected will generated and saved the first time they are displayed."), array("size" => "4"), 1);
 
   $output .= form_textfield(t("Default thumbnail resolution"), "image_default_thumb_size", variable_get("image_default_thumb_size", "100"), 10, 255, t("Default size of thumbnails: format will be the same as original image. Use just one dimension, and put a \"x\" to specify height. Examples: \"100\" for width of 100; \"x200\" for height of 200."));
 
@@ -216,7 +216,7 @@ function image_link($type, $node, $main = 0) {
   // Add links to an image node.
 
   if ($type == "node" && $node->type == "image") {
-    foreach(explode(",", variable_get("image_default_resolutions", "640x400,800x600,1024x768,1600x1200")) as $v) {
+    foreach(explode(",", variable_get("image_default_resolutions", "640x480,800x600,1024x768,1600x1200")) as $v) {
       $max_dim = split("x", $v);
       if ($node->width > $max_dim[0] || $node->height > $max_dim[1]) {
         $links[] = l($v, "node/$node->nid", array(), "res=$v");
@@ -624,7 +624,7 @@ function image_validate(&$node) {
     // Build additional static images.
     // Add to image_list any default resolutions that are missing.
 
-    foreach (variable_get('image_static_resolution', array('640x400')) as $v) {
+    foreach (variable_get('image_static_resolution', array('640x480')) as $v) {
       if (!array_key_exists($v, $node->image_list)) {
         $node->image_list[$v] = '';
       }
@@ -935,7 +935,7 @@ function image_display() {
   if ($_GET['res']) {
 
     list($w, $h) = explode("x", $_GET['res']);
-    $valid_res = explode(",", variable_get("image_default_resolutions", "640x400,800x600,1024x768,1600x1200"));
+    $valid_res = explode(",", variable_get("image_default_resolutions", "640x480,800x600,1024x768,1600x1200"));
 
     // See if the original size if sufficent for this resolution. If so, no need to go through
     // the generate loop.
@@ -1420,14 +1420,14 @@ function node_image_content(&$node, $rand, $main = 0, $page = 0) {
     if ($_GET["res"]) {
       $res = $_GET["res"];
       if ($res != "original") {
-        $valid_res = explode(",", variable_get("image_default_resolutions", "640x400,800x600,1024x768,1600x1200"));
+        $valid_res = explode(",", variable_get("image_default_resolutions", "640x480,800x600,1024x768,1600x1200"));
         if (!in_array($res, $valid_res)) {
-          $res = variable_get("image_default_resolution", "640x400");
+          $res = variable_get("image_default_resolution", "640x480");
         }
       }
     }
     else {
-      $res = variable_get("image_default_resolution", "640x400");
+      $res = variable_get("image_default_resolution", "640x480");
     }
     if ($res == "original") {
       $fname = $node->image_path;
