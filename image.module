@@ -309,22 +309,22 @@ function image_menu($may_cache) {
 
   if ($may_cache) {
     $access = user_access('access images');
-  
+
     // Add page level link if user has access permissions
     // and a vocabulary has been selected for navigation
     if (variable_get('image_nav_vocabulary', '')) {
       $items[] = array('path' => 'image', 'title' => t('image galleries'), 'callback' => 'image_page', 'access' => $access, 'type' => MENU_SUGGESTED_ITEM);
     }
-  
+
     // Add view personal gallery link if the user has personal gallery permission
     if (_image_can_personal()) {
       $items[] = array('path' => "image/uid/$user->uid", 'title' => t('my image gallery'), 'access' => $access);
     }
     $items[] = array('path' => 'image/view', 'title' => t('display image'), 'callback' => 'image_display', 'access' => $access, 'type' => MENU_CALLBACK);
-  
+
     // Add a create link for images if the user has create permission
     $items[] = array('path' => 'node/add/image', 'title' => t('image'), 'access' => (user_access('create images') || _image_can_personal()));
-  
+
     // Add admin items if the user has administer permission
     $access = user_access('administer images');
     $items[] = array('path' => 'admin/image', 'title' => t('images'), 'callback' => '_image_check_configuration', 'access' => $access);
@@ -1516,27 +1516,35 @@ function theme_image_gallery_home($albums, $gallery_description = '') {
 }
 
 /**
- * Theme function to render image gallery album.
+ * Override theme function to render image gallery album.
  */
 function theme_image_gallery_album($images, $subalbums = NULL) {
   global $base_url;
-
-  $output = '';
-
-  if ($subalbums) {
-    $sub = theme("image_gallery_home", $subalbums);
-    if ($sub) {
-      $output .= $sub;
-    }
-  }
   $n = 0;
+  $x = 0;
+  $td_top = "";
+  $td_bottom = "";
   $thumbs_cols = variable_get("image_gallery_thumb_cols", "3");
   $thumbs_rows = variable_get("image_gallery_thumb_rows", "5");
+  if($thumbs_cols > 0){
+	  $width = round(100 / $thumbs_cols);
+  }
+  if ($subalbums) {
+    $sub = theme("image_gallery_home", $subalbums);
+    if ($sub && count($images) > 0) {
+      $output .= $sub."<hr>";
+    } else if ($sub && count($images) == 0){
+    	$output .= $sub;
+    }
+  }
   if ($images) {
-    $output .= "\n<div id=\"image\">\n<table width=\"100%\" cellpadding=\"10\">";
+    $output .= "\n<div id=\"image\">\n<table cellspacing=\"0\">";
     foreach ($images as $image) {
+    	$details = getimagesize($image->thumb_path);
+
       if ($n % $thumbs_cols == 0) {
-        $output .= "<tr>";
+        $td_top .= "\n<tr class=\"gallery_album_upper_row\">";
+        $td_bottom .= "\n<tr class=\"gallery_album_lower_row\">";
       }
       // check if the thumbnail file exists, and create it if it doesn't
       if (!file_exists($image->thumb_path)) {
@@ -1546,20 +1554,37 @@ function theme_image_gallery_album($images, $subalbums = NULL) {
       $output .= "<td valign=\"top\"><div align=\"center\">".l("<img alt=\"".$image->title."\" ".$size[3]." src=\"$base_url/".$image->thumb_path."\" border=\"0\" />", "node/$image->nid")."</div><p class=\"title\">".$image->title."</p><p class=\"teaser\">".$image->teaser."</p></td>\n";
 
       if ($n % $thumbs_cols == $thumbs_cols - 1) {
-        $output .= "</tr>";
+        $td_top .= "\n</tr>";
+        $td_bottom .= "\n</tr>";
+        $output .= $td_top;
+        $output .= $td_bottom;
+        $td_top = $td_bottom = "";
+        $z = 0;
       }
-
+	  $z++;
       $n++;
+	}
+
+    // fill in the remaining cells for this row.
+    for(;$z < $thumbs_cols; $z++){
+        $td_top .= "\n<td></td>";
+        $td_bottom .= "\n<td></td>";
     }
-    if ($n % $thumbs_cols != 0) {
-      $output .= "</tr>";
+
+    // if we started a last row, close it.
+    if ($td_bottom != ""){
+        $td_top .= "\n</tr>";
+        $td_bottom .= "\n</tr>";
+        $output .= $td_top;
+        $output .= $td_bottom;
     }
-    $output .= "</table>\n</div>\n";
+
+    $output .= "\n</table>\n</div>\n";
   }
 
   // Use standard pager. To customize, define a theme_pager() function in your theme. See pager.inc.
   if ($pager = theme("pager", NULL, $thumbs_rows * $thumbs_cols, 0)) {
-    $output .= $pager;
+      $output .= $pager;
   }
 
   return $output;
@@ -1577,12 +1602,12 @@ function theme_image_pager($tags = "", $limit = 10, $element = 0, $attributes = 
  * Theme function to render the image block contents
  */
 function theme_image_block($albums) {
-    $output = "<div class=\"menu\"><ul>";
-    foreach ($albums as $album) {
-        $output .= "<li class=\"collapsed\">" . l($album->name, "image/tid/" . $album->tid) . "</li>";
-    }
-    $output .= "</ul></div>";
-    return $output;
+  $output = "<div class=\"menu\"><ul>";
+  foreach ($albums as $album) {
+      $output .= "<li class=\"collapsed\">" . l($album->name, "image/tid/" . $album->tid) . "</li>";
+  }
+  $output .= "</ul></div>";
+  return $output;
 }
 
 /****
