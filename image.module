@@ -280,17 +280,20 @@ function image_form(&$node, &$help, &$error, &$param) {
     else {
       // **** preview of a new image ****
       
-      // if blank, populate title/body/teaser with IPTC data
-      foreach (_image_iptc_map(_image_tempname($node)) as $key => $value) {
-        if (!$node->$key) $node->$key = $value;
-        unset($error["$key"]); //avoid error msg about missing 'title'
-      }
-      
       if (!$node->image_id) {
         $upload_text = "<div style=\"color: red;\" class=\"error\">". t("You must upload an image.") ."</div>";
         $error[] = 1;
       }
       else {
+        
+        // if blank, populate title/body/teaser with any available IPTC data 
+        if ($proposed = _image_iptc_map(_image_tempname($node))) {        
+          foreach ($proposed as $key => $value) {
+            if (!$node->$key) $node->$key = $value;
+            unset($error["$key"]); //avoid error msg about missing 'title'
+          }
+        }  
+        
         $upload_text = t("Click \"Browse...\" to select an image to upload. If you don't want to change the image you don't need to upload again.");
         if (!$node->image_name) {
           if ($HTTP_POST_FILES["edit"]["name"]["image"]) {
