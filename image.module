@@ -213,7 +213,7 @@ function image_access($op, $node) {
 
 
 function image_view($node, $main = 0) {
-  global $theme, $op;
+  global $op;
 
   $term_data = array_shift(taxonomy_node_get_terms($node->nid));
   if (!$term_data) {
@@ -234,7 +234,7 @@ function image_view($node, $main = 0) {
   }
 
   // the following line should really be deleted and replaced with the line after that. but doing so would kill 4.0 compatibility
-  method_exists($theme, "image_render_node") ? $theme->image_view_node($node, $image_path, $main) : image_render_node($node, $image_path, $main);
+  method_exists("image_render_node") ? $theme->image_view_node($node, $image_path, $main) : image_render_node($node, $image_path, $main);
   //theme("image_render_node", $node, $image_path, $main);
 }
 
@@ -461,7 +461,7 @@ function image_filter($text) {
         $img->hspace = $match[5][$n];
         $img->vspace = $match[7][$n];
         $img->border = $match[9][$n];
-        $match[10][] = method_exists($theme, "image_inline_img") ? $theme->image_inline_img($img) : image_inline_img($img);
+        $match[10][] = method_exists("image_inline_img") ? $theme->image_inline_img($img) : image_inline_img($img);
         //$match[10][] = theme("image_inline_img", $img);
         $n++;
       }
@@ -913,7 +913,7 @@ function _images_transform_form($size, $bytes) {
 ****/
 
 function image_page() {
-  global $theme, $vid, $tid, $uid, $sortby, $image_per_page, $nf, $page;
+  global $vid, $tid, $uid, $sortby, $image_per_page, $nf, $page;
 
   if (user_access("access images") && variable_get("image_nav_vocabulary", "")) {
     if ($uid) {
@@ -954,21 +954,21 @@ function image_page() {
       }
 
       $null = array();
-      $theme->header();
-      $theme->box(t("Photo galleries"), method_exists($theme, "image_gallery_album") ? $theme->image_gallery_album($null, $null, $images, array()) : image_gallery_album($null, $null, $images, array()));
-      //$theme->box(t("Photo galleries"), theme("image_gallery_album", $null, $null, $images, array()));
+      theme("header");
+      theme("box", t("Photo galleries"), method_exists("image_gallery_album") ? $theme->image_gallery_album($null, $null, $images, array()) : image_gallery_album($null, $null, $images, array()));
+      //theme("box", t("Photo galleries"), theme("image_gallery_album", $null, $null, $images, array()));
 
-      $theme->footer();
+      theme("footer");
     }
     else if (!$tid) {
       // show albums
       $albums = taxonomy_get_children(0, variable_get("image_nav_vocabulary", ""));
       $albums = _image_album_properties($albums);
 
-      $theme->header();
-      $theme->box(t("Photo galleries"), method_exists($theme, "image_gallery_home") ? $theme->image_gallery_home($albums) : image_gallery_home($albums));
-      //$theme->box(t("Photo galleries"), theme("image_gallery_home", $albums));
-      $theme->footer();
+      theme("header");
+      theme("box", t("Photo galleries"), method_exists("image_gallery_home") ? $theme->image_gallery_home($albums) : image_gallery_home($albums));
+      //theme("box", t("Photo galleries"), theme("image_gallery_home", $albums));
+      theme("footer");
     }
     else {
       // browse albums; show subalbums and thumbs
@@ -1010,16 +1010,16 @@ function image_page() {
         $n++;
       }
 
-      $theme->header();
-      $theme->box(t("Photo galleries"), method_exists($theme, "image_gallery_album") ? $theme->image_gallery_album($parents, $subalbums, $images, $data) : image_gallery_album($parents, $subalbums, $images, $data));
-      //$theme->box(t("Photo galleries"), theme("image_gallery_album", $parents, $subalbums, $images, $data));
-      $theme->footer();
+      theme("header");
+      theme("box", t("Photo galleries"), method_exists("image_gallery_album") ? $theme->image_gallery_album($parents, $subalbums, $images, $data) : image_gallery_album($parents, $subalbums, $images, $data));
+      //theme("box", t("Photo galleries"), theme("image_gallery_album", $parents, $subalbums, $images, $data));
+      theme("footer");
     }
   }
   else {
-    $theme->header();
-    $theme->box(t("Access denied"), message_access());
-    $theme->footer();
+    theme("header");
+    theme("box", t("Access denied"), message_access());
+    theme("footer");
   }
 }
 
@@ -1120,14 +1120,14 @@ function _image_album_properties($albums) {
 ***/
 
 function image_render_node($node, $image_path, $main = 0) {
-  global $theme, $op;
+  global $op;
   /*
   $output .= "<p align='center'><b>". check_output($node->title) ."</b></p><p align='center'><img src=\"$image_path?".$rand."\"></p><p align='center'>". check_output($node->body) ."</p>";
 
   if ($op != t("Preview")) {
-    $output .= "<p>". $theme->links(link_node($node, $main)) ."</p>";
+    $output .= "<p>". theme("links", link_node($node, $main)) ."</p>";
   }
-  $theme->box(check_output($node->title), $output);
+  theme("box", check_output($node->title), $output);
   */
 
   if(variable_get("image_random_suffix", "0")){
@@ -1136,7 +1136,7 @@ function image_render_node($node, $image_path, $main = 0) {
   else {
     $node->body = "<p align='center'><img src=\"$image_path\"></p><p align='center'>". check_output($node->body) ."</p>";
   }
-  $theme->node($node);
+  theme("node", $node);
 }
 
 function image_gallery_home($albums) {
@@ -1179,7 +1179,7 @@ function image_gallery_album($parents, $subalbums, $images, $data) {
     $output .= "<hr>";
   }
 
-  $sub = method_exists($theme, "image_gallery_home") ? $theme->image_gallery_home($subalbums) : image_gallery_home($subalbums);
+  $sub = method_exists("image_gallery_home") ? $theme->image_gallery_home($subalbums) : image_gallery_home($subalbums);
   //$sub = theme("image_gallery_home", $subalbums);
   if ($sub) {
     $output .= $sub."<hr>";
@@ -1204,7 +1204,7 @@ function image_gallery_album($parents, $subalbums, $images, $data) {
     $output .= "</table>";
   }
 
-  $output .= method_exists($theme, "image_thumb_browser") ? $theme->image_thumb_browser($data) : image_thumb_browser($data);
+  $output .= method_exists("image_thumb_browser") ? $theme->image_thumb_browser($data) : image_thumb_browser($data);
   //$output .= theme_inv
 
   return $output;
