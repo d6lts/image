@@ -18,7 +18,7 @@ msgstr ""
 
 #: image.module
 msgid "Below is a status of image module's current configuration."
-msgstr "Unten findet sich der Zustand der gegenw‰rtigen Konfiguration des Bilder-Modules."
+msgstr "Unten findet sich der Zustand der gegenw√§rtigen Konfiguration des Bilder-Modules."
 
 #: image.module
 msgid "Allow users to upload images and to display them in shared and personal photo galleries."
@@ -34,11 +34,11 @@ msgstr "Bild"
 
 #: image.module
 msgid "An image you can insert into nodes, or see in photo galleries."
-msgstr "Ein Bild, das in anderen Beitr‰gen oder in Bildergalerien angezeigt werden kann."
+msgstr "Ein Bild, das in anderen Beitr√§gen oder in Bildergalerien angezeigt werden kann."
 
 #: image.module
 msgid "Explanation or submission guidelines"
-msgstr "Erkl‰rung oder Richtlinien f¸r Autoren."
+msgstr "Erkl√§rung oder Richtlinien f√ºr Autoren."
 
 #: image.module
 msgid "This text will be displayed at the top of the image submission form.  It is useful for helping or instructing your users."
@@ -46,7 +46,7 @@ msgstr ""
 
 #: image.module
 msgid "Default image path"
-msgstr "Standard Bilder-Pfad"
+msgstr "Bilder-Pfad"
 
 #: image.module
 msgid "Default path for uploaded images relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."
@@ -62,15 +62,15 @@ msgstr ""
 
 #: image.module
 msgid "Temporary image path"
-msgstr "Pfad zum tempor‰ren Bilderverzeichnis."
+msgstr "Pfad zum tempor√§ren Bilderverzeichnis."
 
 #: image.module
 msgid "Path for working directory relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."
-msgstr "Pfad zum Arbeits-Verzeichnis relativ zu Deiner Drupal installation. Es darf nicht schreibgesch¸tzt sein und muﬂ vom WWW aus sichtbar sein. Schr‰gstrich (/) am Ende nicht vergessen."
+msgstr "Pfad zum Arbeits-Verzeichnis relativ zu Deiner Drupal installation. Es darf nicht schreibgesch√ºtzt sein und mu√ü vom WWW aus sichtbar sein. Schr√§gstrich (/) am Ende nicht vergessen."
 
 #: image.module
 msgid "Maximum temporary image directory size"
-msgstr "Maximale Grˆﬂe des tempor‰ren Bilderverzsichnisses"
+msgstr "Maximale Gr√∂√üe des tempor√§ren Bilderverzsichnisses"
 
 #: image.module
 msgid "MBytes."
@@ -86,7 +86,7 @@ msgstr ""
 
 #: image.module
 msgid "Default max image size"
-msgstr "Maximale Dateigrˆﬂe"
+msgstr "Maximale Dateigr√∂√üe"
 
 #: image.module
 msgid "KBytes."
@@ -94,7 +94,7 @@ msgstr "KByte"
 
 #: image.module
 msgid "Default max image resolution"
-msgstr "Maximale Auflˆsung"
+msgstr "Maximale Aufl√∂sung"
 
 #: image.module
 msgid "Example: 800x600."
@@ -102,7 +102,7 @@ msgstr "Beispiel: 800x600"
 
 #: image.module
 msgid "Default thumbnail resolution"
-msgstr "Vorschau-Auflˆsung"
+msgstr "Vorschau-Aufl√∂sung"
 
 #: image.module
 msgid "Default size of thumbnails: format will be the same as original image. Use just one dimension, and put a \"x\" to specify height. Examples: \"100\" for width of 100; \"x200\" for height of 200."
@@ -114,7 +114,7 @@ msgstr "Konvertierungsprogramm"
 
 #: image.module
 msgid "Select the image library to be used during thumbnail generation and image manipulation.  Use ImageMagick if you can; GD produces worse thumbnails, might not support GIF and this module doesn't support image editing (rotate, crop etc) with it."
-msgstr "W‰hle das Konvertierungsprogramm zut Vorschau-Generirung und Bildbearbeitung aus. Falls mˆglich, verwende Imagemagick. GD produziert schlechter Vorschaubilder unterst¸tzt evtl. kein GIF-Format und kann nicht zum Drehen und Verkleinern verwendet werden."
+msgstr "W√§hle das Konvertierungsprogramm zut Vorschau-Generirung und Bildbearbeitung aus. Falls m√∂glich, verwende Imagemagick. GD produziert schlechter Vorschaubilder unterst√ºtzt evtl. kein GIF-Format und kann nicht zum Drehen und Verkleinern verwendet werden."
 
 #: image.module
 msgid "Background Color"
@@ -122,7 +122,7 @@ msgstr "Hintergrundfarbe"
 
 #: image.module
 msgid "Color used to fill in background when rotating images."
-msgstr "Farbe mit der der Hintergdun beim Drehen ausgef¸llt wird."
+msgstr "Farbe mit der der Hintergdun beim Drehen ausgef√ºllt wird."
 
 #: image.module
 msgid "Imagemagick Convert path"
@@ -138,7 +138,7 @@ msgstr "Pfad zum jhead-Programm"
 
 #: image.module
 msgid "Absolute path of jhead, for EXIF parsing; blank to disable."
-msgstr "Absoluter Pfad zu jhead (f¸r EXIF-Daten). Leerlassen zum Abschalten."
+msgstr "Absoluter Pfad zu jhead (f√ºr EXIF-Daten). Leerlassen zum Abschalten."
 
 #: image.module
 msgid "<none>"
@@ -158,7 +158,7 @@ msgstr "Galerie-Vorschau"
 
 #: image.module
 msgid "Set the thumbnail to be dislayed on the gallery page."
-msgstr "W‰hle das Vorschaubild das auf der Galerie-Seite angezeigt wird."
+msgstr "W√§hle das Vorschaubild das auf der Galerie-Seite angezeigt wird."
 
 #: image.module
 msgid "Specify how many rows of thumbnails in each page of the gallery."
@@ -190,7 +190,7 @@ msgstr ""
 
 #: image.module
 msgid "Personal Gallery Picture Limit"
-msgstr "Grenzwert f¸r persˆnliche Bildergalerien."
+msgstr "Grenzwert f√ºr pers√∂nliche Bildergalerien."
 
 #: image.module
 msgid "Set how many pictures users are allowed."
@@ -270,7 +270,7 @@ msgstr "vorheriges Bild"
 
 #: image.module
 msgid "next image"
-msgstr "N‰chstes Bild"
+msgstr "N√§chstes Bild"
 
 #: image.module
 msgid "Photo gallery"
@@ -310,15 +310,15 @@ msgstr ""
 
 #: image.module
 msgid "Personal"
-msgstr "Persˆnlich"
+msgstr "Pers√∂nlich"
 
 #: image.module
 msgid "A personal image can only be seen in the user's photo gallery."
-msgstr "Ein persˆnliches Bild kann nur in der Galerie des Autors angesehen werden."
+msgstr "Ein pers√∂nliches Bild kann nur in der Galerie des Autors angesehen werden."
 
 #: image.module, image.module
 msgid "The image file you are trying to upload is too big."
-msgstr "Das Bild, das Du hochladen willst, ist zu groﬂ."
+msgstr "Das Bild, das Du hochladen willst, ist zu gro√ü."
 
 #: image.module
 msgid "The image file was only partially uploaded. Please try again."
@@ -326,7 +326,7 @@ msgstr "Die Bilddatei wurde nur teilweise hochgeladen. Bitte nochmal versuchen."
 
 #: image.module
 msgid "You must select an image for upload."
-msgstr "Du muﬂt ein Bild zum Hochladen ausw‰hlen."
+msgstr "Du mu√üt ein Bild zum Hochladen ausw√§hlen."
 
 #: image.module, image.module
 msgid "Error processing image file."
@@ -342,7 +342,7 @@ msgstr ""
 
 #: image.module
 msgid "The uploaded image(%ax%b) is to large (max %cx%d)."
-msgstr "Das hochgeladene Bild (%ax%b) ist zu groﬂ (max. %cx%d)."
+msgstr "Das hochgeladene Bild (%ax%b) ist zu gro√ü (max. %cx%d)."
 
 #: image.module
 msgid "Image filter"
@@ -362,15 +362,15 @@ msgstr "Das Bild kann nicht gespeichert werden."
 
 #: image.module
 msgid "Cannot delete old image."
-msgstr "Das Bild kann nicht gelˆscht werden."
+msgstr "Das Bild kann nicht gel√∂scht werden."
 
 #: image.module
 msgid "Cannot delete old thumb."
-msgstr "Kann alte Vorschau nicht lˆschen."
+msgstr "Kann alte Vorschau nicht l√∂schen."
 
 #: image.module
 msgid "Cannot create thumbnail. Current GD library has no read support for '%type' image format."
-msgstr "Kann keine Vorschau erzeugen. Die verwendete GD-Bibliothek unterst¸tzt Bilder vom Typ '%type' nicht."
+msgstr "Kann keine Vorschau erzeugen. Die verwendete GD-Bibliothek unterst√ºtzt Bilder vom Typ '%type' nicht."
 
 #: image.module
 msgid "Cannot create thumbnail. Current GD library has no support for '%type' format image creation."
@@ -378,19 +378,19 @@ msgstr ""
 
 #: image.module
 msgid "Imagemagick: you have to set <code>convert</code> path."
-msgstr "Imagemagick: Du muﬂt den Pfad zu <code>convert</code> setzen."
+msgstr "Imagemagick: Du mu√üt den Pfad zu <code>convert</code> setzen."
 
 #: image.module
 msgid "You can have at most %a images in your gallery."
-msgstr "Du kannst hˆchstens %a Bilder in Deiner Galerie haben."
+msgstr "Du kannst h√∂chstens %a Bilder in Deiner Galerie haben."
 
 #: image.module
 msgid "You have %a kb for your gallery."
-msgstr "Dir stehen %a kB f¸r Deine Galerie zur Verf¸gung."
+msgstr "Dir stehen %a kB f√ºr Deine Galerie zur Verf√ºgung."
 
 #: image.module
 msgid "File is too big (max %a kbytes)"
-msgstr "Datei zu groﬂ (max. %a kB)."
+msgstr "Datei zu gro√ü (max. %a kB)."
 
 #: image.module
 msgid "Upload directory is full."
@@ -398,7 +398,7 @@ msgstr ""
 
 #: image.module
 msgid "Resize/Crop"
-msgstr "Vergrˆﬂern/verkleinern"
+msgstr "Vergr√∂√üern/verkleinern"
 
 #: image.module
 msgid "keep prop"
@@ -418,7 +418,7 @@ msgstr "Hintergrund"
 
 #: image.module
 msgid "white"
-msgstr "weiﬂ"
+msgstr "wei√ü"
 
 #: image.module
 msgid "black"
@@ -430,7 +430,7 @@ msgstr ""
 
 #: image.module
 msgid "Quality (1-100)"
-msgstr "Qualit‰t (1-100)"
+msgstr "Qualit√§t (1-100)"
 
 #: image.module
 msgid "%u's Photo Gallery"
@@ -482,7 +482,7 @@ msgstr ""
 
 #: image.module
 msgid "Delete images after insert"
-msgstr "Dateien nach dem Hochladen lˆschen."
+msgstr "Dateien nach dem Hochladen l√∂schen."
 
 #: image.module
 msgid "If instructed, Drupal will delete all files in the above directory after creating the image nodes."
@@ -490,7 +490,7 @@ msgstr ""
 
 #: image.module
 msgid "Add new gallery"
-msgstr "Neue Galerie hinzuf¸gen."
+msgstr "Neue Galerie hinzuf√ºgen."
 
 #: image.module
 msgid "If needed, create a new term for this gallery by clicking on one of these vocabularies"
@@ -522,7 +522,7 @@ msgstr "ist kein Bild."
 
 #: image.module
 msgid "image type is not supported."
-msgstr "Typ der Bilddatei wird nicht unterst¸tzt."
+msgstr "Typ der Bilddatei wird nicht unterst√ºtzt."
 
 #: image.module
 msgid "Role"
