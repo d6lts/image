@@ -1024,7 +1024,7 @@ function _check_filesize_limits($image_file) {
   $fsize = filesize($image_file);
 
   $max_num = variable_get("image_personal_gallery_max_num", "50");
-  if ($user_images->c == $max_num) {
+  if ($user_images->c >= $max_num) {
     $error = t("You can have at most %a images in your gallery.", array("%a" => $max_num));
   }
 
