@@ -10,15 +10,8 @@ function image_system($field) {
 function image_node($field) {
   $info["name"] = t("image");
   $info["description"] = t("An image you can insert into nodes, or see in photo galleries.");
-
   return $info[$field];
 }
-
-
-function image_help() {
-  echo "tbd";
-}
-
 
 function image_perm() {
   return array("has personal image gallery", "manipulate images", "administer images");
@@ -238,6 +231,7 @@ function image_view($node, $main = 0) {
     $rand = rand();
   }
 
+  // the following line should really be deleted and replaced with the line after that. but doing so would kill 4.0 compatibility
   method_exists($theme, "image_render_node") ? $theme->image_view_node($node, $image_path, $main) : image_render_node($node, $image_path, $main);
   //theme_invoke("image_render_node", $node, $image_path, $main);
 }
@@ -285,6 +279,12 @@ function image_form(&$node, &$help, &$error, &$param) {
     }
     else {
       // **** preview of a new image ****
+      
+      // if blank, populate title/body/teaser with IPTC data
+      foreach (_image_iptc_map(_image_tempname($node)) as $key => $value) {
+        if (!$node->$key) $node->$key = $value;
+        unset($error["$key"]); //avoid error msg about missing 'title'
+      }
       
       if (!$node->image_id) {
         $upload_text = "<div style=\"color: red;\" class=\"error\">". t("You must upload an image.") ."</div>";
@@ -516,7 +516,7 @@ function _image_process($node) {
       }
       else {
         if ($sizex != $originalx || $sizey != $originaly) {
-          $trasform_string .= " -resize ".$sizex."x".$sizey ." -filter QUADRATIC";
+          $trasform_string .= " -scale ".$sizex."x".$sizey ." -filter QUADRATIC";
         }
         if ($rotate) {
           $trasform_string .= " -rotate ".$rotate;
@@ -569,9 +569,21 @@ function _image_tempname($node) {
 
 
 function _image_check_ext($filename) {
+  // print "file name is $filename";  
   return in_array(strtolower(strrchr($filename, ".")), array(".gif", ".jpg", ".png", ".jpeg"));
 }
 
+// returns an array with values proposed by IPTC info in the image
+function _image_iptc_map($image_path) {
+  $size = getimagesize($image_path, $iptc_info);
+  $iptc = _image_iptc($iptc_info);
+  if ($iptc["headline"]) $proposed["title"] = $iptc["headline"];
+  if ($iptc["caption"]) {
+    $proposed["body"] = $iptc["caption"];
+    $proposed["teaser"] = node_teaser($iptc["caption"]);
+  }  
+  return $proposed;
+}
 
 function _image_iptc(&$info) {
   // credit to pkrohn@daemonize.com from php online manual for this
@@ -715,7 +727,7 @@ function image_update($node) {
 function _image_make_thumbnail($node) {
   $lib = variable_get("image_lib", "imagemagick");
   if ($lib == "imagemagick") {
-    echo _image_convert(_image_filename($node), _image_thumbname($node), "-resize ".variable_get("image_default_thumb_size", "100")." -filter QUADRATIC");
+    echo _image_convert(_image_filename($node), _image_thumbname($node), "-scale ".variable_get("image_default_thumb_size", "100")." -filter QUADRATIC");
   } else if ($lib == "gd") {    
     $size = GetImageSize(_image_filename($node));
     if ($size[2] == "2") {
@@ -946,7 +958,6 @@ function image_page() {
     else if (!$tid) {
       // show albums
       $albums = taxonomy_get_children(0, variable_get("image_nav_vocabulary", ""));
-      
       $albums = _image_album_properties($albums); 
             
       $theme->header();
@@ -1243,15 +1254,24 @@ function image_thumb_browser($data) {
 ***** admin function and friends
 ****/
 
-function _image_dir_upload($edit) {
-  global $HTTP_SERVER_VARS;
+function _image_dir_upload($edit, $type = "slow") {
+  global $HTTP_SERVER_VARS, $type, $user;
   
   if (!$edit["dir"]) {
-    $output .= form_textfield("Directory to scan", "dir", variable_get("image_last_upload_dir", ""), 30, 255, "Directory must be visible from the web server.");
-    #$output .= form_checkbox("Delete images after insert", "del_images", $value = 1, $checked = 1);
-    $output .= form_checkbox("Thumbnail", "thumb", $value = 1, $checked = 0, "Show resized image. Use only if you have large bandwidth. <div style=\"color: white;\">so Momar don't use this. UHAHAHAHA</div>");
+    $output .= form_textfield("Directory to scan", "dir", variable_get("image_last_upload_dir", ""), 30, 255, "The path to the directory which holds the source image files. This path should be relative to Drupal root directory - don't forget the slash at the endAlso it should be writeable by the web server. Files in this directory will be deleted after moving into the <b>images</b> directory.");    
+    if ($type == "slow") {  
+      $output .= form_checkbox("Thumbnail", "thumb", $value = 1, $checked = 0, "Show resized image. Use only if you have large bandwidth.");
+    }
+    else {
+      $output .= form_checkbox("Delete images after insert", "del_images", $value = 1, $checked = 1, "If instructed, Drupal will delete all files in the above directory after creating the image nodes.");      
+      foreach (taxonomy_get_vocabularies("image") as $vocab) {      
+        $links[] .= la($vocab->name, array ("mod" => "taxonomy", "op" => "add", "type" => "leaf", "vocabulary_id" => $vocab->vid));
+      }
+      $output .= form_item("Add new gallery", implode(", ", $links), "If needed, create a new term for this gallery by clicking on one of these vocabularies");
+      $output .= implode("<p>", taxonomy_node_form("image", $node));
+    }
     $output .= form_submit("Directory upload");
-    echo form($output, "post");
+    $output =  form($output, "post");
   }
   else {
     // check for tricks
@@ -1265,19 +1285,63 @@ function _image_dir_upload($edit) {
 
     $handle = opendir($dir);
     while (($file = readdir($handle))!==false) {
-      if ($file != "." && $file != "..") { 
-        if ($edit["thumb"]) {
-          echo lm($file, array("mod" => "node", "op" => "add", "type" => "image", "file" => $dir."/".$file));
-          echo " <img src=\"$dir/$file\" height=\"100\">";
+      if ($file != "." && $file != ".." && !is_dir($file)) { 
+        if ($type == "slow") {        
+          if ($edit["thumb"]) {
+            $output .= lm($file, array("mod" => "node", "op" => "add", "type" => "image", "file" => $dir."/".$file));
+            $output .= " <img src=\"$dir/$file\" height=\"100\">";
+          }
+          else {
+            $output .= lm($file, array("mod" => "node", "op" => "add", "type" => "image", "file" => $dir."/".$file));
+          }
+          $output .= "<br>";
         }
         else {
-          echo lm($file, array("mod" => "node", "op" => "add", "type" => "image", "file" => $dir."/".$file));
+          
+          // move to a temporary location. _insert() will later move to final destination
+          $node->$image_id = md5(rand()); 
+          $edit["del_images"] ? $action = "rename" : $action = "copy";          
+          if (!$action("$dir/$file", _image_tempname($node))) {
+            die("cannot copy image to temporary location.");  
+          }
+          
+          //scale down image if needed
+          if (variable_get("image_lib", "imagemagick") == "imagemagick") {          
+            $size = getimagesize(_image_tempname($node));
+            $max_size = split("x", variable_get("image_default_max_size", "1024x768"));
+            if ($size[0] > $max_size[0] || $size[1] > $max_size[1]) {          
+              $trasform_string .= " -scale ".$max_size[0]."x".$max_size[1] ." -filter QUADRATIC";
+              _image_convert(_image_tempname($node), _image_tempname($node), $trasform_string);
+            }
+          }
+
+          // build a node with intelligent defaults
+          // make sure we designate an unused filename as image_name.
+          $node = array ("title" => $file, "type" => "image", "uid" => $user->uid, "taxonomy" => $edit['taxonomy'], "image_id" => $node->image_id, "image_name" => time(). $file, "personal" => 0, "weight" => 5, "moderate" => 0);
+          
+          //override defaults with any data specified in iptc header
+          $node = array_merge($node, _image_iptc_map(_image_tempname($node)));
+          
+          // i would prefer to call node_submit() but it returns text, instead of status and error messages          
+          $nid = node_save(array (), $node);
+          taxonomy_node_save($nid, $node["taxonomy"]);
+          if (!$alreadyprinted) {   // we only want to output this text once
+            $output .= "\nYou may wish to view your new images: <p>\n";
+            foreach ($node["taxonomy"] as $tid) {
+              if ($term = taxonomy_get_term($tid)) {
+                $output .= "gallery: ". lm($term->name, array ("mod" => "image", "tid" => $tid)). "<br />\n";
+              }  
+            }
+            $alreadyprinted = true;
+          }
+          $output .= "--  image: ". l($node["title"], array ("id" => $nid)). "<br />"; 
         }
-        echo "<br>";
+
       }
     }
-    closedir($handle); 
+    closedir($handle);
   }
+  return $output;
 }
 
 function _image_check_configuration() {
@@ -1349,11 +1413,12 @@ function _image_test() {
 
 function _image_gallery_admin() {
   if (!variable_get("image_nav_vocabulary", "")) {
-    echo status("Error: you must assign a vocabulary to navigation before. Fix in ".la("Site Configuration", array("mod" => "system")));
-    exit();
+    $output = status("Error: you must assign a vocabulary to navigation before. Fix in ".la("Site Configuration", array("mod" => "system")));
   }
-  
-  exit();
+  else {
+    // not sure what the intention is for this page    
+  }  
+  return $output;
 }
 
 function image_admin() {
@@ -1361,7 +1426,9 @@ function image_admin() {
 
   if (user_access("administer images")) {
     
-    $links[] = la(t("directory upload"), array("mod" => "image", "op" => "dir_upload"));
+    $slow = la(t("slow"), array("mod" => "image", "op" => "dir_upload", "type" => "slow"));
+    $fast = la(t("fast"), array("mod" => "image", "op" => "dir_upload", "type" => "fast"));
+    $links[] = t("directory upload: "). $fast. ", ". $slow;
     $links[] = la(t("gallery admin"), array("mod" => "image", "op" => "gallery"));
     $links[] = la(t("check configuration"), array("mod" => "image", "op" => "check_configuration"));
     $links[] = la(t("settings"), array("mod" => "system"), "image");
@@ -1373,16 +1440,17 @@ function image_admin() {
     switch ($op) {
       case "test":
       _image_test();
+      break;
       case "help":
         image_help();
         break;
       case "dir_upload":
       case "Directory upload":
-        _image_dir_upload($edit);
+        print _image_dir_upload($edit);
         break;
       case "gallery":
-        _image_gallery_admin($edit);
-        // fall through
+        print _image_gallery_admin($edit);
+        break;
       default:
         _image_check_configuration();
     }
@@ -1391,5 +1459,56 @@ function image_admin() {
     print message_access();
   }
 }
+
+function image_help() {
+
+?>
+<h4>Configuration</h4>
+<p><b>Linux:</b> many ISPs already have Imagemagick installed and available for your use. 
+If you are hosted on Linux and have shell access, type <i>which convert</i>
+at the command prompt This will tell you where the binary is, if it is in the path.
+The name of the binary on most unixoid systems is simply <i>convert</i>.</p>
+
+If you choose to use the GD library, you must install <a href="http://www.boutell.com/gd/">version 2.0 or higher</a>.
+
+<h4>IPTC</h4>
+JPEG images may be tagged with information about the image. This information talks about the
+caption, headline, creation date, location, and many other parameters about the image. To
+embed IPTC data in your images, use an IPTC aware editor like
+<a href="http://www.pixvue.com">PixVue</a> (free, Windows only),
+<a href="http://www.adobe.com/products/photoshop/main.html">Photoshop</a>
+(commercial, Windows/Mac)on , or <a href="http://www.photo.net/bboard/q-and-a-fetch-msg?msg_id=001Lso">possibly GIMP</a> (Linux).
+
+<p>This module reads any IPTC info in your image, and uses it appropriately. Fast directory upload of IPTC
+images is the quickest and most complete way to add lots of images into Drupal. Further, you may tag
+your images while offline and only go online to do the upload/creation in Drupal.</p>
+
+<h4>Directory Upload</h4>
+Admins may create many image nodes at once by uploading all images a folder
+on the Drupal web server. This upload happens outside of Drupal, usually
+using an ftp client. After importing into Drupal, the images are deleted
+from the upload directory. After uploading, an admin may choose <b>fast</b>
+or <b>slow</b> from Admin -> Images. Slow mode enables the Admin to
+manipulate each image individually, and add custom title, description, etc. 
+
+<h5>Fast Mode</h5>
+<ul>
+<li>creates all image nodes at once without user interaction</li>
+<li>applies the same taxonomy term(s) to each node, thus creating a gallery</li>
+<li>if IPTC data is present in the image, the headline and caption fields are
+used to populate the title and body respectively.</li>
+<li>if the image dimensions are bigger than the maximum allowed, the image is
+automatically scaled down.</li>
+</ul>
+
+<h4>Adding images into other nodes</h4>
+Sometimes, you want to add an image to another node like a blog entry or a story.
+You may do this by creating an image node in Drupal for the target image, and then
+referencing that image in your story, blog, etc. To enable this feature and learn the
+proper syntax, visit <b>admin -> site configuration -> content filters</b>
+
+<?
+}
+
 
 ?>
