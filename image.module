@@ -1,7 +1,9 @@
 <?php
 // $Id$
 
-function image_help($section = "admin/help#image") {
+include_once(module_get_path('image') . '/image.inc');
+
+function image_help($section = 'admin/help#image') {
   global $base_url;
 
   $common = t("<p>Admins may create many image nodes at once by uploading all images to a folder on the server. This upload happens outside of Drupal, usually using an FTP client.</p>");
@@ -115,39 +117,6 @@ function image_settings() {
   $output .= form_select(t("Specify resolutions that will be generated at time of editing."), "image_static_resolution", variable_get("image_static_resolution", array("640x400")), $resolution, t("This is a list of the resolutions that will be created at the time of editing. Ones not selected will generated and saved the first time they are displayed."), array("size" => "4"), 1);
 
   $output .= form_textfield(t("Default thumbnail resolution"), "image_default_thumb_size", variable_get("image_default_thumb_size", "100"), 10, 255, t("Default size of thumbnails: format will be the same as original image. Use just one dimension, and put a \"x\" to specify height. Examples: \"100\" for width of 100; \"x200\" for height of 200."));
-
-  // Default to ImageMagick if GD not found.
-
-  $libraries = array("imagemagick" => "imagemagick");
-
-  // Check for imlib2.
-
-  if (function_exists('imlib2_load_image')) {
-    $libraries = array_merge($libraries, array("imlib2" => "imlib2"));
-  }
-
-  // Check which version of the GD library is available.
-
-  if (function_exists("imageCreateTrueColor")) {
-    $libraries = array_merge($libraries, array("gd2" => "gd2"));
-  }
-  else if (function_exists("imageCreate")) {
-    $libraries = array_merge($libraries, array("gd1" => "gd1"));
-  }
-  $output .= form_select(t("Image library"), "image_lib", variable_get("image_lib", "imagemagick"), $libraries, t("Select the image library to be used during thumbnail generation and image manipulation.  Use ImageMagick if you can; GD produces worse thumbnails, might not support GIF and this module doesn't support image editing (rotate, crop etc) with it."));
-  $output .= "<a name=\"image_convert\"></a>";
-  $output .= form_textfield(t("Imagemagick Convert path"), "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, t("Absolute path to ImageMagick convert file. Include the 'convert.exe' (or other filename) at the end. Leave it blank if you have selected GD library."));
-
-  if (variable_get("image_lib", "imagemagick") == "imagemagick") {
-    $output .= form_textfield(t("Background Color"), "image_background", variable_get("image_background", "#000000"), 7, 7, t("Color used to fill in background when rotating images."));
-  }
-  else {
-    variable_set("image_convert_path", "");
-  }
-
-  $output .= "<a name=\"image_jhead\"></a>";
-  $output .= form_textfield(t("jhead path"), "image_jhead_path", variable_get("image_jhead_path", ""), 50, 255, t("Absolute path of jhead, for EXIF parsing; blank to disable."));
-
   foreach (taxonomy_get_vocabularies("image") as $vid => $voc) {
     $vocs[$vid] = $voc->name;
   }
@@ -221,7 +190,7 @@ function image_link($type, $node, $main = 0) {
   // Add links to an image node.
 
   if ($type == "node" && $node->type == "image") {
-    foreach(explode(",", variable_get("image_default_resolutions", "640x400,800x600,1024,768,1600x1200")) as $v) {
+    foreach(explode(",", variable_get("image_default_resolutions", "640x400,800x600,1024x768,1600x1200")) as $v) {
       $max_dim = split("x", $v);
       if ($node->width > $max_dim[0] || $node->height > $max_dim[1]) {
         $links[] = l($v, "node/$node->nid", array(), "res=$v");
@@ -341,7 +310,6 @@ function image_menu() {
  * Function to display image gallery link on user information display.
  */
 function image_user($type, $ahem, &$user) {
-
   if (user_access("access images") && _image_can_personal() && ($type == "view")) {
     return array('Personal gallery' => form_item(t("Image gallery"), l(t("view image gallery"), "image/uid/$user->uid")));
   }
@@ -448,7 +416,15 @@ function image_form(&$node, &$param) {
  */
 function image_validate(&$node) {
 
-  $build_extra = false;
+  // For some reason, we're getting here without having passed through image_load.
+  // We need extra data from the node to operate properly.
+  
+  if ($node->nid) {
+    $extra = image_load($node);
+    foreach ($extra as $key => $value) {
+      $node->$key = $value;
+    }
+  }
 
   // If this $node has an image_path already set we are editing
   // an existing image so set the existing flag.
@@ -460,230 +436,153 @@ function image_validate(&$node) {
     $node->image_list = array();
   }
 
-  // If this is a slow directory upload pull the file name out of the query string
-  if (arg(3) == "file" && !$node->image_id) {
-    $upload_file = "";
+  // Force clear of personal flag if personal gallery is disabled or not allowed for this user.
+  // If it is allowed and personal has not been set yet then default to personal gallery.
+
+  if (!_image_can_personal()) {
+    $node->personal = 0;
+  } else if (!isset($node->personal)) {
+    $node->personal = 1;
+  }
+
+  // If this is a bulk upload pull the file name out of the query string.
+
+  $bulk_upload = (arg(3) == 'file');
+
+  if ($bulk_upload && !$node->image_id) {
+    $upload_file = '';
     $i = 4;
     while ($tmp = arg($i)) {
-      if ($i > 4) $upload_file .= "/";
+      if ($i > 4)
+        $upload_file .= '/';
       $upload_file .= $tmp;
       $i++;
     }
     $upload_name = basename($upload_file);
-  }
-  else {
-    $upload_file = $_FILES["edit"]["tmp_name"]["image"];
-    $upload_name = $_FILES["edit"]["name"]["image"];
+  } else if ($_FILES['edit']['tmp_name']['image']) {
+    $upload_file = $_FILES['edit']['tmp_name']['image'];
+    $upload_name = $_FILES['edit']['name']['image'];
+  } else if ($_POST['edit']['image_id']) {
+    $node->image_path = variable_get("image_temp_path", "./") . "tmpimg_" . $_POST['edit']['image_id'] . $_POST['edit']['extension'];
   }
 
-  // If we uploaded a file pre-process it
-  if (!is_uploaded_file($upload_file) && (arg(3) != "file")) {
-    switch($_FILES["edit"]["error"]["image"]) { // Note: error code is returned only since PHP 4.2.0
-      case 1:  // The uploaded file exceeds the upload_max_filesize directive in php.ini.
-        $errortxt = t("The image file you are trying to upload is too big.");
-        watchdog("error", "uploaded file exceeds the upload_max_filesize directive in php.ini: ". $upload_name);
-        break;
-      case 2:  // The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
-        $errortxt = t("The image file you are trying to upload is too big.");
-        watchdog("error", "uploaded file exceeds the MAX_FILE_SIZE directive: ". $upload_name);
-        break;
-      case 3:  // The uploaded file was only partially uploaded.
-        $errortxt = t("The image file was only partially uploaded. Please try again.");
-        break;
-      default:
-        if (!empty($_POST['op']) && arg(3) != "file" && empty($node->image_id) && empty($node->existing)) {
-          $errortxt = t("You must select an image for upload.");
-        }
-        break;
-    }
-    if ($errortxt) {
-      form_set_error('image', $errortxt);
-    }
-  }
-  else {
+  // If user attempted to upload a file, make sure it was valid.
 
-    // Move uploaded file to temp area
-    $temp_file = variable_get("image_temp_path", "./")."tmpimg_".$upload_name;
-    if (!move_uploaded_file($upload_file, $temp_file) && arg(3) != "file" ) {
-      form_set_error('image', t("Error processing image file."));
-    }
-    else {
+  if (!$bulk_upload && !$node->existing && !$node->image_id) {
+    
+    if (!is_uploaded_file($upload_file)) {
 
-      if (arg(3) == "file") {
-         $temp_file = $upload_file;
-      }
-      else {
-        // Fix file permissions for uploaded images
-        @chmod($temp_file, 0644);
+      switch ($_FILES['edit']['error']['image']) { // Note: error code is returned only since PHP 4.2.0
+
+        case 1:  // The uploaded file exceeds the upload_max_filesize directive in php.ini.
+          $errortxt = t('The image file you are trying to upload is too big.');
+          watchdog('error', 'uploaded file exceeds the upload_max_filesize directive in php.ini: ' . $upload_name);
+          break;
+
+        case 2:  // The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
+          $errortxt = t('The image file you are trying to upload is too big.');
+          watchdog('error', 'uploaded file exceeds the MAX_FILE_SIZE directive: ' . $upload_name);
+          break;
+
+        case 3:  // The uploaded file was only partially uploaded.
+          $errortxt = t("The image file was only partially uploaded. Please try again.");
+          break;
+
+        default:
+          if (!empty($_POST['op']) && !$bulk_upload && empty($node->image_id) && empty($node->existing)) {
+            $errortxt = t("You must select an image for upload.");
+          }
       }
 
-      // Check File Size
-      if ($errortxt = _check_filesize_limits($temp_file, $node->personal)) {
+      if ($errortxt) {
         form_set_error('image', $errortxt);
       }
-      else {
 
-        $image_details = _get_image_details($temp_file);
-        // Check to make sure that uploaded file is an image and has a type supported by image library
-        if ((!_is_image_type_supported($image_details['type'])) || (!_is_valid_image_ext($temp_file))) {
-          if (($image_details['type'] == 'UNKNOWN') || empty($image_details['type'])){
-            form_set_error('image', t('Uploaded file was not an image.'));
-          }
-          else {
-            form_set_error('image', t("image type '%type' is not supported.", array("%type" => $image_details['type'])));
-          }
-        }
-        else {
+      return;
 
-          $max_dim = split("x", variable_get("image_default_max_size", "1024x768"));
-
-          // If the image is larger that the maximum size scale it down the
-          // the maximum size.
-
-          if ($image_details['width'] > $max_dim[0] || $image_details['height'] > $max_dim[1]) {
-            // adjust resolution to keep aspect.
-            $width = $max_dim[0];
-            $height = $max_dim[1];
-            if ($width < round($image_details["width"]*$height/$image_details["height"])) {
-              $height = round($image_details["height"]*$width/$image_details["width"]);
-            } else if ($height < round($image_details["height"]*$width/$image_details["width"])){
-              $width = round($image_details["width"]*$height/$image_details["height"]);
-            }
-            if (($image = image_open($temp_file)) != false) {
-              image_scale($image, $width, $height);
-              image_close($image, $temp_file);
-              $image_details = _get_image_details($temp_file);
-            }
-          }
-          if ($image_details['width'] > $max_dim[0] || $image_details['height'] > $max_dim[1]) {
-            form_set_error('form', t("The uploaded image(%ax%b) is too large (max %cx%d).", array("%a" => $image_details['width'], "%b" => $image_details['height'], "%c" => $max_dim[0], "%d" => $max_dim[1])));
-          }
-          else {
-
-            // Generate image_id if necessary
-            if (!$node->image_id) {
-              $node->image_id = _image_id($upload_name);
-            }
-            // If we already have an image_id and an uploaded file delete it.
-            else if (file_exists(_image_tempname($node))) {
-              unlink(_image_tempname($node));
-            }
-
-            // Pull out iptc data and populate any node elements that are not already set.
-            if ($proposed = _image_iptc_map($image_details['iptc_info'])) {
-              foreach ($proposed as $key => $value) {
-                if (!$node->$key) {
-                  $node->$key = $value;
-                }
-              }
-            }
-
-            // Save off the extension for the final filename
-            $node->extension = _get_ext($upload_name);
-
-            // Set final filename
-            if (!rename($temp_file, _image_tempname($node))) {
-              form_set_error('image', t('Error processing image file.'));
-            }
-            $build_extra = true;
-
-          } // Dimension Check
-
-        } // File Type Check
-
-      } // Filesize Check
-
-    } // Uploaded File Check
-
-  } // Move uploaded file
-
-  // If we have uploaded a new image so set the correct thumb and image paths
-  if ($node->image_id) {
-    $node->image_path = _image_tempname($node);
-    $node->thumb_path = _image_tempthumbname($node);
-  }
-  // If we are editing an existing node and the image_path is not already set
-  // load it from the database.
-  else if ($node->existing && !$node->image_path) {
-    $old_files = db_fetch_object(db_query("SELECT image_path, thumb_path FROM {image} WHERE nid = '%s'", $node->nid));
-    $node->image_path = $old_files->image_path;
-    $node->thumb_path = $old_files->thumb_path;
+    }
   }
 
-  // Load up image node attributes if we have a file
-  if ($node->image_path) {
+  // If we get here, we know that we have a valid attempt to upload an image file
+  // or a valid re-use of an existing file. If an 0upload, move file to temp area.
 
-    // We only need to load this if it hasn't already been loaded.
-    if (empty($image_details)) {
-      $image_details = _get_image_details($node->image_path);
+  $build_derivatives = false;
+
+  if ($bulk_upload) {
+
+    // Exception: Work with bulk uploaded files where they sit.
+    
+    $temp_file = $upload_file;
+
+    if (!_image_validate_uploaded_file($node, $temp_file, $upload_name))
+      return;
+
+    $build_derivatives = true;
+
+  } else if ($upload_name) {
+
+    $temp_file = variable_get('image_temp_path', './') . 'tmpimg_' . $upload_name;
+
+    if (!move_uploaded_file($upload_file, $temp_file) && !$bulk_upload) {
+      form_set_error('image', t("Error processing image file."));
+      return;
     }
 
-    $node->iptc = $image_details['iptc_info'];
-    $node->exif = _image_get_exif($node->image_path);
+    @chmod($temp_file, 0644);
 
-    $node->format = strtolower($image_details['type']);
-    $node->width = $image_details['width'];
-    $node->height = $image_details['height'];
-    $node->filesize = filesize($node->image_path);
-  }
-  if (!$node->extension) {
-    $node->extension = _get_ext($node->image_path);
-  }
+    if (!_image_validate_uploaded_file($node, $temp_file, $upload_name)) {
+      @unlink($temp_file);
+      return;
+    }
 
-  // Image Manipulation
+    $build_derivatives = true;
 
-  if (user_access("manipulate images")  && !$node->manipulated && $node->image_path && (!$upload_file || $upload_file == "none")) {
-    $width = $_POST["width"];
-    $height = $_POST["height"];
-    $rotate = $_POST["rotate"];
-    $cropx = $_POST["cropx"];
-    $cropy = $_POST["cropy"];
-    $quality = $_POST["quality"];
+  } else {
 
-    if (($image = image_open($node->image_path)) != false) {
-      if ($cropx || $cropy) {
-        image_crop($image, $cropx, $cropy, $width, $height);
-        $build_extra = true;
-      }
-      else if (($width && ($width != $node->width)) || ($height && ($height != $node->height))) {
-        image_scale($image, $width, $height);
-        $build_extra = true;
-      }
-      if ($rotate) {
-        image_rotate($image, $rotate);
-        $build_extra = true;
-      }
-      image_close($image, $node->image_path, $quality);
+    //$build_derivatives = _image_validate_do_transform($node);
+
+    if (!$node->existing || $build_derivatives) {
+
+      $build_derivatives = true;
       
-      if ($build_extra) {
-
-        // Generate image_id if necessary.
-
-        if (!$node->image_id) {
-          $node->image_id = _image_id($upload_name);
-          // If this is an existing node then copy the orignal file
-          if ($node->existing) {
-            copy($node->image_path, _image_tempname($node));
+      $node->image_details = image_get_info($node->image_path);
+      
+      if ($proposed = _image_iptc_map($node->image_details['iptc_info'])) {
+        foreach ($proposed as $key => $value) {
+          if (!$node->$key) {
+            $node->$key = $value;
           }
-          $node->image_path = _image_tempname($node);
-          $node->thumb_path = _image_tempthumbname($node);
         }
-
-        // Now let's reload size data.
-
-        $image_details = _get_image_details($node->image_path);
-        $node->width = $image_details['width'];
-        $node->height = $image_details['height'];
-        $node->filesize = filesize($node->image_path);
-
       }
+
+    } else {
+
+      $old_files = db_fetch_object(db_query("SELECT image_path, thumb_path FROM {image} WHERE nid = '%s'", $node->nid));
+      $node->image_path = $old_files->image_path;
+
     }
+
   }
 
-  if ($build_extra) {
+  // At this point, we know that we have an acceptable image at $node->image_path.
+
+  // If we've uploaded a new file or modified the existing one, reload file attributes
+  // and rebuild derivative images (thumbnail and alternate sizes).
+
+  if ($build_derivatives) {
+
+    // Save off image information.
+
+    $node->iptc = $node->image_details['iptc_info'];
+    $node->exif = image_get_exif($node->image_path);
+    $node->img_format = strtolower($node->image_details['type']);
+    $node->width = $node->image_details['width'];
+    $node->height = $node->image_details['height'];
+    $node->filesize = filesize($node->image_path);
 
     // Generate new thumbnail.
 
+    $node->thumb_path = _image_tempthumbname($node);
     $errortxt = _image_make_thumbnail($node->image_path, $node->thumb_path);
     if ($errortxt) {
       form_set_error('image', $errortxt);
@@ -692,33 +591,182 @@ function image_validate(&$node) {
     // Build additional static images.
     // Add to image_list any default resolutions that are missing.
 
-    foreach(variable_get("image_static_resolution", array("640x400")) as $v) {
+    foreach (variable_get('image_static_resolution', array('640x400')) as $v) {
       if (!array_key_exists($v, $node->image_list)) {
-        $node->image_list[$v] = "";
+        $node->image_list[$v] = '';
       }
     }
 
     // Scale image to other static sizes.
 
-    foreach($node->image_list as $k => $v) {
+    foreach ($node->image_list as $k => $v) {
       $fname = _image_make_static($node, $k);
       if ($fname) {
-        $node->image_list[$k]["fname"] = $fname;
+        $node->image_list[$k]['fname'] = $fname;
       }
     }
 
   }
 
-  // Force clear of personal flag if personal gallery is disabled or not allowed for this user
-  if (!_image_can_personal()) {
-    $node->personal = 0;
-  }
-  // If it is allowed and personal has not been set yet then default to personal gallery
-  else if (!isset($node->personal)) {
-    $node->personal = 1;
+}
+
+/**
+ * Look at an uploaded file to ensure that it's valid.
+ *
+ * @param &$node data about this image file
+ * @param $temp_file path to the temporary copy of the file
+ * @param $upload_name name that was given to the image by user
+ *
+ * @return true if valid; false if not - errors will be reported
+ *    via drupal_set_message
+ */
+function _image_validate_uploaded_file(&$node, $temp_file, $upload_name) {
+
+  // Enforce file size limits.
+
+  if ($errortxt = _check_filesize_limits($temp_file, $node->personal)) {
+    form_set_error('image', $errortxt);
+    return false;
   }
 
-  return $error;
+  // Ensure that this uploaded file is an image and is supported by the image library.
+  
+  $image_details = image_get_info($temp_file);
+
+  if ((!image_type_is_supported($image_details['type'])) || (!_is_valid_image_ext($temp_file))) {
+
+    if (($image_details['type'] == 'UNKNOWN') || empty($image_details['type'])){
+      form_set_error('image', t('Uploaded file was not an image.'));
+    } else {
+      form_set_error('image', t("image type '%type' is not supported.", array('%type' => $image_details['type'])));
+    }
+
+    unlink($temp_file);
+    return false;
+
+  }
+
+  // Enforce maximum pixel dimensions for images.
+
+  $max_dim = split('x', variable_get('image_default_max_size', '1024x768'));
+
+  if ($image_details['width'] > $max_dim[0] || $image_details['height'] > $max_dim[1]) {
+
+    // Image is too large; resize it.
+
+    $width = $max_dim[0];
+    $height = $max_dim[1];
+
+    if ($width < round($image_details['width'] * $height / $image_details['height'])) {
+      $height = round($image_details['height'] * $width / $image_details['width']);
+    } else if ($height < round($image_details['height'] * $width / $image_details['width'])){
+      $width = round($image_details['width'] * $height / $image_details['height']);
+    }
+
+    // Write resized image back on top of temp file, then reload image information.
+
+    if (($image = image_open($temp_file)) != false) {
+      image_scale($image, $width, $height);
+      image_close($image, $temp_file);
+      $image_details = image_get_info($temp_file);
+    }
+
+  }
+
+  // If image is still too large (i.e. unable to resize to fit), bail out now.
+  
+  if ($image_details['width'] > $max_dim[0] || $image_details['height'] > $max_dim[1]) {
+    form_set_error('form', t('The uploaded image(%ax%b) is too large (max %cx%d).', array('%a' => $image_details['width'], '%b' => $image_details['height'], '%c' => $max_dim[0], '%d' => $max_dim[1])));
+    return false;
+  }
+
+  // Generate image ID if necessary.
+
+  if (!$node->image_id) {
+
+    $node->image_id = _image_id($upload_name);
+
+  } else if (file_exists(_image_tempname($node))) {
+
+    // We already have an image ID and an uploaded file. Don't need the old temp file any more.
+
+    unlink(_image_tempname($node));
+
+  }
+
+  // Pull out IPTC data and populate any node elements that are not already set.
+
+  if ($proposed = _image_iptc_map($image_details['iptc_info'])) {
+    foreach ($proposed as $key => $value) {
+      if (!$node->$key) {
+        $node->$key = $value;
+      }
+    }
+  }
+
+  // Save off the extension for the final filename.
+
+  $node->extension = _get_ext($upload_name);
+
+  // Move file to appropriate temporary location. (It may already be there, in which
+  // case this is a no-op.)
+
+  $node->image_path = _image_tempname($node);
+
+  if (!rename($temp_file, $node->image_path)) {
+    form_set_error('image', t('Error processing image file.'));
+    return;
+  }
+
+  // Save off the image information so caller can use it.
+
+  $node->image_details = $image_details;
+
+  // Return true: file is OK.
+
+  return true;
+}
+
+/**
+ * Helper function called by image_validate to perform image transformations.
+ */
+function _image_validate_do_transform(&$node) {
+
+  if (user_access('manipulate images') && $node->image_path && (!$upload_file || $upload_file == 'none')) {
+
+    $width = $_POST['width'];
+    $height = $_POST['height'];
+    $rotate = $_POST['rotate'];
+    $cropx = $_POST['cropx'];
+    $cropy = $_POST['cropy'];
+    $quality = $_POST['quality'];
+
+    if (($image = image_open($node->image_path)) != false) {
+
+      if ($cropx || $cropy) {
+        image_crop($image, $cropx, $cropy, $width, $height);
+        $build_extra = true;
+      } else if (($width && ($width != $node->width)) || ($height && ($height != $node->height))) {
+        image_scale($image, $width, $height);
+        $build_extra = true;
+      }
+
+      if ($rotate) {
+        image_rotate($image, $rotate);
+        $build_extra = true;
+      }
+
+      image_close($image, _image_tempname($node), $quality);
+      $node->image_path = _image_tempname($node);
+
+      return true;
+
+    }
+
+  }
+
+  return false;
+
 }
 
 /**
@@ -731,23 +779,24 @@ function image_insert($node) {
 
   // Rename Image
   if (!rename(_image_tempname($node), $node->image_path)) {
-    die(t("Cannot save image."));
+    drupal_set_message(t('Cannot save image to %path.', array('%path' => $node->image_path)), 'error');
   }
 
   // Rename Thumbnail
   if (!rename(_image_tempthumbname($node), $node->thumb_path)) {
-    die(t("Cannot save image."));
+    drupal_set_message(t('Cannot save thumbnail image to %path.', array('%path' => $node->thumb_path)), 'error');
   }
+
   if (is_array($image->image_list)) {
     foreach ($node->image_list as $k => $v) {
       $node->image_list[$k]['fname'] = _image_filename($node, $k);
       if (!rename(_image_tempname($node, $k), $node->image_list[$k]['fname'])) {
-        die(t("Cannot save image."));
+        drupal_set_message(t('Cannot save resized image to %path.', array('%path' => $node->image_list[$k]['fname'])), 'error');
       }
     }
   }
 
-  db_query("INSERT INTO {image} (nid, image_path, thumb_path, image_list, format, width, height, filesize, iptc, exif, personal, weight) VALUES (%d, '%s', '%s', '%s', '%s', %d, %d, %d, '%s', '%s', %d, %d)", $node->nid, $node->image_path, $node->thumb_path, serialize($node->image_list), $node->format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight);
+  db_query("INSERT INTO {image} (nid, image_path, thumb_path, image_list, format, width, height, filesize, iptc, exif, personal, weight) VALUES (%d, '%s', '%s', '%s', '%s', %d, %d, %d, '%s', '%s', %d, %d)", $node->nid, $node->image_path, $node->thumb_path, serialize($node->image_list), $node->img_format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight);
 }
 
 /**
@@ -759,42 +808,43 @@ function image_update($node) {
     $old_files->image_list = unserialize($old_files->image_list);
 
     if (!unlink($old_files->image_path)) {
-      echo t("Cannot delete old image.");
-    };
+      drupal_set_message(t('Cannot delete old image.'), 'error');
+    }
     if (!unlink($old_files->thumb_path)) {
-      echo t("Cannot delete old thumb.");
-    };
+      drupal_set_message(t('Cannot delete old thumb.'), 'error');
+    }
     foreach($old_files->image_list as $k => $v) {
       if ($v['fname']) {
         if (!unlink($v['fname'])) {
-          echo t("Cannot delete static image.");
+          drupal_set_message(t('Cannot delete static image.'), 'error');
         }
       }
     }
+
 
     $node->image_path = _image_filename($node);
     $node->thumb_path = _image_thumbname($node);
 
     // Rename Image
     if (!rename(_image_tempname($node), $node->image_path)) {
-      die(t("Cannot save image."));
+      drupal_set_message(t('Cannot save image to %path.', array('%path' => $node->image_path)), 'error');
     }
 
     // Rename Thumbnail
     if (!rename(_image_tempthumbname($node), $node->thumb_path)) {
-      die(t("Cannot save image."));
+      drupal_set_message(t('Cannot save thumbnail image to %path.', array('%path' => $node->thumb_path)), 'error');
     }
 
     // Rename static images
     foreach ($node->image_list as $k => $v) {
       $node->image_list[$k]['fname'] = _image_filename($node, $k);
       if (!rename(_image_tempname($node, $k), $node->image_list[$k]['fname'])) {
-       die(t("Cannot save image."));
+        drupal_set_message(t('Cannot save resized image to %path.', array('%path' => $node->image_list[$k]['fname'])), 'error');
       }
     }
   }
 
-  db_query("UPDATE {image} SET image_path = '%s', thumb_path = '%s', image_list = '%s', format = '%s', width = %d, height = %d, filesize = %d, iptc = '%s', exif = '%s', personal = %d, weight = %d WHERE nid = %d", $node->image_path, $node->thumb_path, serialize($node->image_list), $node->format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight, $node->nid);
+  db_query("UPDATE {image} SET image_path = '%s', thumb_path = '%s', image_list = '%s', format = '%s', width = %d, height = %d, filesize = %d, iptc = '%s', exif = '%s', personal = %d, weight = %d WHERE nid = %d", $node->image_path, $node->thumb_path, serialize($node->image_list), $node->img_format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight, $node->nid);
 }
 
 /**
@@ -807,6 +857,7 @@ function image_load($node) {
   if (!($image->image_list = unserialize($image->image_list))) {
     $image->image_list = array();
   }
+
   return $image;
 }
 
@@ -833,7 +884,7 @@ function image_display() {
   $node = node_load(array("nid" => arg(2)));
   if ($_GET['res']) {
     list($w, $h) = explode("x", $_GET['res']);
-    $valid_res = explode(",", variable_get("image_default_resolutions", "640x400,800x600,1024,768,1600x1200"));
+    $valid_res = explode(",", variable_get("image_default_resolutions", "640x400,800x600,1024x768,1600x1200"));
     foreach ($valid_res as $v) {
       list($width, $height) = explode("x", $v);
       if ($w > $width || $h > $height) {
@@ -862,7 +913,7 @@ function image_display() {
     $imgname = $node->image_path;
   }
   $header[] = "Expires: ". gmdate("D, d M Y H:i:s") ." GMT";
-  $header[] = "Content-Type: image/$node->format";
+  $header[] = "Content-Type: image/$node->img_format";
   $header[] = "Content-Length: ". filesize($imgname);
 
   file_transfer(realpath($imgname), $header);
@@ -886,7 +937,7 @@ function _image_thumbname($node) {
  * Returns the temporary image filename
  */
 function _image_tempname($node, $resolution = NULL) {
-  return variable_get("image_temp_path", "./")."tmpimg_"._image_strip_name($node->image_id). ($resolution ? "_". $resolution : "").$node->extension;
+  return variable_get("image_temp_path", "./") . "tmpimg_" . _image_strip_name($node->image_id) . ($resolution ? "_" . $resolution : "") . $node->extension;
 }
 
 /**
@@ -927,36 +978,6 @@ function _image_iptc_map($iptc) {
   return $proposed;
 }
 
-function _image_iptc(&$info) {
-  // credit to pkrohn@daemonize.com from php online manual for this
-  if (isset($info['APP13'])) {
-    $iptc = iptcparse($info['APP13']);
-    if (is_array($iptc)) {
-      $result['caption'] = $iptc['2#120'][0];
-      $result['graphic_name'] = $iptc['2#005'][0];
-      $result['urgency'] = $iptc['2#010'][0];
-      $result['category'] = $iptc['2#015'][0];
-      // note that sometimes supp_categories contains multiple entries
-      $result['supp_categories'] = $iptc['2#020'];
-      $result['spec_instr'] = $iptc['2#040'][0];
-      $result['creation_date'] = $iptc['2#055'][0];
-      $result['photog'] = $iptc['2#080'][0];
-      $result['credit_byline_title'] = $iptc['2#085'][0];
-      $result['city'] = $iptc['2#090'][0];
-      $result['state'] = $iptc['2#095'][0];
-      $result['country'] = $iptc['2#101'][0];
-      $result['otr'] = $iptc['2#103'][0];
-      $result['headline'] = $iptc['2#105'][0];
-      $result['source'] = $iptc['2#110'][0];
-      $result['photo_source'] = $iptc['2#115'][0];
-      $result['caption'] = $iptc['2#120'][0];
-      $result['keywords'] = $iptc['2#025'];
-      $result['caption_writer'] = $iptc['2#122'][0];
-    }
-  }
-  return $result;
-}
-
 function _image_render_iptc_exif($iptc) {
   if (is_array($iptc)) {
     $n = 0;
@@ -985,26 +1006,6 @@ function _image_can_personal() {
   return (user_access("has personal image gallery") && variable_get("image_personal_gallery", "1"));
 }
 
-
-function _image_get_exif($file) {
-  // ripped from gallery 1.2.5
-  $_exif_path = variable_get("image_jhead_path", "");
-  if ($_exif_path) {
-    $return = exec($_exif_path." "._image_escape_shell($file), $results);
-
-    #if ($return) {
-      while (list($key,$value) = each($results)) {
-          $explodeReturn = explode(':', $value, 2);
-          $header = trim($explodeReturn[0]);
-          if ($header != "File name" && $header != "File date" && $header != "File size" && $header != "Not JPEG") {
-            $myExif[$header] = trim($explodeReturn[1]);
-          }
-      }
-
-      return $myExif;
-    #}
-  }
-}
 
 function _image_make_static(&$node, $res) {
   if (!file_exists($node->image_path)) {
@@ -1073,48 +1074,6 @@ function _image_add_static($node, $res) {
 
     return $fname;
   }
-}
-
-function _image_convert($source, $dest, $filter) {
-  $_imagick_convert = variable_get("image_convert_path", "misc/image/convert.exe");
-  if (!$_imagick_convert) {
-    return t("Imagemagick: you have to set <code>convert</code> path.");
-  }
-
-  // 040 = space
-  $filter = preg_replace("/[^A-Za-z0-9\.\-\+\040]/","",$filter);
-  $source = _image_escape_shell($source);
-  $dest = _image_escape_shell($dest);
-  $err = exec("$_imagick_convert $filter $source $dest");
-
-  return $err;
-}
-
-
-function _image_escape_shell($filename) {
-
-  if (strstr($_SERVER["SERVER_SOFTWARE"], "Win32") || strstr($_SERVER["SERVER_SOFTWARE"], "IIS")) {
-  // I can't make escapeshellarg work on windows, it adds a '
-  // this should be safe enough
-    return '"'.addslashes(_image_strip_name($filename)).'"';
-  }
-  else {
-    return escapeshellarg(_image_strip_name($filename));
-  }
-}
-
-
-/**
- * Removes any invalid characters from the filename
- */
-function _image_strip_name($filename) {
-  // we don't allow filenames with strange characters
-  // we try to convert some characters, and strip others
-  $filename = strtr(urldecode($filename),
-      "ÁÉÍÓÚÑÀÈÌÒÙÄËÏÖÜÂÊÎÔÛáéíóúñàèìòùäëïöüâêîôûç ",
-      "aeiounaeiouaeiouaeiouaeiounaeiouaeiouaeiouc_");
-
-  return strtolower(preg_replace("/[^A-Za-z0-9\.\-\+\/_]/","",$filename));
 }
 
 function _check_filesize_limits($image_file, $personal = 0) {
@@ -1394,7 +1353,7 @@ function node_image_content(&$node, $rand, $main = 0, $page = 0) {
     if ($_GET["res"]) {
       $res = $_GET["res"];
       if ($res != "original") {
-        $valid_res = explode(",", variable_get("image_default_resolutions", "640x400,800x600,1024,768,1600x1200"));
+        $valid_res = explode(",", variable_get("image_default_resolutions", "640x400,800x600,1024x768,1600x1200"));
         if (!in_array($res, $valid_res)) {
           $res = variable_get("image_default_resolution", "640x400");
         }
@@ -1600,9 +1559,9 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
     $handle = opendir($dir);
     while (($file = readdir($handle)) !== false) {
       if ($file != "." && $file != ".." && !is_dir("$dir/$file")) {
-        $image_details = _get_image_details("$dir/$file");
+        $image_details = image_get_info("$dir/$file");
         // Check to make sure that file is an image and has a type supported by image library
-        if (_is_image_type_supported($image_details['type']) && _is_valid_image_ext($file)) {
+        if (image_type_is_supported($image_details['type']) && _is_valid_image_ext($file)) {
           if ($type == "slow") {
             if ($edit["thumb"]) {
               $output .= l($file, "node/add/image/file/". $dir.$file);
@@ -1647,9 +1606,9 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
             $node->thumb_path = _image_tempthumbname($node);
 
             $node->iptc = $image_details['iptc_info'];
-            $node->exif = _image_get_exif($node->image_path);
+            $node->exif = image_get_exif($node->image_path);
 
-            $node->format = strtolower($image_details['type']);
+            $node->img_format = strtolower($image_details['type']);
             $node->width = $image_details['width'];
             $node->height = $image_details['height'];
             $node->filesize = filesize($node->image_path);
@@ -1661,7 +1620,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
               }
               image_close($image, $node->image_path, $quality);
               // Reset size;
-              $image_details = _get_image_details($node->image_path);
+              $image_details = image_get_info($node->image_path);
               $node->width = $image_details['width'];
               $node->height = $image_details['height'];
               $node->filesize = filesize($node->image_path);
@@ -1739,66 +1698,6 @@ function _image_check_configuration() {
     unset($row);
   }
 
-  // finally we also check for convert
-  $convert = variable_get("image_convert_path", "");
-  $row[] = "ImageMagick convert";
-  if ($convert) {
-    if (!file_exists($convert)) {
-      $row[] = "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/settings/image#image_convert") ."</div>";
-    }
-    else {
-      $row[] = "<div class=\"ok\">OK</div>";
-    }
-  }
-  else {
-    $row[] = "<div class=\"disabled\">disabled</div>";
-  }
-  $rows[] = $row;
-  unset($row);
-
-  // for imlib2 Library
-  $row[] = "imlib2 library";
-  if (function_exists('imlib2_load_image')) {
-    $row[] = "<div class=\"ok\">available</div>";
-  }
-  else {
-    $row[] = "<div class=\"disabled\">unavailable</div>";
-  }
-  
-  $rows[] = $row;
-  unset($row);
-  // for GD Library
-  $row[] = "GD Library";
-  $supported_types = ' - supported formats: '. implode(', ', _get_gd_image_types());
-  if (function_exists('imageCreateTrueColor')) {
-    $row[] = "<div class=\"ok\">available (version 2)". $supported_types ."</div>";
-  }
-  else if (function_exists('imageCreate')) {
-    $row[] = "<div class=\"ok\">available". $supported_types ."</div>";
-  }
-  else {
-    $row[] = "<div class=\"disabled\">unavailable</div>";
-  }
-  $rows[] = $row;
-  unset($row);
-
-  // and jhead
-  $jhead = variable_get("image_jhead_path", "");
-  $row[] = "Jhead";
-  if ($jhead) {
-    if (!file_exists($jhead)) {
-      $row[] = "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/settings/image#image_jhead") ."</div>";
-    }
-    else {
-      $row[] = "<div class=\"ok\">OK</div>";
-    }
-  }
-  else {
-    $row[] = "<div class=\"disabled\">disabled</div>";
-  }
-  $rows[] = $row;
-  unset($row);
-
   // check if he assigned a vocabulary, for image album navigation
   $row[] = "Image vocabulary";
   if (!variable_get("image_nav_vocabulary", "")) {
@@ -1813,42 +1712,6 @@ function _image_check_configuration() {
   $output .= theme("table", $headers, $rows);
 
   print theme("page", $output);
-}
-
-/**
- * Alternative function to GD 1.x imageCopyResized which produce better results.
- * (found on www.php.net)
- */
-function _imageCopyResampled ($dst, &$src, $x, $y) {
-  /*
-  Function derived from ImageCopyResampleBicubic()
-  Original code in C, for the PHP GD Module by jernberg@fairytale.se
-  Port to PHP by John Jensen July 10 2001
-  Updated by tim@smoothdeity.com
-  Re-edited & optimized by TCK
-  */
-  $pals = ImageColorsTotal ($src);
-  ImagePaletteCopy ($dst,$src);
-  $scX =(imagesx ($src)-1)/$x;
-  $scY =(imagesy ($src)-1)/$y;
-  $scX2 =intval($scX/2);
-  $scY2 =intval($scY/2);
-  for ($j = 0; $j < ($y); $j++) {
-    $sY = intval($j * $scY);
-    $y13 = $sY + $scY2;
-    for ($i = 0; $i < ($x); $i++) {
-      $sX = intval($i * $scX);
-      $x34 = $sX + $scX2;
-      $c1 = ImageColorsForIndex ($src, ImageColorAt ($src, $sX, $y13));
-      $c2 = ImageColorsForIndex ($src, ImageColorAt ($src, $sX, $sY));
-      $c3 = ImageColorsForIndex ($src, ImageColorAt ($src, $x34, $y13));
-      $c4 = ImageColorsForIndex ($src, ImageColorAt ($src, $x34, $sY));
-      $r = ($c1['red']+$c2['red']+$c3['red']+$c4['red'])/4;
-      $g = ($c1['green']+$c2['green']+$c3['green']+$c4['green'])/4;
-      $b = ($c1['blue']+$c2['blue']+$c3['blue']+$c4['blue'])/4;
-      ImageSetPixel ($dst, $i, $j, ImageColorClosest ($dst, $r, $g, $b));
-    }
-  }
 }
 
 /**
@@ -1881,350 +1744,6 @@ function _image_id($filename = '') {
   else {
     return basename($filename, strrchr($filename, '.'));
   }
-}
-
-/**
- * Returns the image types supported by the GD library.
- */
-function _get_gd_image_types() {
-
-  $supported_types = array();
-
-  if (function_exists('imagetypes')) {
-    $types = imagetypes();
-    if ($types & IMG_GIF)  $supported_types[] = 'GIF';
-    if ($types & IMG_JPG)  $supported_types[] = 'JPEG';
-    if ($types & IMG_PNG)  $supported_types[] = 'PNG';
-    if ($types & IMG_WBMP) $supported_types[] = 'WBMP';
-  }
-  return $supported_types;
-}
-
-/**
- * Returns image details (width, height, type and IPTC info if present)
- */
-function _get_image_details($image) {
-  $details = array();
-  $data = @getimagesize($image, $raw_iptc_info);
-  if (is_array($data)){
-    $types = array('1' => 'GIF', '2' => 'JPEG', '3' => 'PNG', '4' => 'SWF', '5' => 'PSD', '6' => 'BMP', '7' => 'TIFF', '8' => 'TIFF', '9' => 'JPC', '10' => 'JP2', '11' => 'JPX', '12' => 'JB2', '13' => 'SWC', '14' => 'IFF', '15' => 'WBMP', '16' => 'XBM');
-    $type = array_key_exists($data[2], $types) ? $types[$data[2]] : 'UNKNOWN';
-    $iptc_info = _image_iptc($raw_iptc_info);
-    $details = array('width'     => $data[0],
-                     'height'    => $data[1],
-                     'type'      => $type,
-                     'iptc_info' => $iptc_info);
-  }
-  return $details;
-}
-
-/**
- * Check that image type is supported by current image library.
- * Currently GIF type can be a problem with GD as GIF image creation
- * has been removed from this library until patent expires worldwide.
- */
-function _is_image_type_supported($type) {
-  switch (variable_get('image_lib', 'imagemagick')) {
-    case 'gd1':
-    case 'gd2':
-      $supported = in_array($type, _get_gd_image_types());
-      break;
-    case 'imlib2':
-      $supported = true;
-      break;
-    case 'imagemagick':
-      $supported = true;
-      break;
-    default:
-      $supported = false;
-  }
-  return $supported;
-}
-
-function image_operation($function, $method = "") {
-}
-
-function image_open($filename) {
-  $imagelib = variable_get("image_lib", "imagemagick");
-
-  $function = "image_open_". $imagelib;
-  if (function_exists($function)) {
-    return $function($filename);
-  }
-  else {
-    return false;
-  }
-}
-
-function image_close(&$image, $filename = NULL, $quality = NULL) {
-  $imagelib = variable_get("image_lib", "imagemagick");
-
-  $function = "image_close_". $imagelib;
-  if (function_exists($function)) {
-    return $function($image, $filename, $quality);
-  }
-  else {
-    return false;
-  }
-}
-
-function image_scale(&$image, $width = "", $height = "") {
-  $imagelib = variable_get("image_lib", "imagemagick");
-
-  $function = "image_scale_". $imagelib;
-  if (function_exists($function)) {
-    return $function($image, $width, $height);
-  }
-  else {
-    return false;
-  }
-}
-
-function image_rotate(&$image, $degrees) {
-  $imagelib = variable_get("image_lib", "imagemagick");
-
-  $function = "image_rotate_". $imagelib;
-  if (function_exists($function)) {
-    return $function($image, $degrees);
-  }
-  else {
-    return false;
-  }
-}
-
-function image_crop(&$image, $topx, $topy, $width, $height) {
-  $imagelib = variable_get("image_lib", "imagemagick");
-
-  $function = "image_crop_". $imagelib;
-  if (function_exists($function)) {
-    return $function($image, $topx, $topy, $width, $height);
-  }
-  else {
-    return false;
-  }
-}
-
-function image_crop_and_scale(&$image, $width, $height, $topx, $topy) {
-  $imagelib = variable_get("image_lib", "imagemagick");
-
-  $function = "image_crop_and_scale_". $imagelib;
-  if (function_exists($function)) {
-    return $function(&$image, $width, $height, $topx, $topy);
-  }
-  else  if (function_exists("image_crop_" .$imagelib) && function_exists("image_scale_" .$imagelib)) {
-    if (image_crop($image, $topx, $topy) && image_scale($image, $width, $height)) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-  else {
-    return false;
-  }
-}
-
-function image_supported_type(&$image) {
-  $imagelib = variable_get("image_lib", "imagemagick");
-
-  $function = "image_supported_type_". $imagelib;
-  if (function_exists($function)) {
-    return $function($image);
-  }
-  else {
-    return false;
-  }
-}
-
-/*
- * Image Magick Executable
- */
-
-function image_open_imagemagick($filename) {
-  if (file_exists($filename)) {
-    $image->filename = $filename;
-    return $image;
-  }
-  else {
-    return false;
-  }
-}
-
-function image_close_imagemagick(&$image, $filename = NULL, $quality = NULL) {
-  if ($quality) {
-    $image->trasform_string .= " -quality ".$quality;
-  }
-  $image->error = _image_convert($image->filename, ($filename ? $filename : $image->filename), $image->trasform_string);
-  return $image->error ? false : true;
-
-}
-
-function image_scale_imagemagick(&$image, $width = "", $height = "") {
-  $image->trasform_string .= " -scale ".$width."x".$height ." -filter QUADRATIC";
-  return true;
-}
-
-function image_rotate_imagemagick(&$image, $degrees) {
-  $image->trasform_string .= " -rotate ".$degrees . " -background " . variable_get("image_background", "#000000");
-  return true;
-}
-
-function image_crop_imagemagick(&$image, $topx, $topym, $width, $height) {
-  $image->trasform_string .= " -crop ".$width."x".$height."+".$topx."+".$topy;
-  return true;
-}
-
-function image_supported_type_imagemagick(&$image) {
-  return true;
-}
-
-/*
- * imlib2
- */
-
-function image_open_imlib2($filename) {
-  if (file_exists($filename)) {
-    $image->filename = $filename;
-    $image->imdata = imlib2_load_image($filename);
-    if (!$image->imdata) {
-      return false;
-    }
-    else {
-      return $image;
-    }
-  }
-  else {
-    return false;
-  }
-}
-
-function image_close_imlib2(&$image, $filename, $quality = NULL) {
-  if ($quality) {
-    imlib2_save_image($image->imdata, ($filename ? $filename : $image->filename), $image->error, $quality);
-  }
-  else {
-    imlib2_save_image($image->imdata,($filename ? $filename : $image->filename), $image->error);
-  }
-  return ($image->error ? false : true);
-}
-
-function image_scale_imlib2(&$image, $width = "", $height = "") {
-  $img = imlib2_create_scaled_image($image->imdata, $width, $height);
-  if (!img) {
-    return false;
-  }
-  imlib2_free_image($image->imdata);
-  $image->imdata = $img;
-  return true;
-}
-
-function image_rotate_imlib2(&$image, $degrees) {
-  if (!fmod($degrees, 90)) {
-    imlib2_image_orientate($image->imdata, ($degrees > 360 ? fmod($degrees, 360)/90  : $degrees/90));
-  }
-  else {
-    $img = imlib2_create_rotated_image($image->imdata, $degrees);
-    if (!img) {
-      return false;
-    }
-    imlib2_free_image($image->imdata);
-    $image->imdata = $img;
-  }
-  return true;
-}
-
-function image_crop_imlib2(&$image, $topx, $topy, $width, $height) {
-  $img = imlib2_create_cropped_image($image->imdata, $topx, $topy, $width, $height);
-  if (!img) {
-    return false;
-  }
-  imlib2_free_image($image->imdata);
-  $image->imdata = $img;
-  return true;
-}
-
-function image_supported_type_imlib2(&$image) {
-  return true;
-}
-
-/*
- * gd1 library
- */
-
-function image_open_gd1($filename) {
-  return image_open_gd2($filename);
-}
-
-function image_close_gd1(&$image, $filename = NULL, $quality = NULL) {
-  return image_close_gd2($image, $filename, $quality);
-}
-
-function image_scale_gd1(&$image, $width = "", $height = "") {
-  // X:x = Y:y
-  if (!$height) {
-    $height = round($image->image_details['height']*$width/$image->image_details['width']);
-  } else if (!$width){
-    $width = round($image->image_details['width']*$height/$image->image_details['height']);
-  }
-  $th = imageCreateTrueColor($width, $height);
-  imageCopyResized($th, $image->imdata, 0, 0, 0, 0, $width, $height, $image->image_details['width'], $image->image_details['height']);
-  imageDestroy($image->imdata);
-  $image->imdata = $th;
-  return true;
-}
-
-function image_supported_type_gd1(&$image) {
-}
-
-/*
- * gd2 library
- */
-
-function image_open_gd2($filename) {
-  if (file_exists($filename)) {
-    $image->filename = $filename;
-    $image->image_details = _get_image_details($imagename);
-    $function = 'imageCreateFrom'.$image_details['type'];
-    if (function_exists($function))  {
-      $image->imdata = $function($imagename);
-    }
-    else {
-      return false;
-    }
-    return $image;
-  }
-  else {
-    return false;
-  }
-}
-
-function image_close_gd2(&$image, $filename = NULL, $quality = NULL) {
-  $function = 'image'.$image->image_details['type'];
-  if (function_exists($function))  {
-    $function($image->imdata, $filename ? $filename : $image->filename);
-    imageDestroy($image->imdata);
-    return true;
-  }
-  else {
-    return false;
-  }
-}
-
-function image_scale_gd2(&$image, $width = "", $height = "") {
-  // X:x = Y:y
-  if (!$height) {
-    $height = round($image->image_details['height']*$width/$image->image_details['width']);
-  } else if (!$width){
-    $width = round($image->image_details['width']*$height/$image->image_details['height']);
-  }
-  $th = imageCreateTrueColor($width, $height);
-  imageCopyResampled($th, $image->imdata, 0, 0, 0, 0, $width, $height, $image->image_details['width'], $image->image_details['height']);
-  imageDestroy($image->imdata);
-  $image->imdata = $th;
-  return true;
-}
-
-function image_supported_type_gd2(&$image) {
 }
 
 ?>

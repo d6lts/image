@@ -1,3 +1,10 @@
+17 August 2004
+--------------
+[Eric Scouten]
+- Fix problem with non-admin users submitting images.
+- Split off image manipulation features into image.inc. (Hopefully that
+  can make it into core after the 4.5 release.)
+
 08 August 2004
 --------------
 [Eric Scouten]
