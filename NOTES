@@ -87,7 +87,8 @@ an image submitted (like events, profile); temp upload, preview, cron to delete 
 + complete permission check
 - as additional security, you should disallow php and cgi execution in image directories
 - xhtml
-
+- shadow to thumbs?
+- recreate thumbs
 
 security:
 + verify file extension and format; change blanks to underscores
@@ -140,7 +141,7 @@ TODO (+ = done):
 + image count should not consider personal images
 + check vocabulary settings in admin
 + personal gallery has exchanged settings
-- paging & browser bar
++ paging & browser bar
 - integrate history
 - t() everything
 - blocks
@@ -148,6 +149,8 @@ TODO (+ = done):
 - change die() in trigger_error()?
 - disable convert: no convert -> file upload to upload thumb
 - do we really enforce kb, size and number of personal images limit? shouldn't these checks be at node save too?
+- support gd
+- recheck personal limit
 
 ***
 Moshe:

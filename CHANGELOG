@@ -1,3 +1,10 @@
+23 May 2002
+------------------
+- paging and browser bar in thumbs view; browser bar is customizable by themes
+- link to previous and next image in view
+- always added random prefix to images while editing, to prevent caching
+
+
 21 May 2002 - "gokart"
 ------------------
 - personal galleries can now be limited (both number and size)
@@ -14,6 +21,7 @@
 - cleaned up, code has been
 - in Italian comments no more are ;)
 - Force used, always
+
 
 17 May 2002 - "la cala"
 ------------------

@@ -45,7 +45,8 @@ function image_conf_options() {
   }
   $output .= form_select("Navigation vocabulary", "image_nav_vocabulary", variable_get("image_nav_vocabulary", ""),   $vocs, "One of the taxonomy vocabularies will be the navigation tree.");
   $output .= form_select("Gallery thumb", "image_gallery_thumb", variable_get("image_gallery_thumb", "last"), array("last" => "last", "random" => "random"), "Which thumb will be show in each gallery.");
-  $output .= form_textfield("Gallery thumb per row", "image_gallery_thumb_row", variable_get("image_gallery_thumb_row", "5"), 5, 255, "How many thumbnails in every row of the gallery.");
+  $output .= form_textfield("Gallery thumbs rows", "image_gallery_thumb_rows", variable_get("image_gallery_thumb_rows", "5"), 5, 255, "How many rows of thumbs in each page of the gallery.");
+  $output .= form_textfield("Gallery thumbs columns", "image_gallery_thumb_cols", variable_get("image_gallery_thumb_cols", "3"), 5, 255, "How many columns of thumbs in each page of the gallery.");
   $output .= form_select("Gallery thumb order", "image_gallery_thumb_order", variable_get("image_gallery_thumb_order", "title"), array("title" => "title", "time" => "old -> new", "time desc" => "new -> old", "random" => "random", "weight" => "lighter -> heavier", "weight desc" => "heavier -> lighter"), "Order of thumbs. Lighter and heavier refer to weight property.");
   
   $output .= form_select("Personal photo gallery", "image_personal_gallery", variable_get("image_personal_gallery", "1"),   array("1" => "enabled", "0" => "disabled"), "Activate/deactivate personal photo gallery; use permission to control who can have it.");
@@ -120,13 +121,50 @@ function image_link($type, $node) {
   }
 
   if ($type == "menu.view" && user_access("access content") && _image_can_personal()) {
-    $links[] = lm(t("view photo gallery"), array("mod" => "image", "uid" => $user->uid), "", array("link" => t("View your personal photo gallery.")));
+    $links[] = lm(t("view photo gallery"), array("mod" => "image", "uid" => $user->uid), "", array("title" => t("View your personal photo gallery.")));
   }
 
   if ($type == "node" && $node->type == "image") {
     global $op;
     if (image_access("update", $node)) {
-      $links[] = lm(t("edit this image"), array("mod" => "node", "op" => "edit", "id" => $node->nid), t("Edit this image."));
+      $links[] = lm(t("edit this image"), array("mod" => "node", "op" => "edit", "id" => $node->nid), "", array("title" => t("Edit this image.")));
+      
+      // get previous and next image
+      $sql = "
+        SELECT n.nid, title, teaser, body, thumb_path
+        FROM node n, term_node t, image i
+        WHERE n.nid = t.nid
+        AND n.nid = i.nid
+        AND t.tid = '%s'
+        AND i.personal = 0
+      ";
+      $sql .= "ORDER BY "._image_get_thumb_order();
+
+      $terms = array_keys(taxonomy_node_get_terms_by_vocabulary($node->nid, variable_get("image_nav_vocabulary", "")));
+      $result = db_query($sql, $terms[0]);
+      
+      while ($image = db_fetch_object($result)) {
+        echo $next->nid."*".$prev->nid."-";
+        if ($stop == 1) {
+          $next->nid = $image->nid;
+          $next->title = $image->title;
+          break;
+        }
+        if ($image->nid == $node->nid) {
+          $stop = 1;
+        } else {
+          $prev->nid = $image->nid;
+          $prev->title = $image->title;
+        }
+      }
+      
+      if ($prev) {
+        $links[] = l(t("previous image"), array("id" => $prev->nid), "node", "", array("title" => $prev->title));
+      }
+      
+      if ($next) {
+        $links[] = l(t("next image"), array("id" => $next->nid), "node", "", array("title" => $next->title));
+      }
     }
     else {
       if ($node->personal) {
@@ -188,7 +226,12 @@ function image_view($node) {
     $image_path = $node->image_path;
   }
   
-  $output .= "<p align='center'><b>". check_output($node->title) ."</b></p><p align='center'><img src=\"$image_path?".(variable_get("image_random_suffix", "0") ? rand() : "")."\"></p><p align='center'>". check_output($node->body) ."</p>";
+  if (variable_get("image_random_suffix", "0") || $op == t("Preview")) {
+    // if we edit we must care about caching
+    $rand = rand();
+  }
+  
+  $output .= "<p align='center'><b>". check_output($node->title) ."</b></p><p align='center'><img src=\"$image_path?".$rand."\"></p><p align='center'>". check_output($node->body) ."</p>";
   
   if ($op != t("Preview")) {
     $output .= "<p>". $theme->links(link_node($node, $main)) ."</p>";
@@ -818,7 +861,7 @@ function _images_transform_form($size, $bytes) {
 ****/
 
 function image_page() {
-  global $theme, $vid, $tid, $uid, $sortby, $image_per_page, $nf;
+  global $theme, $vid, $tid, $uid, $sortby, $image_per_page, $nf, $page;
 
   if (user_access("access content") && variable_get("image_nav_vocabulary", "")) {
     if ($uid) {
@@ -894,28 +937,21 @@ function image_page() {
         AND n.nid = i.nid
         AND t.tid = '%s'
         AND i.personal = 0
-        ORDER BY 
       ";
       
-      $order = variable_get("image_gallery_thumb_order", "title");
-      if ($order == "title") {
-        $sql .= "n.title";
-      }
-      else if ($order == "time") {
-        $sql .= "n.created";
-      }
-      else if ($order == "time desc") {
-        $sql .= "n.created DESC";
-      }
-      else if ($order == "weight") {
-        $sql .= "i.weight";
-      }
-      else if ($order == "weight desc") {
-        $sql .= "i.weight DESC";
-      }
-      else {
-        $sql .= "RAND()";
-      }
+      $result = db_query($sql, $tid);
+      $data["total_images"] = db_num_rows($result);
+      
+      $sql .= "ORDER BY "._image_get_thumb_order();
+      
+      $thumb_num = variable_get("image_gallery_thumb_rows", "5") * variable_get("image_gallery_thumb_cols", "3");
+      if (!$page) {$page = 1;}
+      $offset = ($page - 1) * $thumb_num;
+      $data["total_pages"] = ceil($data["total_images"] / $thumb_num);
+      $data["page"] = $page;
+      $data["tid"] = $tid;
+
+      $sql .= " LIMIT $offset, $thumb_num";
 
       $result = db_query($sql, $tid);
       while ($image = db_fetch_object($result)) {
@@ -930,7 +966,7 @@ function image_page() {
       }
       
       $theme->header();
-      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_album") ? $theme->gallery_album($parents, $subalbums, $images) : _image_gallery_album($parents, $subalbums, $images));
+      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_album") ? $theme->gallery_album($parents, $subalbums, $images) : _image_gallery_album($parents, $subalbums, $images, $data));
       $theme->footer();
     }
   }
@@ -939,6 +975,28 @@ function image_page() {
     $theme->box(t("Access denied"), message_access());
     $theme->footer();
   }  
+}
+
+function _image_get_thumb_order() {
+  $order = variable_get("image_gallery_thumb_order", "title");
+  if ($order == "title") {
+    return "n.title";
+  }
+  else if ($order == "time") {
+    return "n.created";
+  }
+  else if ($order == "time desc") {
+    return "n.created DESC";
+  }
+  else if ($order == "weight") {
+    return "i.weight";
+  }
+  else if ($order == "weight desc") {
+    return "i.weight DESC";
+  }
+  else {
+    return "RAND()";
+  }
 }
 
 function _image_get_subalbums($tid, $recurse = 0) {
@@ -1023,7 +1081,7 @@ function _image_gallery_home(&$albums) {
   return $output;
 }
 
-function _image_gallery_album(&$parents, &$subalbums, &$images) {
+function _image_gallery_album(&$parents, &$subalbums, &$images, $data) {
   foreach (array_reverse(array_values($parents)) as $p) {
     $t[] = lm($p->name, array("mod" => "image", "tid" => $p->tid));;
   }
@@ -1038,16 +1096,16 @@ function _image_gallery_album(&$parents, &$subalbums, &$images) {
     $output .= "<hr>";
   }
   $n = 0;
-  $thumbs_row = variable_get("image_gallery_thumb_row", "5");
+  $thumbs_cols = variable_get("image_gallery_thumb_cols", "5");
   if ($images) {
     $output .= "<table width=\"100%\" cellpadding=\"10\">";
     foreach ($images as $image) {
-      if ($n % $thumbs_row == 0) {
+      if ($n % $thumbs_cols == 0) {
         $output .= "<tr>";
       }
       $output .= "<td valign=\"bottom\"><div align=\"center\">".l("<img src=\"".$image->thumb_path."\" border=\"0\">", array("id" => $image->nid))."<br><b>".$image->title."</b><br>".$image->teaser."</div></td>";
 
-      if ($n % $thumbs_row == $thumbs_row - 1) {
+      if ($n % $thumbs_cols == $thumbs_cols - 1) {
         $output .= "</tr>";
       }
 
@@ -1055,6 +1113,8 @@ function _image_gallery_album(&$parents, &$subalbums, &$images) {
     }
     $output .= "</table>";
   }
+  
+  $output .= _gallery_thumb_browser($data);
   
   return $output;
 }
@@ -1074,6 +1134,43 @@ return '
     </tr>
   </table>
   ';
+}
+
+function _gallery_thumb_browser($data) {
+  #print_r($data);
+  $output = '
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td colspan="5"><div align="center">'.$data["total_images"].' images in this album on '.$data["total_pages"].' pages</div></td>
+    </tr>
+    <tr>
+      <td width="10%">'.(($data["page"] > 1) ? lm("|&lt;", array("mod" => "image", "tid" => $data["tid"], "page" => 1)) : "").'</td>
+      <td width="10%">'.(($data["page"] > 1) ? lm("&lt;&lt;", array("mod" => "image", "tid" => $data["tid"], "page" => $data["page"] - 1)) : "").'</td>
+      <td>
+        <div align="center">';
+        
+  for ($n = 1; $n <= $data["total_pages"]; $n++) {
+    if ($n == $data["page"]) {
+      $p[] = "<b>&raquo;$n&laquo;</b>";
+    } else {
+      $p[] = lm($n, array("mod" => "image", "tid" => $data["tid"], "page" => $n));
+    }
+  }
+  $output .= implode("&nbsp;&#149;&nbsp;", $p);
+          
+  $output .= '
+        </div>
+      </td>
+      <td width="10%"> 
+        <div align="right">'.(($data["page"] < $data["total_pages"]) ? lm("&gt;&gt;", array("mod" => "image", "tid" => $data["tid"], "page" => $data["page"] + 1)) : "").'</div>
+      </td>
+      <td width="10%"> 
+        <div align="right">'.(($data["page"] < $data["total_pages"]) ? lm("&gt;|", array("mod" => "image", "tid" => $data["tid"], "page" => $data["total_pages"])) : "").'</div>
+      </td>
+    </tr>
+  </table>';
+  
+  return $output;
 }
 
 /****
