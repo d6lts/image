@@ -1,6 +1,11 @@
 <?php
 // $Id$
 
+function image_system($field) {
+  $system["description"] = t("Admins may add images to nodes. Provides photo galleries (shared and personal).");
+  return $system[$field];
+}
+
 function image_node($field) {
   $info["name"] = t("image");
   $info["description"] = t("An image you can insert into nodes, or see in photo galleries.");
