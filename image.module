@@ -4,7 +4,7 @@
 function image_help($section = "admin/help#image") {
   global $base_url;
 
-  $common = "<p>Admins may create many image nodes at once by uploading all images to a folder on the server. This upload happens outside of Drupal, usually using an FTP client.</p>";
+  $common = t("<p>Admins may create many image nodes at once by uploading all images to a folder on the server. This upload happens outside of Drupal, usually using an FTP client.</p>");
   $output = '';
   switch ($section) {
     case 'admin/help#image':
@@ -24,31 +24,34 @@ function image_help($section = "admin/help#image") {
       $output .= "<p>You can verify your directory and image library application configuration by visiting the <a href=\"". $base_url . "/?q=admin/image\">images administration screen</a>.</p>";
       $output .= "<h4>Adding images into other nodes</h4>";
       $output .= "<p>Sometimes, you want to add an image to another node like a blog entry or a story. You may do this by creating an image node in Drupal for the target image, and then referencing that image in your story, blog, etc. To enable this feature and learn the proper syntax, visit the <a href=\"" . $base_url . "/?q=admin/system/filters\">filters configuration screen</a>.</p>";
+      $output  = t($output); 
       break;
     case 'admin/image':
-      $output = "Below is a status of image module's current configuration.";
+      $output = t("Below is a status of image module's current configuration.");
       break;
     case 'admin/image/dir_upload/fast':
-      $output  = $common . "<h4>Fast Mode</h4><ul>";
+      $output  = "<h4>Fast Mode</h4><ul>";
       $output .= "<li>Creates all image nodes at once without user interaction.</li>";
       $output .= "<li>Applies the same taxonomy term(s) to each node, thus creating a gallery.</li>";
       $output .= "<li>If IPTC data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>";
       $output .= "<li>If the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li></ul>";
+      $output  = $common . t($output); 
       break;
     case 'admin/image/dir_upload/slow':
-      $output  = $common . "<h4>Slow Mode</h4><ul>";
+      $output  = "<h4>Slow Mode</h4><ul>";
       $output .= "<li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>";
       $output .= "<li>Add custom titles, descriptions, etc.</li></ul>";
+      $output  = $common . t($output); 
       break;
     case 'admin/system/modules#description':
-      $output = "Allow users to upload images and to display them in shared and personal photo galleries.";
+      $output = t("Allow users to upload images and to display them in shared and personal photo galleries.");
       break;
     case 'admin/system/modules/image':
-      $output = "Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced.";
+      $output = t("Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced.");
       break;
   }
 
-  return t($output);
+  return $output;
 }
 
 /**
