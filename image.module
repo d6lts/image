@@ -218,8 +218,8 @@ function image_access($op, $node) {
 }
 
 
-function image_view($node) {
-  global $theme, $op, $file, $image_not_uploaded;
+function image_view($node, $main = 0) {
+  global $theme, $op;
   
   $term_data = array_shift(taxonomy_node_get_terms($node->nid));
   if (!$term_data) {
@@ -238,18 +238,13 @@ function image_view($node) {
     // if we edit we must care about caching
     $rand = rand();
   }
-  
-  $output .= "<p align='center'><b>". check_output($node->title) ."</b></p><p align='center'><img src=\"$image_path?".$rand."\"></p><p align='center'>". check_output($node->body) ."</p>";
-  
-  if ($op != t("Preview")) {
-    $output .= "<p>". $theme->links(link_node($node, $main)) ."</p>";
-  }
-  $theme->box(check_output($node->title), $output);
+
+  method_exists($theme, "image_render_node") ? $theme->image_view_node($node, $image_path, $main) : image_render_node($node, $image_path, $main);
+  //theme_invoke("image_render_node", $node, $image_path, $main);
 }
 
-
 function image_form(&$node, &$help, &$error, &$param) {
-  global $tid, $op, $file, $HTTP_POST_FILES, $PHP_SELF;
+  global $tid, $op, $file, $HTTP_POST_FILES;
   
   /*
     we can be here if:
@@ -1103,6 +1098,25 @@ function _image_album_properties($albums) {
   }
   
   return $albums;
+}
+
+/***
+**** render functions
+***/
+
+function image_render_node($node, $image_path, $main = 0) {
+  global $theme, $op;
+  /*
+  $output .= "<p align='center'><b>". check_output($node->title) ."</b></p><p align='center'><img src=\"$image_path?".$rand."\"></p><p align='center'>". check_output($node->body) ."</p>";
+  
+  if ($op != t("Preview")) {
+    $output .= "<p>". $theme->links(link_node($node, $main)) ."</p>";
+  }
+  $theme->box(check_output($node->title), $output);
+  */
+  
+  $node->body = "<p align='center'><img src=\"$image_path?".$rand."\"></p><p align='center'>". check_output($node->body) ."</p>";
+  $theme->node($node);
 }
 
 function image_gallery_home($albums) {
