@@ -5,7 +5,7 @@ function image_help($section = "admin/help#image") {
   global $base_url;
 
   $common = "<p>Admins may create many image nodes at once by uploading all images to a folder on the server. This upload happens outside of Drupal, usually using an FTP client.</p>";
-
+  $output = '';
   switch ($section) {
     case 'admin/system/modules#description':
       $output = 'Allows users to upload images.';
