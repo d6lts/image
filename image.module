@@ -49,18 +49,16 @@ function image_help($section = "admin/help#image") {
     case 'admin/system/modules/image':
       $output = t("Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced.");
       break;
-      
     case 'filter#short-tip':
       if (variable_get("image_filter_enabled", 0)) {
         return t("You may link to images on this site <a href=\"%explanation-url\">using a special syntax</a>", array("%explanation-url" => url("filter/tips", NULL, 'image')));
       }
-
     case 'filter#long-tip':
       if (variable_get("image_filter_enabled", 0)) {
         return t("<p>You may quickly link to image nodes using a special syntax. The image code(s) will be replaced by thumbnail linked to full size image node. Syntax: <code>[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]</code>. Every parameter except node_id is <em>optional</em>.</p>");
       }
   }
-  
+
   return $output;
 }
 
@@ -663,7 +661,7 @@ function image_filter($text) {
       foreach ($match[1] as $key => $value) {
         $map[$value] = $key;
       }
-      $result = db_query("SELECT n.nid, n.teaser, i.thumb_path FROM {image} i, {node} n WHERE i.nid = n.nid AND n.nid IN ('".implode("','", array_map("check_query", $match[1]))."')");
+      $result = db_query("SELECT n.nid, n.teaser, i.thumb_path FROM {image} i, {node} n WHERE n.status = 1 AND i.nid = n.nid AND n.nid IN ('".implode("','", array_map("check_query", $match[1]))."')");
       while ($img = db_fetch_object($result)) {
         $n = $map[$img->nid];
         $img->align = $match[3][$n];
@@ -1135,7 +1133,7 @@ function image_page() {
       $thumb_num = variable_get("image_gallery_thumb_rows", "5") * variable_get("image_gallery_thumb_cols", "3");
       $images = array();
 
-      $sql  = "SELECT n.nid, n.title, n.body, i.thumb_path FROM {node} n, {image} i, {users} u WHERE n.nid = i.nid AND i.personal = 1 AND n.uid = u.uid AND u.uid = '". $uid . "' AND n.moderate = 0 ORDER BY ". _image_get_thumb_order();
+      $sql  = "SELECT n.nid, n.title, n.body, i.thumb_path FROM {node} n, {image} i, {users} u WHERE n.nid = i.nid AND i.personal = 1 AND n.status = 1 AND n.uid = u.uid AND u.uid = '". $uid . "' AND n.moderate = 0 ORDER BY ". _image_get_thumb_order();
       $result = pager_query($sql, $thumb_num, 0);
       while ($image = db_fetch_object($result)) {
         $images[] = $image;
@@ -1162,7 +1160,7 @@ function image_page() {
       $subalbums = _image_album_properties($subalbums);
       $thumb_num = variable_get("image_gallery_thumb_rows", "5") * variable_get("image_gallery_thumb_cols", "3");
 
-      $sql = "SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path FROM {node} n, {term_node} t, {image} i WHERE n.nid = t.nid AND n.nid = i.nid AND t.tid = '". $tid ."' AND i.personal = 0 AND n.moderate = 0 ORDER BY ". _image_get_thumb_order();
+      $sql = "SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path FROM {node} n, {term_node} t, {image} i WHERE n.nid = t.nid AND n.nid = i.nid AND t.tid = '". $tid ."' AND i.personal = 0 AND n.moderate = 0 AND n.status = 1 ORDER BY ". _image_get_thumb_order();
 
       $result = pager_query($sql, $thumb_num, 0);
       while ($image = db_fetch_object($result)) {
@@ -1238,7 +1236,7 @@ function _image_album_properties($albums) {
     foreach ($children as $term) {
       $terms[] = $term->tid;
     }
-    $result = db_query("SELECT COUNT(*) AS c FROM {term_node} t, {node} n, {image} i WHERE t.nid = n.nid AND i.nid = n.nid AND t.tid IN (". implode(",", $terms) .") AND i.personal = 0 AND n.moderate = 0");
+    $result = db_query("SELECT COUNT(*) AS c FROM {term_node} t, {node} n, {image} i WHERE t.nid = n.nid AND i.nid = n.nid AND t.tid IN (". implode(",", $terms) .") AND i.personal = 0 AND n.moderate = 0 AND n.status = 1");
     while ($term = db_fetch_object($result)) {
       $albums[$term_id]->image_count = $term->c;
     }
@@ -1248,7 +1246,7 @@ function _image_album_properties($albums) {
     $albums[$term_id]->thumb = $last_update->thumb_path;
 
     if (variable_get("image_gallery_thumb", "last") == "random") {
-      $random = db_fetch_object(db_query_range("SELECT i.thumb_path FROM {node} n INNER JOIN {image} i ON  n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (".implode(",", $terms).") AND n.type = 'image' AND i.personal = 0 AND n.moderate = 0 ORDER BY RAND()", 0, 1));
+      $random = db_fetch_object(db_query_range("SELECT i.thumb_path FROM {node} n INNER JOIN {image} i ON  n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (".implode(",", $terms).") AND n.type = 'image' AND i.personal = 0 AND n.moderate = 0 AND n.status = 1 ORDER BY RAND()", 0, 1));
       $albums[$term_id]->thumb = $random->thumb_path;
     }
   }
