@@ -85,7 +85,7 @@ function image_block($op = "list", $delta = 0) {
  * Node descriptor
  */
 function image_node_name() {
-  return t("image");
+  return t('image');
 }
 
 /**
@@ -292,15 +292,18 @@ function image_menu() {
   $access = user_access('access images');
 
   // Add page level link if user has access permissions
- // and a vocabulary has been selected for navigation
- if (variable_get('image_nav_vocabulary', '')) {
-   $items[] = array('path' => 'image', 'title' => t('image galleries'), 'callback' => 'image_page', 'access' => $access, 'type' => MENU_SUGGESTED_ITEM);
- }
+  // and a vocabulary has been selected for navigation
+  if (variable_get('image_nav_vocabulary', '')) {
+    $items[] = array('path' => 'image', 'title' => t('image galleries'), 'callback' => 'image_page', 'access' => $access, 'type' => MENU_SUGGESTED_ITEM);
+  }
 
+  // Add view personal gallery link if the user has personal gallery permission
   if (_image_can_personal()) {
     $items[] = array('path' => "image/uid/$user->uid", 'title' => t('my image gallery'), 'access' => $access);
-    $items[] = array('path' => 'node/add/image', 'title' => t('image'), 'callback' => '_image_check_configuration', 'access' => user_access('create images'));
   }
+
+  // Add a create link for images if the user has create permission
+  $items[] = array('path' => 'node/add/image', 'title' => t('image'), 'access' => (user_access('create images') || _image_can_personal()));
 
   // Add admin items if the user has administer permission
   $access = user_access('administer images');
