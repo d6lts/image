@@ -11,4 +11,4 @@ CREATE TABLE image (
   exif text,
   personal tinyint not null,
   weight tinyint not null
-)
+);
