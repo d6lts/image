@@ -64,7 +64,7 @@ function image_block($op = "list", $delta = 0) {
     // listing of blocks, such as on the admin/system/block page
     if ($op == "list") {
         $blocks[0]["info"] = t("Image Gallery");
-    } else {
+    } elseif (user_access('access images')) {
         // our block content
         $blocks["subject"] = t(variable_get("image_block_title", "Image Galleries"));
         $albums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
@@ -208,7 +208,7 @@ function image_link($type, $node, $main = 0) {
   $links = array();
 
   // Add page level link if a vocabulary has been selected for navigation.
-  if ($type == "page") {
+  if ($type == "page" && user_access('access images')) {
     if (variable_get("image_nav_vocabulary", "")) {
       $links[] = l(t("image galleries"), "image");
     }
