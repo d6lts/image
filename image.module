@@ -435,7 +435,7 @@ function image_validate(&$node) {
         break;
     }
     if ($errortxt) {
-      $error["image"] = theme("theme_error", $errortxt);
+      $error["image"] = theme("error", $errortxt);
     }
   }
   else {
@@ -443,7 +443,7 @@ function image_validate(&$node) {
     // Move uploaded file to temp area
     $temp_file = variable_get("image_temp_path", "./")."tmpimg_".$upload_name;
     if (!move_uploaded_file($upload_file, $temp_file) && arg(3) != "file" ) {
-      $error["image"] = theme("theme_error", t("Error processing image file."));
+      $error["image"] = theme("error", t("Error processing image file."));
     }
     else {
 
@@ -457,7 +457,7 @@ function image_validate(&$node) {
 
       // Check File Size
       if ($errortxt = _check_filesize_limits($temp_file)) {
-        $error["image"] = theme("theme_error", $errortxt);
+        $error["image"] = theme("error", $errortxt);
       }
       else {
 
@@ -465,17 +465,17 @@ function image_validate(&$node) {
         // Check to make sure that uploaded file is an image and has a type supported by image library
         if ((!_is_image_type_supported($image_details['type'])) || (!_is_valid_image_ext($temp_file))) {
           if (($image_details['type'] == 'UNKNOWN') || empty($image_details['type'])){
-            $error["image"] = theme("theme_error", t("Uploaded file was not an image."));
+            $error["image"] = theme("error", t("Uploaded file was not an image."));
           }
           else {
-            $error["image"] = theme("theme_error", t($image_details['type'] ." image type is not supported."));
+            $error["image"] = theme("error", t($image_details['type'] ." image type is not supported."));
           }
         }
         else {
 
           $max_dim = split("x", variable_get("image_default_max_size", "1024x768"));
           if ($image_details['width'] > $max_dim[0] || $image_details['height'] > $max_dim[1]) {
-            $error["image"] = theme("theme_error", t("The uploaded image(%ax%b) is to large (max %cx%d).", array("%a" => $image_details['width'], "%b" => $image_details['height'], "%c" => $max_dim[0], "%d" => $max_dim[1])));
+            $error["image"] = theme("error", t("The uploaded image(%ax%b) is to large (max %cx%d).", array("%a" => $image_details['width'], "%b" => $image_details['height'], "%c" => $max_dim[0], "%d" => $max_dim[1])));
           }
           else {
 
@@ -502,13 +502,13 @@ function image_validate(&$node) {
 
             // Set final filename
             if (!rename($temp_file, _image_tempname($node))) {
-              $error["image"] = theme("theme_error", t("Error processing image file."));
+              $error["image"] = theme("error", t("Error processing image file."));
             }
 
             // Generate Thumbnail
             $errortxt = _image_make_thumbnail(_image_tempname($node), _image_tempthumbname($node));
             if ($errortxt) {
-              $error["image"] = theme("theme_error", $errortxt);
+              $error["image"] = theme("error", $errortxt);
             }
 
           } // Dimension Check
@@ -592,13 +592,13 @@ function image_validate(&$node) {
 
       $errortxt = _image_convert($node->image_path, $node->image_path, $trasform_string);
       if ($errortxt) {
-        $error["image"] = theme("theme_error", $errortxt);
+        $error["image"] = theme("error", $errortxt);
       }
 
       // Generate New Thumbnail
       $errortxt = _image_make_thumbnail($node->image_path, $node->thumb_path);
       if ($errortxt) {
-        $error["image"] = theme("theme_error", $errortxt);
+        $error["image"] = theme("error", $errortxt);
       }
 
       // now let's reload size data
@@ -1449,7 +1449,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
     // check for tricks
     $dir = str_replace ("../", "", "./".$edit["dir"]);
     if (!is_dir($dir)) {
-      return theme("theme_error", $edit["dir"] ." ". t("is not a directory"));
+      return theme("error", $edit["dir"] ." ". t("is not a directory"));
     }
 
     variable_set("image_last_upload_dir", $edit["dir"]);
@@ -1457,7 +1457,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
     // Make sure image temp directory is writable before proceeding
     $temp_dir = variable_get("image_temp_path", "./");
     if (!is_writable($temp_dir)) {
-      return theme("theme_error", "$temp_dir ". t("is not writable. Change permissions on server"));
+      return theme("error", "$temp_dir ". t("is not writable. Change permissions on server"));
     }
 
     // Process files in upload directory
@@ -1559,10 +1559,10 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
         }
         else {
           if (($image_details['type'] == 'UNKNOWN') || empty($image_details['type'])) {
-            $output .= theme("theme_error", "$file ". t("is not an image."));
+            $output .= theme("error", "$file ". t("is not an image."));
           }
           else {
-            $output .= theme("theme_error", "$file : ". $image_details['type'] ." ". t("image type is not supported."));
+            $output .= theme("error", "$file : ". $image_details['type'] ." ". t("image type is not supported."));
           }
         }
       }
