@@ -564,7 +564,7 @@ function _image_thumbname($node) {
 
 
 function _image_tempname($node) {
-  return variable_get("image_temp_path", "./")."/tmpimg_"._image_secure_strip_name($node->image_id);
+  return variable_get("image_temp_path", "./")."tmpimg_"._image_secure_strip_name($node->image_id);
 }
 
 
