@@ -14,7 +14,7 @@ function image_node($field) {
 }
 
 function image_perm() {
-  return array("has personal image gallery", "manipulate images", "administer images");
+  return array("has personal image gallery", "manipulate images", "access images", "create images", "administer images");
 }
 
 
@@ -111,20 +111,20 @@ function image_load($node) {
 function image_link($type, $node) {
   global $user;
 
-  if ($type == "page" && user_access("access content") && variable_get("image_nav_vocabulary", "")) {
+  if ($type == "page" && user_access("access images") && variable_get("image_nav_vocabulary", "")) {
     // only if an admin defined a vocabulary as navigation tree
     $links[] = l(t("photo gallery"), "image");
   }
 
   if ($type == "admin" && user_access("administer images")) {
-    $links[] = l(t("images"), "admin/image"));
+    $links[] = l(t("images"), "admin/image");
   }
 
-  if ($type == "menu.create" && user_access("post content")) {
+  if ($type == "menu.create" && user_access("create images")) {
     $links[] = l(t("create image"), "node/add/image", array("title" => t("Add a new image.")));
   }
 
-  if ($type == "menu.view" && user_access("access content") && _image_can_personal()) {
+  if ($type == "menu.view" && user_access("access images") && _image_can_personal()) {
     $links[] = l(t("view photo gallery"), "image/uid/$user->uid", array("title" => t("View your personal photo gallery.")));
   }
 
@@ -180,7 +180,7 @@ function image_link($type, $node) {
 
 
 function image_user($type, $ahem, &$user) {
-  if (user_access("access content")) {
+  if (user_access("access images")) {
     if ($type == "view_public") {
       $output .= form_item("Photo gallery", "<a href=\"?q=image/uid/$user->uid\">view user's photo gallery</a>");
     }
@@ -915,7 +915,7 @@ function _images_transform_form($size, $bytes) {
 function image_page() {
   global $theme, $vid, $tid, $uid, $sortby, $image_per_page, $nf, $page;
 
-  if (user_access("access content") && variable_get("image_nav_vocabulary", "")) {
+  if (user_access("access images") && variable_get("image_nav_vocabulary", "")) {
     if ($uid) {
     // view user personal gallery
       $sql = "
