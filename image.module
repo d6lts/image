@@ -119,15 +119,15 @@ function image_settings() {
   $output .= form_textfield(t("Default thumbnail resolution"), "image_default_thumb_size", variable_get("image_default_thumb_size", "100"), 10, 255, t("Default size of thumbnails: format will be the same as original image. Use just one dimension, and put a \"x\" to specify height. Examples: \"100\" for width of 100; \"x200\" for height of 200."));
 
   // Check which version of the GD library is available
+  $libraries = array("imagemagick" => "imagemagick");
+  if (function_exists("imagick_readimage")) {
+    $libraries['libmagick'] = "libmagick";
+  }
   if (function_exists("imageCreateTrueColor")) {
-    $libraries = array("imagemagick" => "imagemagick", "gd2" => "gd2");
+    $libraries['gd2'] = "gd2";
   }
-  else if (function_exists("imageCreate")) {
-    $libraries = array("imagemagick" => "imagemagick", "gd1" => "gd1");
-  }
-  else {
-    // Default to ImageMagick if GD not found
-    $libraries = array("imagemagick" => "imagemagick");
+  elseif (function_exists("imageCreate")) {
+    $libraries['gd1'] = "gd1";
   }
   $output .= form_select(t("Image library"), "image_lib", variable_get("image_lib", "imagemagick"), $libraries, t("Select the image library to be used during thumbnail generation and image manipulation.  Use ImageMagick if you can; GD produces worse thumbnails, might not support GIF and this module doesn't support image editing (rotate, crop etc) with it."));
   $output .= "<a name=\"image_convert\"></a>";
@@ -1224,9 +1224,6 @@ function _dirsize($directory) {
 }
 
 function _images_transform_form($node) {
-  if (variable_get("image_lib", "imagemagick") != "imagemagick" && variable_get("image_lib", "imagemagick") != "imlib2") {
-    return "";
-  }
   return '<br/>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <tr valign="top">

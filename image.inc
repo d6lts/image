@@ -124,6 +124,9 @@ function image_type_is_supported($type) {
     case 'gd2':
       $supported = in_array($type, _get_gd_image_types());
       break;
+    case 'libmagick':
+      $supported = true;
+      break;
     case 'imlib2':
       $supported = true;
       break;
@@ -315,6 +318,79 @@ function _image_convert($source, $dest, $filter) {
   return $err;
 }
 
+/**
+ * @}
+ */
+
+/**
+ * @defgroup libmagick
+ *  Image manipulation functions using ImageMagick php extension.
+ * @{
+ */
+
+function _image_open_libmagick($filename) {
+  if (file_exists($filename)) {
+    $image->filename = $filename;
+    $image->imdata = imagick_readimage($filename);
+    if (imagick_iserror($image->imdata)) {
+      return false;
+    }
+    else {
+      return $image;
+    }
+  } else {
+    return false;
+  }
+}
+
+function _image_close_libmagick(&$image, $filename = NULL, $quality = NULL) {
+  if (!imagick_writeimage($image->imdata, $filename ? $filename : $image->filename)) {
+    return false;
+  }
+  return true;
+}
+
+function _image_scale_libmagick(&$image, $width = '', $height = '') {
+  if (!imagick_scale($image->imdata, $width, $height, "!")) {
+    return false;
+  }
+  return true;
+}
+
+function _image_rotate_libmagick(&$image, $degrees) {
+  $degrees = ($degrees > 360 ? fmod($degrees, 360)/90  : $degrees/90);
+  if (!fmod($degrees, 90)) {
+    switch($degrees) {
+      case 90:
+        $x = 0;
+        $y = 90;
+      case 180:
+      case 270:
+      default:
+        $x = $y = 0;
+    }
+    if (!imagick_shear($image->imdata, $x, $y)) {
+      return false;
+    }
+  }
+  else { 
+    if (!imagick_rotate($image->imdata, $degrees)) {
+      return false;
+    }
+  }
+  return true; 
+}
+
+function _image_crop_libmagick(&$image, $topx, $topym, $width, $height) {
+  if (!imagick_crop($image->imdata, $topx, $topym, $width, $height)) {
+    return false;
+  }
+  return true;
+}
+
+function _image_supported_type_libmagick(&$image) {
+  return true;
+}
 /**
  * @}
  */
