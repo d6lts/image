@@ -31,7 +31,7 @@ function image_perm() {
  */
 function image_settings() {
 
-  $output .= form_textarea(t("Explanation or submission guidelines"), "image_help", variable_get("story_help", ""), 70, 5, t("This text will be displayed at the top of the image submission form.  It is useful for helping or instructing your users."));
+  $output .= form_textarea(t("Explanation or submission guidelines"), "image_help", variable_get("image_help", ""), 70, 5, t("This text will be displayed at the top of the image submission form.  It is useful for helping or instructing your users."));
 
   $output .= form_textfield(t("Default image path"), "image_default_path", variable_get("image_default_path", "images/"), 30, 255, t("Default path for uploaded images relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."));
   
@@ -682,9 +682,9 @@ function image_update($node) {
     if (!rename(_image_tempthumbname($node), $node->thumb_path)) {
       die(t("Cannot save image."));
     }
-
-    db_query("UPDATE image SET image_path = '%s', thumb_path = '%s', format = '%s', width = '%s', height = '%s', filesize = '%s', iptc = '%s', exif = '%s', personal = '%s', weight = '%s' WHERE nid = '%s'", $node->image_path, $node->thumb_path, $node->format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight, $node->nid);
   }
+
+  db_query("UPDATE image SET image_path = '%s', thumb_path = '%s', format = '%s', width = '%s', height = '%s', filesize = '%s', iptc = '%s', exif = '%s', personal = '%s', weight = '%s' WHERE nid = '%s'", $node->image_path, $node->thumb_path, $node->format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight, $node->nid);
 }
 
 /**
@@ -1022,7 +1022,7 @@ function _dirsize($directory) {
         $size += filesize($directory . '/' . $dirfile);
       }
       else if (is_dir($directory . '/' . $dirfile)) {
-        $dirSize = dirsize($directory . '/' . $dirfile);
+        $dirSize = _dirsize($directory . '/' . $dirfile);
         if ($dirSize >= 0) {
           $size += $dirSize;
         }

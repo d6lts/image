@@ -1,3 +1,26 @@
+9 June 2003 (Summarization of several patches)
+-----------
+[Craig Courtney]
+- Moved processing logic from _from to _validate
+- Seperated personal gallery privileges from site gallery privileges
+- Added support for register globals off
+- Integrated proper error display with returning $error
+- Fixed next/prev links
+- Made Body/Teaser consistent with drupal CVS behaviors
+- Cleaned up submission form
+- Removed image filename clashes
+- Added temp directory size limits to prevent image uploads from filling up server disk space
+- Module now displays teaser on main page instead of full image
+- Fixed bug where changes would not save on edit unless the image itself was changed
+[Jonathan Chaffer]
+- Patch to fix undefined function call error
+[Moshe Weitzman]
+- Fix to admin page to show properly when a usr hasn't yet selectd a vocabulary for organizing images.
+[Al Maw]
+- Added t() blocks for translations
+- Removed styes in favor of drupal.css classes
+
+
 19. May 2003
 ------------
 [Bruno Rocci]
