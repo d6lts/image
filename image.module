@@ -44,13 +44,13 @@ function image_help($section = "admin/help#image") {
       <li>Add custom titles, descriptions, etc.</li></ul>");
       break;
     case 'admin/system/modules#description':
-      $output = t("Allow users to upload images and to display them in shared and personal photo galleries.");
+      $output = t("Allow users to upload images and to display them in shared and personal image galleries.");
       break;
     case 'admin/system/modules/image':
       $output = t("Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced.");
       break;
     case 'node/add#image':
-      $output = t("An image you can insert into nodes, or see in photo galleries.");
+      $output = t("An image you can insert into nodes, or see in image galleries.");
       break;
     case 'filter#short-tip':
       if (variable_get("image_filter_enabled", 0)) {
@@ -68,7 +68,7 @@ function image_help($section = "admin/help#image") {
 /**
  * Node descriptor
  */
-function image_node_name($node) {
+function image_node_name() {
   return t("image");
 }
 
@@ -139,7 +139,7 @@ function image_settings() {
   $output .= form_textfield(t("Gallery Columns"), "image_gallery_thumb_cols", variable_get("image_gallery_thumb_cols", "3"), 5, 255, t("Specify how many columns of thumbnails in each page of the gallery."));
   $output .= form_select(t("Gallery Order"), "image_gallery_thumb_order", variable_get("image_gallery_thumb_order", "title"), array("title" => "title", "time" => "old -> new", "time desc" => "new -> old", "random" => "random", "weight" => "lighter -> heavier", "weight desc" => "heavier -> lighter"), t("Order of thumbnails within a gallery. Lighter and heavier refer to weight property."));
 
-  $output .= form_select(t("Personal Photo Galleries"), "image_personal_gallery", variable_get("image_personal_gallery", "1"),   array("1" => "enabled", "0" => "disabled"), t("Activate/deactivate personal photo galleries site-wide.  When enabled you can use the \"has personal image gallery\" permission to control which roles have personal galleries."));
+  $output .= form_select(t("Personal Image Galleries"), "image_personal_gallery", variable_get("image_personal_gallery", "1"),   array("1" => "enabled", "0" => "disabled"), t("Activate/deactivate personal image galleries site-wide.  When enabled you can use the \"has personal image gallery\" permission to control which roles have personal galleries."));
   if (variable_get("image_personal_gallery", "1") == "1") {
     $output .= form_textfield(t("Personal Gallery Picture Limit"), "image_personal_gallery_max_num", variable_get("image_personal_gallery_max_num", "50"), 5, 255, t("Set how many pictures users are allowed."));
     $output .= form_select(t("Personal Gallery Picture Limit Per Role"), "image_personal_gallery_role", variable_get("image_personal_gallery_role", "0"), array("0" => "disabled", "1" => "enabled"), t("Enabling this will allow for setting a maximum number of pictures per role."));
@@ -190,7 +190,7 @@ function image_link($type, $node, $main = 0) {
   // Add page level link if the user has access permissions and a vocabulary has been selected for navigation
   if ($type == "page") {
     if (user_access("access images") && variable_get("image_nav_vocabulary", "")) {
-      $links[] = l(t("photo galleries"), "image");
+      $links[] = l(t("image galleries"), "image");
     }
   }
 
@@ -209,11 +209,11 @@ function image_link($type, $node, $main = 0) {
 
     // Add view personal gallery link if the user has personal gallery permission
     if (user_access("access images") && _image_can_personal()) {
-      menu("image/uid/$user->uid", t("my photo gallery"), "image_page");
+      menu("image/uid/$user->uid", t("my image gallery"), "image_page");
     }
 
     if (user_access("access image") && variable_get("image_nav_vocabulary","")) {
-      menu("image", t("photo galleries"), "image_page", 0, 1);
+      menu("image", t("image galleries"), "image_page", 0, 1);
     }
   }
 
@@ -224,9 +224,9 @@ function image_link($type, $node, $main = 0) {
       $links[] = l(t("edit this image"), "node/edit/$node->nid", array("title" => t("Edit this image.")));
     }
 
-    // Display personal gallery links if this is a personal gallery photo and personal gallery photo is enabled
+    // Display personal gallery links if this is a personal gallery image and personal image gallery is enabled
     if ($node->personal && _image_can_personal()) {
-      $links[] = l(t("%u's photo gallery", array("%u" => $node->name)), "image/uid/$node->uid", array("title" => t("View %u's photo gallery.", array("%u" => $node->name))));
+      $links[] = l(t("%u's image gallery", array("%u" => $node->name)), "image/uid/$node->uid", array("title" => t("View %u's image gallery.", array("%u" => $node->name))));
 
       $sql  = "SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path FROM {node} n, {image} i WHERE n.nid = i.nid AND i.personal = 1 AND n.moderate = 0 AND n.uid = ";
       $sql .= $node->uid;
@@ -234,7 +234,7 @@ function image_link($type, $node, $main = 0) {
 
     }
 
-    // If this is not a personal gallery photo the display normal links
+    // If this is not a personal gallery image then display normal links
     else {
 
       $vid = variable_get("image_nav_vocabulary", "");
@@ -256,7 +256,7 @@ function image_link($type, $node, $main = 0) {
           $term = taxonomy_get_term($tid);
         }
 
-        $links[] = l(t("%t photo gallery", array("%t" => $term->name)), "image/tid/" . $term->tid, array("title" => t("View %t photo gallery.", array("%t" => $terms->name))));
+        $links[] = l(t("%t image gallery", array("%t" => $term->name)), "image/tid/" . $term->tid, array("title" => t("View %t image gallery.", array("%t" => $terms->name))));
 
         $sql = "SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path FROM {node} n, {term_node} t, {image} i WHERE n.nid = t.nid AND n.nid = i.nid AND i.personal = 0 AND n.moderate = 0";
         if (isset($term->tid)) {
@@ -299,12 +299,12 @@ function image_link($type, $node, $main = 0) {
 }
 
 /**
- * Function to display photo gallery link on user information display.
+ * Function to display image gallery link on user information display.
  */
 function image_user($type, $ahem, &$user) {
 
   if (user_access("access images") && _image_can_personal() && ($type == "view_public")) {
-    return form_item(t("Photo gallery"), l(t("view user's photo gallery"), "image/uid/$user->uid"));
+    return form_item(t("Image gallery"), l(t("view user's image gallery"), "image/uid/$user->uid"));
   }
 }
 
@@ -322,7 +322,7 @@ function image_access($op, $node) {
     return ($node->status && user_access("access images"));
   }
 
-  // For create access if theuser has create permissions
+  // For create access if the user has create permissions
   if ($op == "create") {
     return user_access("create images") || _image_can_personal();
   }
@@ -389,7 +389,7 @@ function image_form(&$node, &$error, &$param) {
   }
 
   if (_image_can_personal() && user_access("create images")) {
-    $output .= form_select(t("Personal"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can only be seen in the user's photo gallery."));
+    $output .= form_select(t("Personal"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can only be seen in the user's image gallery."));
   }
 
   $output .= form_hidden("existing", $node->existing);
@@ -493,7 +493,7 @@ function image_validate(&$node) {
 
           $max_dim = split("x", variable_get("image_default_max_size", "1024x768"));
           if ($image_details['width'] > $max_dim[0] || $image_details['height'] > $max_dim[1]) {
-            $error["image"] = theme("error", t("The uploaded image(%ax%b) is to large (max %cx%d).", array("%a" => $image_details['width'], "%b" => $image_details['height'], "%c" => $max_dim[0], "%d" => $max_dim[1])));
+            $error["image"] = theme("error", t("The uploaded image(%ax%b) is too large (max %cx%d).", array("%a" => $image_details['width'], "%b" => $image_details['height'], "%c" => $max_dim[0], "%d" => $max_dim[1])));
           }
           else {
 
@@ -1145,7 +1145,7 @@ function image_page() {
       $breadcrumb[] = l(t("Home"), "");
       drupal_set_breadcrumb($breadcrumb);
 
-      print theme("page", theme("image_gallery_album", $images), t("%u's Photo Gallery", array("%u" => $galleryuser->name)));
+      print theme("page", theme("image_gallery_album", $images), t("%u's Image Gallery", array("%u" => $galleryuser->name)));
     }
     else if (!isset($tid)) {
       // show albums
@@ -1176,7 +1176,7 @@ function image_page() {
          $breadcrumb[] = l($parents[$n]->name, 'image/tid/'. $parents[$n]->tid);
       }
       $title = $parents[0]->name;
-      $breadcrumb[] = l(t('Photo galleries'), 'image');
+      $breadcrumb[] = l(t('Image galleries'), 'image');
       $breadcrumb[] = l(t('Home'), '');
       $breadcrumb = array_reverse($breadcrumb);
       drupal_set_breadcrumb($breadcrumb);
@@ -1627,10 +1627,10 @@ function _image_check_configuration() {
   $rows[] = $row;
   unset($row);
 
-  // check if he assigned a vocabulary, for photo album navigation
+  // check if he assigned a vocabulary, for image album navigation
   $row[] = "Image vocabulary";
   if (!variable_get("image_nav_vocabulary", "")) {
-    $row[] = "<div class=\"error\">Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ". l("Site Configuration", "admin/system/modules/image#image_nav_vocabulary"). "</div>";
+    $row[] = "<div class=\"error\">Warning: you must assign a vocabulary to navigate in image gallery. Fix in ". l("Site Configuration", "admin/system/modules/image#image_nav_vocabulary"). "</div>";
   }
   else {
     $row[] = "<div class=\"ok\">assigned</div>";
