@@ -1,3 +1,16 @@
+8 March 2003
+------------
+[Kjartan Mannes]
+Updated to work with latest node changes:
+  - Removed _save():
+      * Moved code into _validate hook.
+  - Changed *_validate() to the new system:
+      * No $error for second parameter.
+      * Return $error instead of $node.
+      * $node passed by reference.
+  - Note to developers: don't do valiation in the _form function, do that
+    in _validate. Just a hint :)
+
 6 October 2002
 ----------------------
 [Gerhard Killesreiter]

@@ -80,25 +80,6 @@ function image_cron() {
 }
 
 
-function image_save($op, $node) {
-  if ($op == "approve") {
-    return array("status" => 1);
-  }
-
-  if ($op == "create") {
-    return array("body" => filter($node->body), "teaser" => filter($node->teaser), "image_id", "image_name", "personal", "weight", "moderate" => 0);
-  }
-
-  if ($op == "decline") {
-    return array("status" => 0);
-  }
-
-  if ($op == "update") {
-    return array("body" => filter($node->body), "teaser" => filter($node->teaser), "image_id", "image_name", "personal", "weight");
-  }
-}
-
-
 function image_load($node) {
   $image = db_fetch_object(db_query("SELECT * FROM image WHERE nid = '%s'", $node->nid));
   $image->iptc = unserialize($image->iptc);
@@ -432,6 +413,11 @@ function image_form(&$node, &$help, &$error, &$param) {
   return $output;
 }
 
+
+function image_validate(&$node) {
+  $node->body = filter($node->body);
+  $node->teaser = filter($node->body);
+}
 
 function image_delete(&$node) {
   db_query("DELETE FROM image WHERE nid = '%s'", $node->nid);
