@@ -373,8 +373,10 @@ function image_page($type = NULL, $tid = 0) {
   drupal_set_html_head('<style type="text/css">@import url('.drupal_get_path('module','image').'/image.css);</style>');
   $albums = taxonomy_get_tree(_image_get_vid(), $tid, -1, 1);
   for ($i=0; $i < count($albums); $i++) {
-    $albums[$i]->count = db_result(db_query(db_rewrite_sql("SELECT COUNT(*) FROM {term_node} t INNER JOIN {node} n ON t.nid=n.nid WHERE n.status=1 AND n.type='image' AND t.tid=%d"), $albums[$i]->tid));
-    $last = db_fetch_object(db_query_range(db_rewrite_sql("SELECT n.nid FROM {node} n INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid=%d AND n.type = 'image' AND n.status = 1 ORDER BY n.sticky DESC, n.changed DESC"), $albums[$i]->tid, 0, 1));
+    $albums[$i]->count = taxonomy_term_count_nodes($albums[$i]->tid, 'image');
+    $tree = taxonomy_get_tree(_image_get_vid(), $albums[$i]->tid, -1);
+    $descendant_tids = array_merge(array($albums[$i]->tid), array_map('_taxonomy_get_tid_from_term', $tree));
+    $last = db_fetch_object(db_query_range(db_rewrite_sql('SELECT n.nid FROM {node} n INNER JOIN {term_node} tn ON n.nid = tn.nid WHERE tn.tid IN (%s) AND n.status = 1 ORDER BY n.sticky DESC, n.created DESC'), implode(',', $descendant_tids), 0, 1));
     $albums[$i]->latest = node_load(array('nid' => $last->nid));
   }
 
