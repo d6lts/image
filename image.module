@@ -84,7 +84,7 @@ function image_node_name() {
  * Permissions this module exposes.
  */
 function image_perm() {
-  return array("has personal image gallery", "manipulate images", "access images", "create images", "administer images");
+  return array("has personal image gallery", "manipulate images", "create images", "administer images");
 }
 
 /**
@@ -205,10 +205,9 @@ function image_link($type, $node, $main = 0) {
 
   $links = array();
 
-  // Add page level link if the user has access permissions and a vocabulary has been selected for navigation.
-
+  // Add page level link if a vocabulary has been selected for navigation.
   if ($type == "page") {
-    if (user_access("access images") && variable_get("image_nav_vocabulary", "")) {
+    if (variable_get("image_nav_vocabulary", "")) {
       $links[] = l(t("image galleries"), "image");
     }
   }
@@ -339,7 +338,7 @@ function image_menu($may_cache) {
  * Function to display image gallery link on user information display.
  */
 function image_user($type, $ahem, &$user) {
-  if (user_access("access images") && _image_can_personal() && ($type == "view")) {
+  if (_image_can_personal() && ($type == "view")) {
     return array('Personal gallery' => form_item(t("Image gallery"), l(t("view image gallery"), "image/uid/$user->uid")));
   }
 }
@@ -353,24 +352,19 @@ function image_user($type, $ahem, &$user) {
 function image_access($op, $node) {
   global $user;
 
-  // For node view allow access if the node status is approved and they have access permissions
-  if ($op == "view") {
-    return ($node->status && user_access("access images"));
-  }
-
   // For create access if the user has create permissions
   if ($op == "create") {
     return user_access("create images") || _image_can_personal();
   }
 
-  // Only allow the creator of the node to update it
-  if ($op == "update") {
-    return ($user->uid == $node->uid);
+  // allow the creator of the node to update it
+  if ($op == "update" && $user->uid == $node->uid) {
+    return TRUE;
   }
 
-  // Only allow the creator of the node to delete it
-  if ($op == "delete") {
-    return ($user->uid == $node->uid);
+  // allow the creator of the node to delete it
+  if ($op == "delete" && $user->uid == $node->uid) {
+    return TRUE;
   }
 }
 
@@ -1279,7 +1273,7 @@ function image_page() {
     $uid = arg(2);
   }
 
-  if (user_access("access images") && variable_get("image_nav_vocabulary", "")) {
+  if (variable_get("image_nav_vocabulary", "")) {
     // view user personal gallery if personal gallery is enabled
     if (isset($uid) && _image_can_personal()) {
       $thumb_num = variable_get("image_gallery_thumb_rows", "5") * variable_get("image_gallery_thumb_cols", "3");
