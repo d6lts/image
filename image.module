@@ -212,7 +212,7 @@ function image_link($type, $node, $main = 0) {
       menu("image/uid/$user->uid", t("my image gallery"), "image_page");
     }
 
-    if (user_access("access image") && variable_get("image_nav_vocabulary","")) {
+    if (user_access("access images") && variable_get("image_nav_vocabulary","")) {
       menu("image", t("image galleries"), "image_page", 0, 1);
     }
   }
