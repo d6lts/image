@@ -7,9 +7,8 @@ follow these steps:
 
 
 (1) Move update-image.php to the root directory of your site (next to update.php or index.php).
-(2) Log in as the original user of the site (user ID #1).
-(3) Open this script at "http://my.site.com/update-image.php" and follow the on-screen instructions.
-(4) For security, remove the update-image.php script (until the next version ;-) ).
+(2) Open this script at "http://my.site.com/update-image.php".
+(3) For security, remove the update-image.php script.
 
 
-Send comments to drupal.org@ericscouten.com.
+Send comments to walkah@walkah.net.

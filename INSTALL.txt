@@ -1,76 +1,9 @@
-Requirements
-------------
+image.module installation instructions
 
-This module requires ImageMagick (http://www.imagemagick.org),  GD (http://www.boutell.com/gd) or ImLib2 (http://www.enlightenment.org/pages/imlib2.html).
-Note that full image manipulation functionality (i.e. rotate, crop, etc.) is not yet available with GD.
+1.) Copy this directory to your modules/ directory
 
+2.) Enable the module at ?q=admin/modules
 
-Installation
-------------
+3.) Configure the module settings at ?q=admin/modules/settings
 
-1. If you are updating the image.module from a previous installation please skip to the Update section below.
-
-2. If you are installing image.module for the first time :
-
-Create the SQL tables.
-     mysql -u username -ppassword drupal < image.sql
-     
-3. Copy the entire image folder to your drupal/modules directory.  Drupal will automatically detect it. Note: only image.module and image.inc are required in this folder for proper operation.
-
-4. Proceed to your Drupal site and enable the module in "administer > modules".
-
-5. The image module needs to be properly configured to your system and some folders for your uploaded images may need to be created on your system.  To do this goto "administer > settings > image".  If the image option is not there something went wrong in your previous steps.
-
-6. Define the "Default image path" and "Default thumb path".  These paths are defined from the root of your Drupal installation.  The default setting is "images/" and "images/thumbs/".  So go ahead and create a folder at the base of your Drupal installation called "images" and another inside that called "thumbs".  Both of these folders need the appropriate permissions so that your PHP can write to the folder.
-
-7. Define "Temporary image path".  This path is defined relative to the modules folder.  Create a folder at the base of your Drupal installation called "tmp".  Then set the path to "./tmp/".
-
-8. Define the "ImageMagick Convert path".  The image.module needs to know where to find your installation of ImageMagick's "convert" executable.  If you are using GD Library just leave this blank.  The default setting will be appropriate for many on Windows machines.  If you are using Linux or Mac OS X the convert path should probably look like "/usr/local/bin/convert", but will be specific to machines or installations.
-
-9. You can check to see if you have set these directory paths correctly by visiting "administer > images".
-
-10. Define categories for image galleries.  To get image galleries working you will need to create a new Vocabulary in "administer > categories".  Select "add vocabulary", give it a name and under "Types" select "image".
-
-11. Return to "administer > settings > image" and scroll down to "Gallery Navigation Vocabulary".  Select the vocabulary you just created in step 10.
-
-12. You should now be able to upload and modify images by visiting "create Content" and selecting "image".
-
-13. Be sure to visit "administer > users > configure > permissions" to set the right permissions to the roles you have defined.
-
-
-Update
-------
-
-image.module has an automated update system similar to Drupal core. This updater will help you upgrade from the version 4.4.0 version of image.module to newer versions. To use it, follow these steps:
-
-1. Remove the old image.module file in your drupal/module directory.
-
-2. Copy the entire image module folder to your drupal/modules directory.
-
-3. Move update-image.php to the root directory of your site (next to update.php or index.php).
-
-4. Log in as the original user of the site (user ID #1).
-
-5. Open this script at "http://your.site.com/update-image.php" and follow the on-screen instructions.
-
-6. For security, remove the update-image.php script (until the next version ;-) ).
-
-
-Notes
------
-
-From 4.3.0RC version and up, for PostgreSQL users, it is no longer necessary to replace all occurrences of RAND() with RANDOM() in image.module.
-Thanks to Adrian, update.php includes now a function to create a RAND() function within PostgreSQL, which just wraps the existing RANDOM(). See update_65().
-
-For 4.2.0 version, image module has been improved to use the correct function in queries, RAND() or RANDOM(), based on the database type.
-
-
-Author
-------
-
-Marco Molinari <marco@porciletto.org>
-
-
-Maintainer
-----------
-Eric Scouten <drupal.org@ericscouten.com>
+4.) Optionally, add image albums for the gallery at ?q=admin/image

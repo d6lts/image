@@ -1,13 +1,13 @@
-This module allow users with proper permissions to upload images into drupal. Thumbnails are created automaticaly.
+IMAGE MODULE
+-------------
 
-Images could be posted individualy to the front page, included in stories or grouped in galleries.
-Galleries are either personal, i.e linked to a user, or global to the drupal site.
+Image.module is responsible for the creation & maintenance of "image
+nodes" that can be used for several purposes - such as embedding in
+other nodes, or used on their own to display photographs, screenshots or
+diagrams. This module also comes with basic image gallery
+functionality - for organizing and displaying images in albums. 
 
-Admin could administer images and set various parameters such as, among others, maximum image size, permissions to access images or manipulate them.
+TO UPDATE: PLEASE READ UPDATE.TXT
 
-This module requires ImageMagick (http://www.imagemagick.org),  GD (http://www.boutell.com/gd) or ImLib2 (http://www.enlightenment.org/pages/imlib2.html)
-
-See INSTALL.txt for installation instructions.
-
---
-Send comments to drupal.org@ericscouten.com.
+Please, send bug reports, feature requests, or other comments to me:
+James Walker <james@bryght.com>
