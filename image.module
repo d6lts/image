@@ -286,13 +286,9 @@ function image_link($type, $node, $main = 0) {
  */
 function image_user($type, $ahem, &$user) {
 
-  $output = '';
-
   if (user_access("access images") && _image_can_personal() && ($type == "view_public")) {
-    $output = form_item(t("Photo gallery"), l(t("view user's photo gallery"), "image/uid/$user->uid"));
+    return form_item(t("Photo gallery"), l(t("view user's photo gallery"), "image/uid/$user->uid"));
   }
-
-  return $output;
 }
 
 /**
