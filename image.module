@@ -250,7 +250,8 @@ function image_view($node, $main = 0) {
 function image_form(&$node, &$help, &$error, &$param) {
   global $tid, $file;
 
-  $op = $_POST["op"];
+  $op = arg(1);
+
   /*
     we can be here if:
     - we try to add a new image
