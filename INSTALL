@@ -1,7 +1,7 @@
 Readme
 ------
 
-This module is about images ;)
+This module is about enables and admins and optionally users to upload images into drupal.
 
 Send comments to marco@porciletto.org.
 
@@ -9,7 +9,7 @@ Send comments to marco@porciletto.org.
 Requirements
 ------------
 
-This module requires Drupal CVS version circa May 2001.
+This module requires Drupal 4 or later.
 
 
 Installation
@@ -21,6 +21,8 @@ Installation
 2. Copy the image.module to the Drupal modules/ directory. Drupal should automatically detect it. Enable the module in Site Configuration -> Modules.
 
 3. There are a lot of options in admin: you should set at least imagemagick convert path for funny things on images, and some writeable directories to work.
+If Imagemagick is unavailable, you may use GD instead (version 2.01+. see http://www.boutell.com/gd/). Imaqge manipulation is not
+implemented if you choose GD.
 
 4. You can check your directory permissions in admin/image
 
