@@ -573,7 +573,6 @@ function image_validate(&$node) {
     }
 
     $build_derivatives = _image_validate_do_transform($node);
-
     if (!$node->existing || $build_derivatives) {
 
       $build_derivatives = true;
@@ -674,7 +673,7 @@ function _image_validate_uploaded_file(&$node, $temp_file, $upload_name) {
       form_set_error('image', t("image type '%type' is not supported.", array('%type' => $image_details['type'])));
     }
 
-    unlink($temp_file);
+    @unlink($temp_file);
     return false;
 
   }
@@ -723,7 +722,7 @@ function _image_validate_uploaded_file(&$node, $temp_file, $upload_name) {
 
     // We already have an image ID and an uploaded file. Don't need the old temp file any more.
 
-    unlink(_image_tempname($node));
+    @unlink(_image_tempname($node));
 
   }
 
@@ -746,7 +745,7 @@ function _image_validate_uploaded_file(&$node, $temp_file, $upload_name) {
 
   $node->image_path = _image_tempname($node);
 
-  if (!rename($temp_file, $node->image_path)) {
+  if (!@rename($temp_file, $node->image_path)) {
     form_set_error('image', t('Error processing image file.'));
     return;
   }
@@ -784,7 +783,7 @@ function _image_validate_do_transform(&$node) {
         $node->image_id = _image_id($upload_name);
       }
 
-      if (($image = image_open($node->image_path)) != false) {
+      if (($image = image_open((file_exists(_image_tempname($node)) ? _image_tempname($node) : $node->image_path))) != false) {
 
         if ($cropx || $cropy) {
           image_crop($image, $cropx, $cropy, $width, $height);
@@ -823,12 +822,12 @@ function image_insert($node) {
   $node->thumb_path = _image_thumbname($node);
 
   // Rename Image
-  if (!rename(_image_tempname($node), $node->image_path)) {
+  if (!@rename(_image_tempname($node), $node->image_path)) {
     drupal_set_message(t('Cannot save image to %path.', array('%path' => $node->image_path)), 'error');
   }
 
   // Rename Thumbnail
-  if (!rename(_image_tempthumbname($node), $node->thumb_path)) {
+  if (!@rename(_image_tempthumbname($node), $node->thumb_path)) {
     drupal_set_message(t('Cannot save thumbnail image to %path.', array('%path' => $node->thumb_path)), 'error');
   }
 
@@ -836,7 +835,7 @@ function image_insert($node) {
   if (is_array($node->image_list)) {
     foreach ($node->image_list as $k => $v) {
       $node->image_list[$k]['fname'] = _image_filename($node, $k);
-      if (!rename(_image_tempname($node, $k), $node->image_list[$k]['fname'])) {
+      if (!@rename(_image_tempname($node, $k), $node->image_list[$k]['fname'])) {
         drupal_set_message(t('Cannot save resized image to %path.', array('%path' => $node->image_list[$k]['fname'])), 'error');
       }
     }
@@ -879,14 +878,14 @@ function image_update($node) {
     }
 
     // Rename Thumbnail
-    if (!rename(_image_tempthumbname($node), $node->thumb_path)) {
+    if (!@rename(_image_tempthumbname($node), $node->thumb_path)) {
       drupal_set_message(t('Cannot save thumbnail image to %path.', array('%path' => $node->thumb_path)), 'error');
     }
 
     // Rename static images
     foreach ($node->image_list as $k => $v) {
       $node->image_list[$k]['fname'] = _image_filename($node, $k);
-      if (!rename(_image_tempname($node, $k), $node->image_list[$k]['fname'])) {
+      if (!@rename(_image_tempname($node, $k), $node->image_list[$k]['fname'])) {
         drupal_set_message(t('Cannot save resized image to %path.', array('%path' => $node->image_list[$k]['fname'])), 'error');
       }
     }
@@ -918,11 +917,11 @@ function image_load($node) {
  */
 function image_delete(&$node) {
   db_query("DELETE FROM {image} WHERE nid = '%s'", $node->nid);
-  unlink($node->image_path);
-  unlink($node->thumb_path);
+  @unlink($node->image_path);
+  @unlink($node->thumb_path);
   foreach($node->image_list as $k => $v) {
     if(file_exists($node->image_list[$k]['fname'])) {
-      unlink($node->image_list[$k]['fname']);
+      @unlink($node->image_list[$k]['fname']);
     }
   }
 }
@@ -1139,7 +1138,7 @@ function _image_add_static($node, $res) {
   $image->image_list = unserialize($image->image_list);
 
   if (file_exists(_image_tempname($node, $res))) {
-    rename(_image_tempname($node, $res), $fname);
+    @rename(_image_tempname($node, $res), $fname);
     $image->image_list[$res]["fname"] = $fname;
 
     db_query("UPDATE {image} SET image_list = '%s' WHERE nid = '%s'",serialize($image->image_list), $node->nid);
