@@ -49,6 +49,9 @@ function image_help($section = "admin/help#image") {
     case 'admin/system/modules/image':
       $output = t("Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced.");
       break;
+    case 'node/add#image':
+      $output = t("An image you can insert into nodes, or see in photo galleries.");
+      break;
     case 'filter#short-tip':
       if (variable_get("image_filter_enabled", 0)) {
         return t("You may link to images on this site <a href=\"%explanation-url\">using a special syntax</a>", array("%explanation-url" => url("filter/tips", NULL, 'image')));
@@ -65,10 +68,8 @@ function image_help($section = "admin/help#image") {
 /**
  * Node descriptor
  */
-function image_node($field) {
-  $info["name"] = t("image");
-  $info["description"] = t("An image you can insert into nodes, or see in photo galleries.");
-  return $info[$field];
+function image_node_name($node) {
+  return t("image");
 }
 
 /**
