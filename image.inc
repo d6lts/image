@@ -98,7 +98,7 @@ function image_get_exif($file) {
   if ($_exif_path) {
 
     $return = exec($_exif_path . ' ' . _image_escape_shell($file), $results);
-
+    
     while (list($key,$value) = each($results)) {
       $explodeReturn = explode(':', $value, 2);
       $header = trim($explodeReturn[0]);
@@ -315,8 +315,7 @@ function _image_convert($source, $dest, $filter) {
   $filter = preg_replace("/[^A-Za-z0-9\.\-\+\040]/", '', $filter);
   $source = _image_escape_shell($source);
   $dest = _image_escape_shell($dest);
-  $err = exec("$_imagick_convert $filter $source $dest");
-
+  $err = _image_exec("$_imagick_convert $filter $source $dest");  // MSChange
   return $err;
 }
 
@@ -587,6 +586,20 @@ function _image_escape_shell($filename) {
     return '"' . addslashes(_image_strip_name($filename)) . '"';
   } else {
     return escapeshellarg(_image_strip_name($filename));
+  }
+}
+
+// MSChange
+function _image_exec($cmd) {
+  if (substr(php_uname(), 0, 7) == "Windows"){
+    if ($h = popen("start \"bla\" $cmd", "r")) {
+      pclose($h);
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return exec($cmd);    
   }
 }
 
