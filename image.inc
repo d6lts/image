@@ -21,6 +21,7 @@
  *      'width': image's width in pixels
  *      'height': image's height in pixels
  *      'type': image type ('GIF', 'JPEG', etc., or 'UNKNOWN')
+ *      'mime_type': image's MIME type ('image/jpeg', 'image/gif', etc.)
  *      'iptc_info': array containing IPTC information (see _image_iptc below)
  */
 function image_get_info($image) {
@@ -35,6 +36,7 @@ function image_get_info($image) {
     $details = array('width'     => $data[0],
                      'height'    => $data[1],
                      'type'      => $type,
+                     'mime_type' => $data['mime'],
                      'iptc_info' => $iptc_info);
   }
   return $details;
@@ -511,7 +513,7 @@ function _image_supported_type_gd1(&$image) {
 function _image_open_gd2($filename) {
   if (file_exists($filename)) {
     $image->filename = $filename;
-    $image->image_details = _get_image_details($image->filename);
+    $image->image_details = image_get_info($image->filename);
     $function = 'imageCreateFrom' . $image->image_details['type'];
     if (function_exists($function)) {
       $image->imdata = $function($image->filename);
@@ -616,25 +618,6 @@ function _get_gd_image_types() {
     if ($types & IMG_WBMP) $supported_types[] = 'WBMP';
   }
   return $supported_types;
-}
-
-/**
- * Returns image details (width, height, type and IPTC info if present)
- */
-function _get_image_details($image) {
-  $details = array();
-  $data = @getimagesize($image, $raw_iptc_info);
-  if (is_array($data)){
-    $types = array('1' => 'GIF', '2' => 'JPEG', '3' => 'PNG', '4' => 'SWF', '5' => 'PSD', '6' => 'BMP', '7' => 'TIFF', '8' => 'TIFF', '9' => 'JPC', '10' => 'JP2', '11' => 'JPX', '12' => 'JB2', '13' => 'SWC', '14' => 'IFF', '15' => 'WBMP', '16' => 'XBM');
-    $type = array_key_exists($data[2], $types) ? $types[$data[2]] : 'UNKNOWN';
-    $iptc_info = _image_iptc($raw_iptc_info);
-    $details = array('width'     => $data[0],
-                     'height'    => $data[1],
-                     'type'      => $type,
-                     'mime_type' => $data[5],
-                     'iptc_info' => $iptc_info);
-  }
-  return $details;
 }
 ?>
 
