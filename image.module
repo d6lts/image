@@ -100,12 +100,16 @@ function image_settings() {
   else if (function_exists("imageCreate")) {
     $libraries = array("imagemagick" => "imagemagick", "gd1" => "gd1");
   }
+  else {
+    // Default to ImageMagick if GD not found
+    $libraries = array("imagemagick" => "imagemagick");
+  }
   $output .= form_select(t("Image library"), "image_lib", variable_get("image_lib", "imagemagick"), $libraries, t("Select the image library to be used during thumbnail generation and image manipulation.  Use ImageMagick if you can; GD produces worse thumbnails, might not support GIF and this module doesn't support image editing (rotate, crop etc) with it."));
+  $output .= "<a name=\"image_convert\"></a>";
+  $output .= form_textfield(t("Imagemagick Convert path"), "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, t("Absolute path to ImageMagick convert file. Include the 'convert.exe' (or other filename) at the end. Leave it blank if you have selected GD library."));
 
   if (variable_get("image_lib", "imagemagick") == "imagemagick") {
     $output .= form_textfield(t("Background Color"), "image_background", variable_get("image_background", "#000000"), 7, 7, t("Color used to fill in background when rotating images."));
-    $output .= "<a name=\"image_convert\"></a>";
-    $output .= form_textfield(t("Imagemagick Convert path"), "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, t("Absolute path to ImageMagick convert file. Include the 'convert.exe' (or other filename) at the end."));
   }
   else {
     variable_set("image_convert_path", "");
@@ -1135,11 +1139,11 @@ function image_page() {
 
   if (user_access("access images") && variable_get("image_nav_vocabulary", "")) {
     // view user personal gallery if personal gallery is enabled
-    if ($uid && _image_can_personal()) {
+    if (isset($uid) && _image_can_personal()) {
       $thumb_num = variable_get("image_gallery_thumb_rows", "5") * variable_get("image_gallery_thumb_cols", "3");
+      $images = array();
 
       $sql  = "SELECT n.nid, n.title, n.body, i.thumb_path FROM {node} n, {image} i, {users} u WHERE n.nid = i.nid AND i.personal = 1 AND n.uid = u.uid AND u.uid = '". $uid . "' AND n.moderate = 0 ORDER BY ". _image_get_thumb_order();
-
       $result = pager_query($sql, $thumb_num, 0);
       while ($image = db_fetch_object($result)) {
         $images[] = $image;
@@ -1152,7 +1156,7 @@ function image_page() {
 
       print theme("page", theme("image_gallery_album", $images), t("%u's Photo Gallery", array("%u" => $galleryuser->name)));
     }
-    else if (!$tid) {
+    else if (!isset($tid)) {
       // show albums
       $albums = taxonomy_get_children(0, variable_get("image_nav_vocabulary", ""));
       $albums = _image_album_properties($albums);
@@ -1331,16 +1335,17 @@ function theme_image_gallery_home($albums, $gallery_description = '') {
 /**
  * Theme function to render image gallery album.
  */
-function theme_image_gallery_album($images, $subalbums ) {
+function theme_image_gallery_album($images, $subalbums = NULL) {
   global $base_url;
 
   $output = '';
 
-  $sub = theme("image_gallery_home", $subalbums);
-  if ($sub) {
-    $output .= $sub."<hr>";
+  if ($subalbums) {
+    $sub = theme("image_gallery_home", $subalbums);
+    if ($sub) {
+      $output .= $sub."<hr>";
+    }
   }
-
   $n = 0;
   $thumbs_cols = variable_get("image_gallery_thumb_cols", "3");
   $thumbs_rows = variable_get("image_gallery_thumb_rows", "5");
