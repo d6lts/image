@@ -641,11 +641,11 @@ function image_filter($text) {
     if (preg_match_all("/\[image:(\d+)(,(left|right|top|middle|bottom|absmiddle|texttop|baseline))?(,(\d+))?(,(\d+))?(,(\d+))?\]/i", $text, $match)) {
       // then we make the html
       foreach ($match[1] as $key => $value) {
-	$map[$value] = $key;
+        $map[$value] = $key;
       }
       $result = db_query("SELECT n.nid, n.teaser, i.thumb_path FROM {image} i, {node} n WHERE i.nid = n.nid AND n.nid IN ('".implode("','", array_map("check_query", $match[1]))."')");
       while ($img = db_fetch_object($result)) {
-	$n = $map[$img->nid];
+        $n = $map[$img->nid];
         $img->align = $match[3][$n];
         $img->hspace = $match[5][$n];
         $img->vspace = $match[7][$n];
@@ -658,8 +658,8 @@ function image_filter($text) {
       // corresponding to search elements.  To make sure that the
       // order of the arrays correspond, we make new copies here.
       foreach ($match[1] as $key => $value) {
-	$mtch[] = $match[0][$key];
-	$repl[] = $match[10][$key];
+        $mtch[] = $match[0][$key];
+        $repl[] = $match[10][$key];
       }
       $text = str_replace($mtch, $repl, $text);
     }
