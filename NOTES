@@ -152,6 +152,7 @@ TODO (+ = done):
 - do we really enforce kb, size and number of personal images limit? shouldn't these checks be at node save too?
 - support gd
 - recheck personal limit
+- probably convert path should not be a variable, but more hardwired (security); besides, convert path is troublesome on win32
 
 ***
 Moshe:
@@ -226,6 +227,18 @@ this requires personal taxonomies. Does the taxonomy module yet have a
 concept of a taxonomy belonging to a person?
 - As you mention in NOTES, we do need an overview of personal galleries, at
 this overview, i imagine we show galleries by last updated or by user.
+
+
++ missing 'administer images' permission in image_perm()
++ perhaps the JHead error message is too loud. It is an optional feature
++ add an anchor to this link: "Warning: you must assign a vocabulary to
+navigate in photo gallery. Fix in Site Configuration "
++ image_cron() mistakenly deleted Drupal system files by when I set 'temp
+path' incorrectly. perhaps you can only delete files of type=image or add
+warning text in the description for the temp path form field.
+- My new images are appearing in the queue AND in the gallery
+- when viewing an image, i see redundant link for 'edit this image' and
+'administer'. no big deal though
 
 
 

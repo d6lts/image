@@ -15,12 +15,11 @@ function image_help() {
 
 
 function image_perm() {
-  return array("has personal image gallery", "manipulate images");
+  return array("has personal image gallery", "manipulate images", "administer images");
 }
 
 
 function image_conf_options() {
-  $output .= "<a name=\"image\"></a>";
   $output .= "<a name=\"image_default_path\"></a>";
   $output .= form_textfield("Default image path", "image_default_path", variable_get("image_default_path", "images/"), 30, 255, "Default path for uploaded images; it must be writeable and visible from the web.");
   
@@ -38,11 +37,12 @@ function image_conf_options() {
   $output .= "<a name=\"image_convert\"></a>";
   $output .= form_textfield("Convert path", "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, "Path of ImageMagick convert.");
   $output .= "<a name=\"image_jhead\"></a>";
-  $output .= form_textfield("jhead path", "image_jhead_path", variable_get("image_jhead_path", "misc/image/jhead.exe"), 50, 255, "Path of jhead, for EXIF parsing; blank to disable.");
+  $output .= form_textfield("jhead path", "image_jhead_path", variable_get("image_jhead_path", ""), 50, 255, "Path of jhead, for EXIF parsing; blank to disable.");
   
   foreach (taxonomy_get_vocabularies("image") as $vid => $voc) {
     $vocs[$vid] = $voc->name;
   }
+  $output .= "<a name=\"image_nav_vocabulary\"></a>";
   $output .= form_select("Navigation vocabulary", "image_nav_vocabulary", variable_get("image_nav_vocabulary", ""),   $vocs, "One of the taxonomy vocabularies will be the navigation tree.");
   $output .= form_select("Gallery thumb", "image_gallery_thumb", variable_get("image_gallery_thumb", "last"), array("last" => "last", "random" => "random"), "Which thumb will be show in each gallery.");
   $output .= form_textfield("Gallery thumbs rows", "image_gallery_thumb_rows", variable_get("image_gallery_thumb_rows", "5"), 5, 255, "How many rows of thumbs in each page of the gallery.");
@@ -65,8 +65,9 @@ function image_cron() {
   chdir(variable_get("image_temp_path", "./"));
   $handle = opendir(".");
   while (($file = readdir($handle))!==false) {
-    if ($file != "." && $file != ".." && strpos($file, "tmpimg") == "0") {
+    if ($file != "." && $file != ".." && strpos($file, "tmpimg") !== false) {
       // delete older than 6 hours
+      echo $file;
       if (time() - filemtime($file) > 60*60*6) {
         unlink($file);
       }
@@ -625,7 +626,7 @@ function _image_can_personal() {
 
 function _image_get_exif($file) {
   // ripped from gallery 1.2.5
-  $_exif_path = variable_get("image_jhead_path", "misc/image/jhead.exe");
+  $_exif_path = variable_get("image_jhead_path", "");
   if ($_exif_path) {
     $return = exec($_exif_path." "._image_escape_shell($file), $results);
 
@@ -1245,7 +1246,7 @@ function _image_check_configuration() {
   echo "</div></b><br>";
   
   // and jhead
-  $jhead = variable_get("image_jhead_path", "misc/image/jhead.exe");
+  $jhead = variable_get("image_jhead_path", "");
   echo "jhead :<b>";
   if ($jhead) {
     if (!is_executable($jhead)) {
@@ -1262,11 +1263,16 @@ function _image_check_configuration() {
   
   // check if he assigned a vocabulary, for photo album navigation
   if (!variable_get("image_nav_vocabulary", "")) {
-    echo "Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ".la("Site Configuration", array("mod" => "system"));
+    echo "Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ".la("Site Configuration", array("mod" => "system"), "image_nav_vocabulary");
   }  
 }
 
 function _image_test() {
+  $file = 'tmpimg_marco';
+  if (strpos($file, "tmpimg")) {
+    echo "OK";
+  }
+  image_cron();
 }
 
 function _image_gallery_admin() {
@@ -1288,7 +1294,7 @@ function image_admin() {
     $links[] = la(t("check configuration"), array("mod" => "image", "op" => "check_configuration"));
     $links[] = la(t("settings"), array("mod" => "system"), "image");
     $links[] = la(t("help"), array("mod" => "image", "op" => "help"));
-    #$links[] = la(t("test"), array("mod" => "image", "op" => "test"));
+    $links[] = la(t("test"), array("mod" => "image", "op" => "test"));
     
     print "<small>".  implode(" | ", $links) ."</small><hr>\n";
 
