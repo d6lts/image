@@ -15,13 +15,16 @@ function image_help() {
 
 
 function image_perm() {
-  return array("has personal photo gallery", "manipulate images");
+  return array("has personal image gallery", "manipulate images");
 }
 
 
 function image_conf_options() {
+  $output .= "<a name=\"image\"></a>";
+  $output .= "<a name=\"image_default_path\"></a>";
   $output .= form_textfield("Default image path", "image_default_path", variable_get("image_default_path", "images/"), 30, 255, "Default path for uploaded images; it must be writeable and visible from the web.");
   
+  $output .= "<a name=\"image_default_thumb_path\"></a>";
   $output .= form_textfield("Default thumb path", "image_default_thumb_path", variable_get("image_default_thumb_path", "images/thumbs/"), 30, 255, "Default path for thumbnails; it must be writeable and visible from the web.");
   $output .= form_textfield("Default thumb name format", "image_default_thumb_name", variable_get("image_default_thumb_name", "%file_th%ext"), 30, 255, "Default format of thumbnails; you can use \"%file\" and \"%ext\" placeholders.");
   $output .= form_textfield("Default thumb size", "image_default_thumb_size", variable_get("image_default_thumb_size", "100"), 10, 255, "Default size of thumbnails: format will be the same as original image. Use just one dimension, put an \"x\" to specify height; example: \"100\" for width to 100; \"x200\" for height to 200.");
@@ -29,9 +32,13 @@ function image_conf_options() {
   $output .= form_textfield("Default max image weight", "image_default_max_weight", variable_get("image_default_max_weight", "200"), 6, 255, "KBytes.");
   $output .= form_textfield("Default max image size", "image_default_max_size", variable_get("image_default_max_size", "1024x768"), 10, 255, "Example: 800x600.");
   
+  $output .= "<a name=\"image_temp_path\"></a>";
   $output .= form_textfield("Temporary image path", "image_temp_path", variable_get("image_temp_path", "./"), 30, 255, "Path for working directory; it must be writeable and visible from the web.");
-  $output .= form_textfield("Convert path", "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 30, 255, "Path of ImageMagick convert.");
-  $output .= form_textfield("jhead path", "image_jhead_path", variable_get("image_jhead_path", "misc/image/jhead.exe"), 30, 255, "Path of jhead, for EXIF parsing; blank to disable.");
+  
+  $output .= "<a name=\"image_convert\"></a>";
+  $output .= form_textfield("Convert path", "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, "Path of ImageMagick convert.");
+  $output .= "<a name=\"image_jhead\"></a>";
+  $output .= form_textfield("jhead path", "image_jhead_path", variable_get("image_jhead_path", "misc/image/jhead.exe"), 50, 255, "Path of jhead, for EXIF parsing; blank to disable.");
   
   foreach (taxonomy_get_vocabularies("image") as $vid => $voc) {
     $vocs[$vid] = $voc->name;
@@ -41,7 +48,9 @@ function image_conf_options() {
   $output .= form_textfield("Gallery thumb per row", "image_gallery_thumb_row", variable_get("image_gallery_thumb_row", "5"), 5, 255, "How many thumbnails in every row of the gallery.");
   $output .= form_select("Gallery thumb order", "image_gallery_thumb_order", variable_get("image_gallery_thumb_order", "title"), array("title" => "title", "time" => "old -> new", "time desc" => "new -> old", "random" => "random", "weight" => "lighter -> heavier", "weight desc" => "heavier -> lighter"), "Order of thumbs. Lighter and heavier refer to weight property.");
   
-  $output .= form_select("Personal photo gallery", "image_personal_gallery", variable_get("image_personal_gallery", "1"),   array("enabled", "disabled"), "Activate/deactivate personal photo gallery; use permission to control who can have it.");
+  $output .= form_select("Personal photo gallery", "image_personal_gallery", variable_get("image_personal_gallery", "1"),   array("1" => "enabled", "0" => "disabled"), "Activate/deactivate personal photo gallery; use permission to control who can have it.");
+  $output .= form_textfield("Personal gallery max number of pictures", "image_personal_gallery_max_num", variable_get("image_personal_gallery_max_num", "50"), 5, 255, "How many pictures users are allowed.");
+  $output .= form_textfield("Personal gallery max disk size", "image_gallery_max_kb", variable_get("image_gallery_max_kb", "1000"), 5, 255, "Max kb allowed per user.");
   
   $output .= form_select("Random prefix", "image_random_suffix", variable_get("image_random_suffix", "0"), array("0" => "disabled", "1" => "enabled"), "A random prefix added to images while viewing; to prevent caching by browsers.");
   
@@ -107,11 +116,11 @@ function image_link($type, $node) {
   }
 
   if ($type == "menu.create" && user_access("post content")) {
-    $links[] = lm(t("create image"), array("mod" => "node", "op" => "add", "type" => "image"), t("Add a new image."));
+    $links[] = lm(t("create image"), array("mod" => "node", "op" => "add", "type" => "image"), "", array("link" => t("Add a new image.")));
   }
 
   if ($type == "menu.view" && user_access("access content") && _image_can_personal()) {
-    $links[] = lm(t("view your photo gallery"), array("mod" => "image", "uid" => $user->uid), t("View your personal photo gallery."));
+    $links[] = lm(t("view photo gallery"), array("mod" => "image", "uid" => $user->uid), "", array("link" => t("View your personal photo gallery.")));
   }
 
   if ($type == "node" && $node->type == "image") {
@@ -233,7 +242,7 @@ function image_form(&$node, &$help, &$error, &$param) {
       // **** preview of a new image ****
       
       if (!$node->image_id) {
-        $upload_text = "<div style=\"color: red;\">". t("You must upload an image.") ."</div>";
+        $upload_text = "<div style=\"color: red;\" class=\"error\">". t("You must upload an image.") ."</div>";
         $error[] = 1;
       }
       else {
@@ -249,6 +258,11 @@ function image_form(&$node, &$help, &$error, &$param) {
       }
       
       if ($error_string = _image_max_filesize(_image_tempname($node))) {
+        $error[] = 1;
+        echo $error_string;
+      }
+      
+      if ($node->personal && $error_string = _image_personal_limit(_image_tempname($node))) {
         $error[] = 1;
         echo $error_string;
       }
@@ -274,7 +288,7 @@ function image_form(&$node, &$help, &$error, &$param) {
       
       if (file_exists(_image_filename($node)) && ($node->image_name)) {
         $error[] = 1;
-        $filename_desc = "<div style=\"color: red;\">".t("Warning: this filename already exists.")."</div>";
+        $filename_desc = "<div style=\"color: red;\" class=\"error\">".t("Warning: this filename already exists.")."</div>";
       }
       else {
         $filename_desc = t("If you want, you can change the name this file will have on the server.");
@@ -313,6 +327,11 @@ function image_form(&$node, &$help, &$error, &$param) {
     else {
       // **** edit preview ****
       if ($error_string = _image_max_filesize(_image_tempname($node))) {
+        $error[] = 1;
+        echo $error_string;
+      }
+      
+      if ($node->personal && $error_string = _image_personal_limit(_image_tempname($node))) {
         $error[] = 1;
         echo $error_string;
       }
@@ -430,7 +449,7 @@ function _image_process($node) {
     // let's start with gif, jpg, png
     
     if ((!in_array($size[2], array(1,2,3))) || (!_image_check_ext($HTTP_POST_FILES["edit"]["name"]["image"]))) {
-      echo "<div style=\"color: red;\">uploaded file was not an image.</div>";
+      echo "<div style=\"color: red;\" class=\"error\">uploaded file was not an image.</div>";
       $HTTP_POST_FILES = array();
     }
     else if (!copy($image_file, _image_tempname($node))) {
@@ -559,7 +578,7 @@ function _image_render_iptc_exif($iptc, $title) {
 
 
 function _image_can_personal() {
-  return (user_access("has personal photo gallery") && variable_get("image_personal_gallery", "1"));
+  return (user_access("has personal image gallery") && variable_get("image_personal_gallery", "1"));
 }
 
 
@@ -611,7 +630,7 @@ function image_update($node) {
   global $HTTP_POST_FILES;
 
   if (is_uploaded_file($HTTP_POST_FILES["edit"]["tmp_name"]["image"])) {
-    echo t("<div style=\"color: red;\">"."Warning: you must preview an image before submitting; new file has not been saved.")."</div><br/>"; 
+    echo t("<div style=\"color: red;\" class=\"error\">"."Warning: you must preview an image before submitting; new file has not been saved.")."</div><br/>"; 
   }
   
   if ($node->image_name) {
@@ -704,18 +723,33 @@ function _image_max_filesize($image_file, $tid = 0, $personal = 0) {
   // check whether uploaded file is too big (kbytes or physical size)
   $max_weight = variable_get("image_default_max_weight", "200");
   if (filesize($image_file) > $max_weight * 1000) {
-    $error .= "<div style=\"color: red; text-align: center\">file is too big (max $max_weight kbytes).</div>";
+    $error .= "<div style=\"color: red; text-align: center\" class=\"error\">file is too big (max $max_weight kbytes).</div>";
   }
   
   $size = getimagesize($image_file);
   $max_size = split("x", variable_get("image_default_max_size", "1024x768"));
   if ($size[0] > $max_size[0] || $size[1] > $max_size[1]) {
-    $error .= "<div style=\"color: red; text-align: center\">file is too big (max ".variable_get("image_default_max_size", "1024x768").").</div>";
+    $error .= "<div style=\"color: red; text-align: center\" class=\"error\">file is too big (max ".variable_get("image_default_max_size", "1024x768").").</div>";
   }
   
   return $error;
 }
 
+function _image_personal_limit($image_file) {
+  global $user;
+  $user_images = db_fetch_object(db_query("SELECT COUNT(*) AS c, SUM(filesize) AS size FROM image i, node n WHERE i.nid = n.nid AND n.uid = ".$user->uid));
+  
+  $max_num = variable_get("image_personal_gallery_max_num", "50");
+  if ($user_images->c == $max_num) {
+    $error .= "<div style=\"color: red; text-align: center\" class=\"error\">you can have at most $max_num images in your gallery.</div>";
+  }
+  
+  $max_kb = variable_get("image_gallery_max_kb", "1000") * 1000;
+  if (($user_images->size + filesize($image_file)) > $max_kb) {
+    $error .= "<div style=\"color: red; text-align: center\" class=\"error\">you have $max_kb kb for your gallery.</div>";
+  }
+  return $error;
+}
 
 function _images_transform_form($size, $bytes) {
   return '
@@ -834,9 +868,12 @@ function image_page() {
       $albums = taxonomy_get_children(0, variable_get("image_nav_vocabulary", ""));
       
       #print_r($albums);
-      foreach (array_keys($albums) as $term_id) {
-        _image_album_properties($albums, $term_id);
-      }
+      #foreach (array_keys($albums) as $term_id) {
+        #_image_album_properties($albums, $term_id);
+      #}
+      _image_album_properties($albums);
+      #print_r($albums);
+      
             
       $theme->header();
       $theme->box(t("Photo galleries"), method_exists($theme, "gallery_home") ? $theme->gallery_home($albums) : _image_gallery_home($albums));
@@ -845,9 +882,10 @@ function image_page() {
     else {
       // browse albums; show subalbums and thumbs
       $subalbums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
-      foreach (array_keys($subalbums) as $term_id) {
-        _image_album_properties($subalbums, $term_id);
-      }
+      #foreach (array_keys($subalbums) as $term_id) {
+      #  _image_album_properties($subalbums, $term_id);
+      #}
+      _image_album_properties($albums);
       
       $sql = "
         SELECT n.nid, title, teaser, body, thumb_path
@@ -918,26 +956,44 @@ function _image_get_subalbums($tid, $recurse = 0) {
   return $subalbums;
 }
 
-function _image_album_properties(&$albums, $term_id) {
+function _image_album_properties(&$albums) {
   // to every album add: how many images, last update, path of a thumbnail (, number of views, date of first image, something about comments)
-  $albums[$term_id]->photocount = taxonomy_term_count_nodes($term_id, "image");
-  $subalbums = _image_get_subalbums($term_id);
-  $albums[$term_id]->subalbums = $subalbums;
+  // let's add how many images there are in it and its parents
+  $result = db_query("
+        SELECT t.tid, COUNT(*) AS c
+        FROM term_node t, node n, image i, term_data d
+        WHERE t.nid = n.nid
+        AND i.nid = n.nid
+        AND d.tid = t.tid
+        AND type = 'image'
+        AND vid = '".variable_get("image_nav_vocabulary", "")."'
+        AND personal = 0
+        GROUP BY tid
+    ");
+  while ($term = db_fetch_object($result)) {
+    $albums[$term->tid]->image_count = $term->c;
+  }
   
-  $thumb_choice = (variable_get("image_gallery_thumb", "last") == "random" ? "RAND()" : "created DESC");
+  foreach (array_keys($albums) as $term_id) {
+    $subalbums = _image_get_subalbums($term_id);
+    $albums[$term_id]->subalbums = $subalbums;
 
-  $last_update = db_fetch_object(db_query("
-      SELECT created, thumb_path
-      FROM node n, image i
-      LEFT JOIN term_node t ON n.nid = t.nid
-      WHERE n.nid = i.nid
-      AND t.tid IN (".implode(",", array_merge($term_id, array_keys($subalbums))).")
-      AND type = 'image'
-      ORDER BY $thumb_choice
-      LIMIT 1
-    "));
-  $albums[$term_id]->last_updated = $last_update->created;
-  $albums[$term_id]->thumb = $last_update->thumb_path;
+    $thumb_choice = (variable_get("image_gallery_thumb", "last") == "random" ? "RAND()" : "created DESC");
+
+    $last_update = db_fetch_object(db_query("
+        SELECT created, thumb_path
+        FROM node n, image i
+        LEFT JOIN term_node t ON n.nid = t.nid
+        WHERE n.nid = i.nid
+        AND t.tid IN (".implode(",", array_merge($term_id, array_keys($subalbums))).")
+        AND type = 'image'
+        AND personal = 0
+        ORDER BY $thumb_choice
+        LIMIT 1
+      "));
+    $albums[$term_id]->last_updated = $last_update->created;
+    $albums[$term_id]->thumb = $last_update->thumb_path;
+  }
 }
 
 function _image_gallery_home(&$albums) {
@@ -951,7 +1007,12 @@ function _image_gallery_home(&$albums) {
     }
     $output .= "</td><td>";
     $output .= lm($album->name, array("mod" => "image", "tid" => $album->tid))."<br>";
-    $output .= check_output($album->description)."<br>There are ".$album->photocount." images in this album.";
+    $output .= check_output($album->description)."<br>";
+    if ($album->image_count) {
+      $output .= "There are ".format_plural($album->image_count, "image", "images")." in this album.";
+    } else {
+      $output .= "There are no images in this album.";
+    }
     if ($album->last_updated) {
       $output .= "<br>Last updated: ".format_date($album->last_updated);
     }
@@ -1025,7 +1086,7 @@ function _image_dir_upload($edit) {
   if (!$edit["dir"]) {
     $output .= form_textfield("Directory to scan", "dir", variable_get("image_last_upload_dir", ""), 30, 255, "Directory must be visible from the web server.");
     #$output .= form_checkbox("Delete images after insert", "del_images", $value = 1, $checked = 1);
-    $output .= form_checkbox("Thumbnail", "thumb", $value = 1, $checked = 0, "Show resized image. Use only if you have large bandwidth. <div style=\"color: white;\">so Momar don't activate this. UHAHAHAHA</div>");
+    $output .= form_checkbox("Thumbnail", "thumb", $value = 1, $checked = 0, "Show resized image. Use only if you have large bandwidth. <div style=\"color: white;\">so Momar don't use this. UHAHAHAHA</div>");
     $output .= form_submit("Directory upload");
     echo form($output, "post");
   }
@@ -1066,10 +1127,10 @@ function _image_check_configuration() {
   foreach ($dirs as $description => $key) {
     echo $description.": <b>";
     if (!file_exists(variable_get($key[0], $key[1]))) {
-      echo "<div style=\"color: red;\">DOES NOT EXISTS - fix in ".la("settings and filters", array("mod" => "system"));
+      echo "<div style=\"color: red;\" class=\"error\">DOES NOT EXIST - fix in ".la("Site Configuration", array("mod" => "system"), $key[0]);
     }
     else if (!is_writable(variable_get($key[0], $key[1]))) {
-      echo "<div style=\"color: red;\">NOT WRITABLE - change permissions on server";
+      echo "<div style=\"color: red;\" class=\"error\">NOT WRITABLE - change permissions on server";
     }
     else {
       echo "<div style=\"color: green;\">OK";
@@ -1082,7 +1143,7 @@ function _image_check_configuration() {
   echo "ImageMagick convert :<b>";
   if ($convert) {
     if (!is_executable($convert)) {
-      echo "<div style=\"color: red;\">DOES NOT EXISTS - fix in ".la("settings and filters", array("mod" => "system"));
+      echo "<div style=\"color: red;\" class=\"error\">DOES NOT EXIST - fix in ".la("Site Configuration", array("mod" => "system"), "image_convert");
     }
     else {
       echo "<div style=\"color: green;\">OK";
@@ -1098,7 +1159,7 @@ function _image_check_configuration() {
   echo "jhead :<b>";
   if ($jhead) {
     if (!is_executable($jhead)) {
-      echo "<div style=\"color: red;\">DOES NOT EXISTS - fix in ".la("settings and filters", array("mod" => "system"));
+      echo "<div style=\"color: red;\" class=\"error\">DOES NOT EXIST - fix in ".la("Site Configuration", array("mod" => "system"), "image_jhead");
     }
     else {
       echo "<div style=\"color: green;\">OK";
@@ -1111,7 +1172,7 @@ function _image_check_configuration() {
   
   // check if he assigned a vocabulary, for photo album navigation
   if (!variable_get("image_nav_vocabulary", "")) {
-    echo "Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ".la("settings and filters", array("mod" => "system"));
+    echo "Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ".la("Site Configuration", array("mod" => "system"));
   }  
 }
 
@@ -1150,11 +1211,11 @@ function _image_test() {
 
 function _image_gallery_admin() {
   if (!variable_get("image_nav_vocabulary", "")) {
-    echo "Error: you must assign a vocabulary to navigation before. Fix in ".la("settings and filters", array("mod" => "system"));
+    echo status("Error: you must assign a vocabulary to navigation before. Fix in ".la("Site Configuration", array("mod" => "system")));
     exit();
   }
   
-  echo "tbd";
+  #echo "tbd";
   exit();
 }
 
@@ -1166,6 +1227,7 @@ function image_admin() {
     $links[] = la(t("directory upload"), array("mod" => "image", "op" => "dir_upload"));
     $links[] = la(t("gallery admin"), array("mod" => "image", "op" => "gallery"));
     $links[] = la(t("check configuration"), array("mod" => "image", "op" => "check_configuration"));
+    $links[] = la(t("settings"), array("mod" => "system"), "image");
     $links[] = la(t("help"), array("mod" => "image", "op" => "help"));
     $links[] = la(t("test"), array("mod" => "image", "op" => "test"));
     

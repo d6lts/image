@@ -1,6 +1,11 @@
+21 May 2002 - "gokart"
+------------------
+- personal galleries can now be limited (both number and size)
+- lots of bug fixes and tidbits
+
+
 20 May 2002 - "Attack of the clones"
 ------------------
-- can now considered beta
 - filter, customizable, uses thumb and teaser; I now understand the problems of the filter system
 - you now need a specific permission ("manipulate images") to have convert work; I was not easy with the idea of people uploading huge pictures and spending their time rotating them one degree every time
 - many less query when showing gallery, now we do
