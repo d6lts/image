@@ -709,7 +709,7 @@ function image_delete(&$node) {
  * Returns the final image filename
  */
 function _image_filename($node) {
-  return variable_get("image_default_path", "images/")."img_"._image_strip_name($node->image_id) ."-". $node->nid . $node->extension;
+  return variable_get("image_default_path", "images/") . _image_strip_name($node->image_id) ."-". $node->nid . $node->extension;
 }
 
 /**
@@ -1245,8 +1245,8 @@ function _image_album_properties($albums) {
         LEFT JOIN {term_node} t ON n.nid = t.nid
         WHERE n.nid = i.nid
         AND t.tid IN (".implode(",", $terms).")
-        AND type = 'image'
-        AND personal = 0
+        AND n.type = 'image'
+        AND i.personal = 0
         ORDER BY n.created DESC
         LIMIT 1
       "));
