@@ -176,7 +176,6 @@ function image_settings() {
   return $output;
 }
 
-
 /**
  * Function called by cron.php to do clean up work for this module.
  *
