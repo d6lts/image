@@ -353,7 +353,7 @@ function image_form(&$node, &$help, &$error, &$param) {
   $output .= "<br/>";
 
   // the guy who thought about this $param array is a genius
-  $param["options"] = 'enctype="multipart/form-data" name="image_forms"';
+  $param["options"] = array("enctype" => "multipart/form-data",  "name" => "image_forms");
 
   return $output;
 }
