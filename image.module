@@ -79,7 +79,7 @@ function image_settings() {
   $output .= form_select(t("Personal Photo Galleries"), "image_personal_gallery", variable_get("image_personal_gallery", "1"),   array("1" => "enabled", "0" => "disabled"), t("Activate/deactivate personal photo galleries site-wide.  When enabled you can use the \"has personal image gallery\" permission to control which roles have personal galleries."));
   if (variable_get("image_personal_gallery", "1") == "1") {
     $output .= form_textfield(t("Personal Gallery Picture Limit"), "image_personal_gallery_max_num", variable_get("image_personal_gallery_max_num", "50"), 5, 255, t("Set how many pictures users are allowed."));
-    $output .= form_textfield(t("Personal Gallery Size Limit"), "image_gallery_max_kb", variable_get("image_gallery_max_kb", "1000"), 5, 255, t("Set a maximum number of kilobytes allowed per user."_);
+    $output .= form_textfield(t("Personal Gallery Size Limit"), "image_gallery_max_kb", variable_get("image_gallery_max_kb", "1000"), 5, 255, t("Set a maximum number of kilobytes allowed per user."));
   }
 
   $output .= form_select(t("Disable Image Caching"), "image_random_suffix", variable_get("image_random_suffix", "0"), array("0" => "disabled", "1" => "enabled"), t("Enabling this will add random parameters to image URIs which will prevent the browser from caching."));
