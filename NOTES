@@ -1,0 +1,128 @@
+   
+image editing:
++ crop
++ resize
++ rotate
+- save in jpg, gif, png
++ different quality (jpg, png)
+- color background during rotation
+- contrasto (contrast, level)
+- revert
+- mirror (flip)
+- monochrome
+- trasparent
+- blur
+- sharp
+avanzate:
+- watermark
+- montage
+- border
+
+
+what you should see:
+- different containers (vocabularies)
+- for every container define:
+  - which thumb is shown (random, last, most seen, exact number, none)
+  - thumb order (alpha, most seen, most commented, time, vote)
+  - how many rows/cols in table; this also defines number of thumbs per page
+  - weight of the container in main page
+  + max kbytes and size of images
+  + thumb size
+  - thumb format
+  - preview size
+  - preview format
+  + format name of thumbs
+  - locations of +thumbs, previews, +full images
++ in admin I choose which vocabulary is used as navigation
+- while browsing, use other terms as filters
+- first page with containers; optional, latest addictions and random images
+- second page with thumbs (and browsing)
+- third with node; optional: preview, an image between thumb and full size; this can be chosen in admin
+- permissions: edit container properties, edit image
+
+(* = urgent; + = done)
+
+- should be both a way to have galleries AND a repository for the cms
+*- galleries should be based on taxonomy, possibly supporting hierarchy
+- other terms in taxonomy could define more metadata, but picture.module should also
+have textfields meta data such as name, description, "other keywords", ??
+- picture upload
+  + form upload
+  + directory
+  - zip
+  - site mirroring
++ use imagemagick for thumbnails
+- imagemagick seems to support movies too (skeptic, how could read quicktime or divx without codec?)
++ basic editing (thumbs, rotate, resize, crop)
+- to crop use gallery applet
++ admins should be able to add, mode, del images (most done as normal nodes)
+*- order images (weight?)
+- image mirroring (as gallery, have images on other sites)
+- look at gallery remote, be compatible with?
++ have meaningful errors to explain permissions for files; command to check permissions
++ exif and IPTC headers (exif_read_data from php 4.2, or http://www.sentex.net/~mwandel/jhead/index.html and code from gallery::view_photo_properties.php; iptcparse from php4)
+- image revisions (heavy)
++ make a imagemagick module which is compatible with the upcoming php extension, but uses system()
++ don't use imagemagick module, make a function and call that directly; in general settings define location of convert
+*- filter to add images in text (like trip_image)
+- a sort of dialog to choose an image in the repository and add it to the text? integrate this with some sort of extended textarea
+*- api to help other modules to support images. for ex a module could want to have
+an image submitted (like events, profile); temp upload, preview, cron to delete existing files ecc; see gerhard's post in ml
+*- let a user edit his own pictures; personal picture gallery
++ have a cron delete temp images
+- change die() in trigger_error()
+- send postcard (dedicated module)
+- images could have a property: public (in galleries), personal (in personal gallery), private (exists but does not appear any gallery)
+- blocks: last image, random image
+- large blocks: last images, random images
+- save iptc and exif data; load them in node data
+- permission to edit (rotate, resize etc) images; can give too much power to a user (imagine uploading a large image and keeping on rotating it)
+- paging in photo galleries
+- integrate history (new photo)
+- browse bar in node view (next, prev, up and controls like filter, order etc)
+- other thumb orders: size (width x height), filesize, format, number of comments, last comment, some sort of algorithm to see what are most discussed images
+- implement search
+- personal photo gallery "white pages"
+- limit personal gallery size (number and kb)
+- option to disable convert
+- complete permission check
+
+security:
+- verify file extension and format; change blanks to underscores
+- check format of image edit: size should be just numbers, etc; use escapeshellcmd
+
+general options:
+- convert path
++ temp dir
+- default options for every container; you can override these options in admin
+- hashing of images (mask.jpg -> m/a/s/mask.jpg)
+- flag per aggiungere un random in fondo alle immagini, per evitare il caching
+
+
+CREATE TABLE image (
+nid int unsigned not null,
+image_path varchar(255) not null,
+thumb_path varchar(255) not null,
+previewpath varchar(255) not null,
+format varchar(255) not null,
+width int unsigned not null,
+height int unsigned not null,
+filesize int unsigned not null,
+iptc text,
+exif text,
+personal tinyint not null,
+weight tinyint not null
+)
+
+add:
+- format?
+- size (x, y, kb)
+- personal
+- weight
+- iptc
+- exif
+
+
+BUGS:
+- editing an image is a bit weird: you must preview before submitting, only previewed changes are saved
+- as additional security, you should disallow php and cgi execution in image directories

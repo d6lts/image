@@ -1,0 +1,38 @@
+Readme
+------
+
+This module is about images ;)
+THIS MODULE IS ALPHA QUALITY: IT PROBABLY WON'T EVEN WORK FOR YOU. THERE ARE KNOWN BUGS AND THERE COULD ALSO BE SECURITY HAZARDS, PAY A LOT OF ATTENTION!!
+
+Send comments to marco@porciletto.org.
+
+
+Requirements
+------------
+
+This module requires Drupal CVS version circa May 2001.
+
+
+Installation
+------------
+
+1. Create the SQL tables.
+     mysql -u username -ppassword drupal < image.sql
+
+2. Copy the image.module to the Drupal modules/ directory. Drupal should automatically detect it. Enable the module in Site Configuration -> Modules.
+
+3. There are a lot of options in admin: you should set at least imagemagick convert path for funny things on images, and some writeable directories to work.
+
+4. You can check your directory permissions in admin/image
+
+5. Create at least a vocabulary and assign it to images, then select it as navigation vocabulary in settings. This way you'll have the gallery
+
+6. If you want to enable personal photo galleries, remember to set right permissions to roles.
+
+
+Author
+------
+
+Marco Molinari <marco@porciletto.org>
+
+
