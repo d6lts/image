@@ -176,6 +176,10 @@ function image_link($type, $node, $main = 0) {
     $links[] = l(t("photo galleries"), "image");
   }
 
+  if ($type == "system" && user_access("access image") && variable_get("image_nav_vocabulary","")) {
+    menu("image", t("photo galleries"), "image_page", 0, 1);
+  }
+
   // Add admin items if the user has administer permission
   if ($type == "system" && user_access("administer images")) {
     menu("admin/image", "images", "_image_check_configuration");
