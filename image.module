@@ -390,15 +390,15 @@ function image_page($type = NULL, $tid = 0) {
     $album = taxonomy_get_term($tid);
     $parents = taxonomy_get_parents($tid);
     foreach ($parents as $parent) {
-      $breadcrumb[] = l($parent->name, 'image/tid/'.$parent->tid);
+      $breadcrumb[] = array('path' => 'image/tid/'.$parent->tid, 'title' => $parent->name);
     }
-    $breadcrumb[] = l(t('Image galleries'), 'image');
-    $breadcrumb[] = l(t('Home'), '');
+    $breadcrumb[] = array('path' => 'image', 'title' => t('Image galleries'));
     $breadcrumb = array_reverse($breadcrumb);
-    drupal_set_breadcrumb($breadcrumb);
     drupal_set_title($album->name);
   }
-
+  
+  $breadcrumb[] = array('path' => $_GET['q']);
+  menu_set_location($breadcrumb);
   $content = theme('image_album', $albums, $images);
   print theme('page', $content);
 }
