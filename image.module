@@ -983,7 +983,7 @@ function _image_convert($source, $dest, $filter) {
 
 function _image_escape_shell($filename) {
 
-  if (strstr($_SERVER["SERVER_SOFTWARE"], "Win32")) {
+  if (strstr($_ENV["OS"], "Windows")) {
   // I can't make escapeshellarg work on windows, it adds a '
   // this should be safe enough
     return '"'.addslashes(_image_strip_name($filename)).'"';
