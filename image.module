@@ -1263,7 +1263,7 @@ function _image_album_properties($albums) {
  * Theme function to render image node.
  *
  */
-function node_image($node, $rand, $main = 0) {
+function theme_node_image($node, $rand, $main = 0) {
   global $base_url;
 
   if ($main)
@@ -1287,7 +1287,7 @@ function node_image($node, $rand, $main = 0) {
   theme("node", $node, $main);
 }
 
-function image_gallery_home($albums) {
+function theme_image_gallery_home($albums) {
   global $base_url;
   if ($albums) {
     $output .= "\n<div id=\"image\">\n<table>\n";
@@ -1319,7 +1319,7 @@ function image_gallery_home($albums) {
   return $output;
 }
 
-function image_gallery_album($parents, $subalbums, $images, $data, $galleryuser = null) {
+function theme_image_gallery_album($parents, $subalbums, $images, $data, $galleryuser = null) {
   global $base_url;
 
   if (!$galleryuser) {
