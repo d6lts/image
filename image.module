@@ -1155,9 +1155,7 @@ function image_page() {
       $data["page"] = $page;
       $data["tid"] = $tid;
 
-      $sql .= " LIMIT $offset, $thumb_num";
-
-      $result = db_query($sql, $tid);
+      $result = db_query_range($sql, $tid, $offset, $thumb_num);
       while ($image = db_fetch_object($result)) {
         $images[] = $image;
       }
@@ -1234,14 +1232,14 @@ function _image_album_properties($albums) {
       $albums[$term_id]->image_count = $term->c;
     }
 
-    $last_update = db_fetch_object(db_query("SELECT n.created, i.thumb_path FROM {node} n INNER JOIN {image} i ON n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (". implode(",", $terms) .") AND n.type = 'image' AND i.personal = 0 ORDER BY n.created DESC LIMIT 1"));
+    $last_update = db_fetch_object(db_query_range("SELECT n.created, i.thumb_path FROM {node} n INNER JOIN {image} i ON n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (". implode(",", $terms) .") AND n.type = 'image' AND i.personal = 0 ORDER BY n.created DESC", 0, 1));
     $albums[$term_id]->last_updated = $last_update->created;
     $albums[$term_id]->thumb = $last_update->thumb_path;
 
     if (variable_get("image_gallery_thumb", "last") == "random") {
       $nodes = db_fetch_object(db_query("SELECT MIN(nid) as min, MAX(nid) as max FROM {node} WHERE type = 'image'"));
       $id = rand($nodes->min, $nodes->max);
-      $random = db_fetch_object(db_query("SELECT i.thumb_path FROM {node} n INNER JOIN {image} i ON  n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (". implode(",", $terms) .") AND n.type = 'image' AND i.personal = 0 AND n.nid >= ". $id ." LIMIT 1"));
+      $random = db_fetch_object(db_query_range("SELECT i.thumb_path FROM {node} n INNER JOIN {image} i ON n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (". implode(",", $terms) .") AND n.type = 'image' AND i.personal = 0 AND n.nid >= ". $id), 0, 1);
       $albums[$term_id]->thumb = $random->thumb_path;
     }
   }
