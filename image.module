@@ -53,7 +53,7 @@ function image_access($op, $node) {
  */
 function image_settings() {
   _image_check_settings();
-  
+
   $paths .= form_textfield(t('Default image path'), 'image_default_path', variable_get('image_default_path', 'images'), 30, 255, t('Subdirectory in the directory "%dir" where pictures will be stored.', array('%dir' => '<em>'. variable_get('file_directory_path', 'files') .'/</em>')));
   $output.= form_group(t('File paths'), $paths);
 
@@ -64,14 +64,14 @@ function image_settings() {
     $row = array();
     if (in_array($sizes[$i]['label'], _image_required_sizes())) {
       $row[] = form_hidden('image_sizes]['.$i.'][label', $sizes[$i]['label']) .
-        form_textfield(NULL, 'image_sizes]['. $i .'][label', $sizes[$i]['label'], 24, 255, NULL, array('disabled' => 'disabled'));        
+        form_textfield(NULL, 'image_sizes]['. $i .'][label', $sizes[$i]['label'], 24, 255, NULL, array('disabled' => 'disabled'));
     }
     else {
       $row[] = form_textfield(NULL, 'image_sizes]['. $i .'][label', $sizes[$i]['label'], 24, 255);
     }
     $row[] = form_textfield(NULL, 'image_sizes]['. $i .'][width', $sizes[$i]['width'], 5, 5);
     $row[] = form_textfield(NULL, 'image_sizes]['. $i .'][height', $sizes[$i]['height'], 5, 5);
-    
+
     $rows[] = $row;
   }
   $header = array(t('Label'), t('Width'), t('Height'));
@@ -165,7 +165,7 @@ function image_file_download($file) {
  */
 function image_link($type, $node, $main = 0) {
   $links = array();
-  
+
   if ($type == "page" && user_access('access content')) {
     if (_image_get_vid()) {
       $links[] = l(t("image galleries"), "image");
@@ -192,7 +192,7 @@ function image_link($type, $node, $main = 0) {
       $links[] = l(t('view original'), 'node/'.$node->nid, NULL, 'size=_original');
     }
   }
-  
+
   return $links;
 }
 
@@ -213,12 +213,12 @@ function image_block($op, $delta = 0) {
         case 0:
           $images = image_get_latest();
           $block['subject'] = t('Latest image');
-          $block['content'] = l(image_display($images[0], 'thumbnail'), 'node/'.$images[0]->nid);
+          $block['content'] = l(image_display($images[0], 'thumbnail'), 'node/'.$images[0]->nid, array(), NULL, NULL, FALSE, TRUE);
           break;
         case 1:
           $images = image_get_random();
           $block['subject'] = t('Random image');
-          $block['content'] = l(image_display($images[0], 'thumbnail'), 'node/'.$images[0]->nid);
+          $block['content'] = l(image_display($images[0], 'thumbnail'), 'node/'.$images[0]->nid, array(), NULL, NULL, FALSE, TRUE);
           break;
       }
       return $block;
@@ -238,7 +238,7 @@ function image_form(&$node, &$param) {
       $output .= form_hidden('images]['.$label, $image);
     }
   }
-  
+
   // Taxonomy select form
   $output .= implode('', taxonomy_node_form('image', $node));
 
@@ -278,7 +278,7 @@ function image_view(&$node, $main = 0, $page = 0) {
   }
   $request = ($_GET['size']) ? $_GET['size'] : 'preview';
   $node = node_prepare($node, $main);
-  $node->teaser = l(image_display($node, 'thumbnail'), 'node/'.$node->nid) . $node->teaser;
+  $node->teaser = l(image_display($node, 'thumbnail'), 'node/'.$node->nid, array(), NULL, NULL, FALSE, TRUE) . $node->teaser;
   $node->body = image_display($node, $request) . $node->body;
 }
 
@@ -343,7 +343,7 @@ function image_display($node, $size = 'preview', $attributes = array()) {
     $info = image_get_info(file_create_path($node->images[$size]));
     $attr = 'width="'.$info['width'].'" height="'.$info['height'].'" ' . drupal_attributes($attributes);
     $output.= '<div class="image '.$size.'">';
-    $output.= theme('image', file_create_url($node->images[$size]), check_form($node->title), check_form($node->title), $attr, FALSE);
+    $output.= theme('image', file_create_url($node->images[$size]), check_plain($node->title), check_plain($node->title), $attr, FALSE);
     $output.= "</div>\n";
     return $output;
   }
@@ -377,14 +377,14 @@ function image_page($type = NULL, $tid = 0) {
     $last = db_fetch_object(db_query_range(db_rewrite_sql("SELECT n.nid FROM {node} n INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid=%d AND n.type = 'image' AND n.status = 1 ORDER BY n.sticky DESC, n.changed DESC"), $albums[$i]->tid, 0, 1));
     $albums[$i]->latest = node_load(array('nid' => $last->nid));
   }
-  
+
   $images = array();
   if ($tid) {
     $result = pager_query(db_rewrite_sql("SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid=n.nid WHERE n.status=1 AND n.type='image' AND t.tid=%d ORDER BY n.sticky DESC, n.created DESC"), 6, 0, NULL, $tid);
     while ($node = db_fetch_object($result)) {
       $images[] = node_load(array('nid' => $node->nid));
     }
-    
+
     $album = taxonomy_get_term($tid);
     $parents = taxonomy_get_parents($tid);
     foreach ($parents as $parent) {
@@ -463,7 +463,7 @@ function image_admin_album($edit = array()) {
     $exclude[] = $child->tid;
   }
   $exclude[] = $edit['tid'];
-  
+
   $form .= _taxonomy_term_select(t('Parent'), 'parent', $parent, $edit['vid'], NULL, 0, '<'. t('root') .'>', $exclude);
   $form .= form_weight(t('Weight'), 'weight', $edit['weight'], 10, t('In listings, the heavier (with a higher weight value) terms will sink and the lighter terms will be positioned nearer the top.'));
 
@@ -486,7 +486,7 @@ function theme_image_album($albums, $images) {
     $content.= '<ul class="albums">';
     foreach ($albums as $album) {
       $content.= "<li>";
-      $content.= l(image_display($album->latest, 'thumbnail'), 'image/tid/'.$album->tid);
+      $content.= l(image_display($album->latest, 'thumbnail'), 'image/tid/'.$album->tid, array(), NULL, NULL, FALSE, TRUE);
       $content.= "<h3>".l($album->name, 'image/tid/'.$album->tid) . "</h3>\n";
       $content.= '<div class="description">'. check_output($album->description) ."</div>\n";
       $content.= '<p class="count">' . format_plural($album->count, 'There is %count image in this album', 'There are %count images in this album') . "</p>\n";
@@ -506,7 +506,7 @@ function theme_image_album($albums, $images) {
         $content .= ' class="sticky"';
       }
       $content .= ">\n";
-      $content .= l(image_display($image, 'thumbnail'), 'node/'.$image->nid);
+      $content .= l(image_display($image, 'thumbnail'), 'node/'.$image->nid, array(), NULL, NULL, FALSE, TRUE);
       $content .= '<h3>'.l($image->title, 'node/'.$image->nid)."</h3>";
       $content .= '<div class="author">'. t('Posted by: %name', array('%name' => format_name($image))) . "</div>\n";
       $content .= '<div class="date">'.format_date($image->created)."</div>\n";
@@ -518,7 +518,7 @@ function theme_image_album($albums, $images) {
   if ($pager = theme('pager', NULL, 6, 0)) {
     $content.= $pager;
   }
-  
+
   return $content;
 }
 
@@ -657,7 +657,7 @@ function _image_get_vid() {
     }
     variable_set('image_nav_vocabulary', $vid);
   }
-  
+
   return $vid;
 }
 
