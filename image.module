@@ -164,8 +164,7 @@ function image_link($type, $node, $main = 0) {
 
   // Add links to an image node
   if ($type == "node" && $node->type == "image") {
-
-  	// If you have access to update this node display update link
+    // If you have access to update this node display update link
     if (image_access("update", $node)) {
       $links[] = l(t("edit this image"), "node/edit/$node->nid", array("title" => t("Edit this image.")));
     }
@@ -174,9 +173,7 @@ function image_link($type, $node, $main = 0) {
     if ($node->personal) {
       $links[] = l(t("%u's photo gallery", array("%u" => $node->name)), "image/uid/$node->uid", array("title" => t("View %u's photo gallery.", array("%u" => $node->name))));
 
-      $sql = "
-        SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path
-        FROM {node} n, {image} i WHERE n.nid = i.nid AND i.personal = 1 AND n.uid = ";
+      $sql = "SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path FROM {node} n, {image} i WHERE n.nid = i.nid AND i.personal = 1 AND n.uid = ";
       $sql .= $node->uid;
       $sql .= " ORDER BY "._image_get_thumb_order();
 
@@ -1176,23 +1173,24 @@ function image_page() {
 
 function _image_get_thumb_order() {
   $order = variable_get("image_gallery_thumb_order", "title");
-  if ($order == "title") {
-    return "n.title";
-  }
-  else if ($order == "time") {
-    return "n.created";
-  }
-  else if ($order == "time desc") {
-    return "n.created DESC";
-  }
-  else if ($order == "weight") {
-    return "i.weight";
-  }
-  else if ($order == "weight desc") {
-    return "i.weight DESC";
-  }
-  else {
-    return "RAND()";
+  switch($order) {
+    case "title":
+      return "n.title";
+      break;
+    case "time":
+      return "n.created";
+      break;
+    case "time desc":
+      return "n.created DESC";
+      break;
+    case "weight":
+      return "i.weight";
+      break;
+    case "weight desc":
+      return "i.weight DESC";
+      break;
+    default:
+      return "RAND()";
   }
 }
 
@@ -1221,34 +1219,19 @@ function _image_album_properties($albums) {
     foreach ($children as $term) {
       $terms[] = $term->tid;
     }
-    $result = db_query("
-          SELECT COUNT(*) AS c FROM {term_node} t, {node} n, {image} i
-          WHERE t.nid = n.nid
-          AND i.nid = n.nid AND t.tid IN (".implode(",", $terms).") AND i.personal = 0
-      ");
+    $result = db_query("SELECT COUNT(*) AS c FROM {term_node} t, {node} n, {image} i WHERE t.nid = n.nid AND i.nid = n.nid AND t.tid IN (". implode(",", $terms) .") AND i.personal = 0");
     while ($term = db_fetch_object($result)) {
       $albums[$term_id]->image_count = $term->c;
     }
 
-    $last_update = db_fetch_object(db_query("
-        SELECT n.created, i.thumb_path
-        FROM {node} n INNER JOIN {image} i
-        ON n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid
-        WHERE t.tid IN (".implode(",", $terms).")
-        AND n.type = 'image' AND i.personal = 0
-        ORDER BY n.created DESC LIMIT 1
-      "));
+    $last_update = db_fetch_object(db_query("SELECT n.created, i.thumb_path FROM {node} n INNER JOIN {image} i ON n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (". implode(",", $terms) .") AND n.type = 'image' AND i.personal = 0 ORDER BY n.created DESC LIMIT 1"));
     $albums[$term_id]->last_updated = $last_update->created;
     $albums[$term_id]->thumb = $last_update->thumb_path;
 
     if (variable_get("image_gallery_thumb", "last") == "random") {
-      $random = db_fetch_object(db_query("
-          SELECT i.thumb_path
-          FROM {node} n INNER JOIN {image} i ON  n.nid = i.nid
-          INNER JOIN {term_node} t ON n.nid = t.nid
-          WHERE t.tid IN (".implode(",", $terms).") AND n.type = 'image' AND i.personal = 0
-          ORDER BY RAND() LIMIT 1
-        "));
+      $nodes = db_fetch_object(db_query("SELECT MIN(nid) as min, MAX(nid) as max FROM {node} WHERE type = 'image'"));
+      $id = rand($nodes->min, $nodes->max);
+      $random = db_fetch_object(db_query("SELECT i.thumb_path FROM {node} n INNER JOIN {image} i ON  n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (". implode(",", $terms) .") AND n.type = 'image' AND i.personal = 0 AND n.nid >= ". $id ." LIMIT 1"));
       $albums[$term_id]->thumb = $random->thumb_path;
     }
   }
