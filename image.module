@@ -498,8 +498,8 @@ function image_validate(&$node) {
   // load it from the database.
   else if ($node->existing && !$node->image_path) {
     $old_files = db_fetch_object(db_query("SELECT image_path, thumb_path FROM image WHERE nid = '%s'", $node->nid));
-    $image_path = $old_files->image_path;
-    $thumb_path = $old_files->thumb_path;  
+    $node->image_path = $old_files->image_path;
+    $node->thumb_path = $old_files->thumb_path;  
   }
 
   // Load up image node attributes if we have a file
