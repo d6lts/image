@@ -173,7 +173,7 @@ function image_link($type, $node, $main = 0) {
 
   // Add page level link if the user has access permissions and a vocabulary has been selected for navigation
   if ($type == "page" && user_access("access images") && variable_get("image_nav_vocabulary", "")) {
-    $links[] = l(t("photo gallery"), "image");
+    $links[] = l(t("photo galleries"), "image");
   }
 
   // Add admin items if the user has administer permission
@@ -190,7 +190,7 @@ function image_link($type, $node, $main = 0) {
 
   // Add view personal gallery link if the user has personal gallery permission
   if ($type == "system" && user_access("access images") && _image_can_personal()) {
-    menu("image/uid/$user->uid", t("view photo gallery"), "image_page");
+    menu("image/uid/$user->uid", t("my photo gallery"), "page");
   }
 
   // Add links to an image node
@@ -278,13 +278,14 @@ function image_link($type, $node, $main = 0) {
  * Function to display photo gallery link on user information display.
  */
 function image_user($type, $ahem, &$user) {
-  if (user_access("access images")) {
-    if ($type == "view_public") {
-      $output .= form_item(t("Photo gallery"), l(t("view user's photo gallery"), "image/uid/$user->uid"));
-    }
 
-    return $output;
+  $output = '';
+
+  if (user_access("access images") && _image_can_personal() && ($type == "view_public")) {
+    $output = form_item(t("Photo gallery"), l(t("view user's photo gallery"), "image/uid/$user->uid"));
   }
+
+  return $output;
 }
 
 /**
