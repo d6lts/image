@@ -686,7 +686,7 @@ function image_insert($node) {
     die(t("Cannot save image."));
   }
 
-  db_query("INSERT INTO {image} (nid, image_path, thumb_path, format, width, height, filesize, iptc, exif, personal, weight) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", $node->nid, $node->image_path, $node->thumb_path, $node->format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight);
+  db_query("INSERT INTO {image} (nid, image_path, thumb_path, format, width, height, filesize, iptc, exif, personal, weight) VALUES (%d, '%s', '%s', '%s', %d, %d, %d, '%s', '%s', %d, %d)", $node->nid, $node->image_path, $node->thumb_path, $node->format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight);
 }
 
 /**
@@ -717,7 +717,7 @@ function image_update($node) {
     }
   }
 
-  db_query("UPDATE {image} SET image_path = '%s', thumb_path = '%s', format = '%s', width = '%s', height = '%s', filesize = '%s', iptc = '%s', exif = '%s', personal = '%s', weight = '%s' WHERE nid = '%s'", $node->image_path, $node->thumb_path, $node->format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight, $node->nid);
+  db_query("UPDATE {image} SET image_path = '%s', thumb_path = '%s', format = '%s', width = %d, height = %d, filesize = %d, iptc = '%s', exif = '%s', personal = %d, weight = %d WHERE nid = %d", $node->image_path, $node->thumb_path, $node->format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight, $node->nid);
 }
 
 /**
