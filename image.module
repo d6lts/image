@@ -489,6 +489,12 @@ function image_filter($text) {
   return $text;
 }
 
+function image_compose_tips() {
+  if (variable_get("image_filter_enabled", 0)) {
+    return array(t("You may quickly link to image nodes using a special syntax. The image code(s) will be replaced by thumbnail linked to full size image node. Syntax: <i>[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]</i>. Every parameter except node_id is <i>optional</i>."));
+  }  
+}  
+
 
 
 /****
