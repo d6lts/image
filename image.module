@@ -1660,7 +1660,7 @@ function _image_check_configuration() {
   $rows[] = $row;
   unset($row);
 
-  $output .= table($headers, $rows);
+  $output .= theme("table", $headers, $rows);
 
   return $output;
 }
@@ -1716,7 +1716,7 @@ function _image_form_max_picture_per_role() {
     $rows[] = $row;
     unset($row);
   }
-  return form_item('', table($header, $rows), t('Set how many pictures each role listed above is allowed. "Personal Gallery Picture Limit" will be the default value for new roles.'));
+  return form_item('', theme("table", $header, $rows), t('Set how many pictures each role listed above is allowed. "Personal Gallery Picture Limit" will be the default value for new roles.'));
 }
 
 /**
