@@ -320,7 +320,7 @@ function image_menu() {
 function image_user($type, $ahem, &$user) {
 
   if (user_access("access images") && _image_can_personal() && ($type == "view")) {
-    return array('Personal gallery' => form_item(t("Image gallery"), l(t("view user's image gallery"), "image/uid/$user->uid")));
+    return array('Personal gallery' => form_item(t("Image gallery"), l(t("view image gallery"), "image/uid/$user->uid")));
   }
 }
 
@@ -372,7 +372,7 @@ function image_view($node, $main = 0, $page = 0) {
 /**
  * Return form for adding and editing image nodes
  */
-function image_form(&$node, &$error, &$param) {
+function image_form(&$node, &$param) {
   global $base_url;
 
   // Taxonomy select form
@@ -395,7 +395,7 @@ function image_form(&$node, &$error, &$param) {
   }
 
   $output .= "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"".variable_get("image_default_max_weight", "200") * 1000 ."\">";
-  $output .= form_file("Image", "image", 50, t("Click \"Browse...\" to select an image to upload.") . $error["image"]);
+  $output .= form_file("Image", "image", 50, t("Click \"Browse...\" to select an image to upload."));
 
   $output .= form_textarea(t("Description"), "body", $node->body, 60, 5);
 
@@ -469,7 +469,7 @@ function image_validate(&$node) {
         break;
     }
     if ($errortxt) {
-      $error["image"] = theme("error", $errortxt);
+      form_set_error('image', $errortxt);
     }
   }
   else {
@@ -477,7 +477,7 @@ function image_validate(&$node) {
     // Move uploaded file to temp area
     $temp_file = variable_get("image_temp_path", "./")."tmpimg_".$upload_name;
     if (!move_uploaded_file($upload_file, $temp_file) && arg(3) != "file" ) {
-      $error["image"] = theme("error", t("Error processing image file."));
+      form_set_error('image', t("Error processing image file."));
     }
     else {
 
@@ -491,7 +491,7 @@ function image_validate(&$node) {
 
       // Check File Size
       if ($errortxt = _check_filesize_limits($temp_file, $node->personal)) {
-        $error["image"] = theme("error", $errortxt);
+        form_set_error('image', $errortxt);
       }
       else {
 
@@ -499,17 +499,17 @@ function image_validate(&$node) {
         // Check to make sure that uploaded file is an image and has a type supported by image library
         if ((!_is_image_type_supported($image_details['type'])) || (!_is_valid_image_ext($temp_file))) {
           if (($image_details['type'] == 'UNKNOWN') || empty($image_details['type'])){
-            $error["image"] = theme("error", t("Uploaded file was not an image."));
+            form_set_error('image', t('Uploaded file was not an image.'));
           }
           else {
-            $error["image"] = theme("error", t("image type '%type' is not supported.", array("%type" => $image_details['type'])));
+            form_set_error('image', t("image type '%type' is not supported.", array("%type" => $image_details['type'])));
           }
         }
         else {
 
           $max_dim = split("x", variable_get("image_default_max_size", "1024x768"));
           if ($image_details['width'] > $max_dim[0] || $image_details['height'] > $max_dim[1]) {
-            $error["image"] = theme("error", t("The uploaded image(%ax%b) is too large (max %cx%d).", array("%a" => $image_details['width'], "%b" => $image_details['height'], "%c" => $max_dim[0], "%d" => $max_dim[1])));
+            form_set_error('form', t("The uploaded image(%ax%b) is too large (max %cx%d).", array("%a" => $image_details['width'], "%b" => $image_details['height'], "%c" => $max_dim[0], "%d" => $max_dim[1])));
           }
           else {
 
@@ -536,13 +536,13 @@ function image_validate(&$node) {
 
             // Set final filename
             if (!rename($temp_file, _image_tempname($node))) {
-              $error["image"] = theme("error", t("Error processing image file."));
+              form_set_error('image', t('Error processing image file.'));
             }
 
             // Generate Thumbnail
             $errortxt = _image_make_thumbnail(_image_tempname($node), _image_tempthumbname($node));
             if ($errortxt) {
-              $error["image"] = theme("error", $errortxt);
+              form_set_error('image', $errortxt);
             }
 
           } // Dimension Check
@@ -626,13 +626,13 @@ function image_validate(&$node) {
 
       $errortxt = _image_convert($node->image_path, $node->image_path, $trasform_string);
       if ($errortxt) {
-        $error["image"] = theme("error", $errortxt);
+        form_set_error('image', $errortxt);
       }
 
       // Generate New Thumbnail
       $errortxt = _image_make_thumbnail($node->image_path, $node->thumb_path);
       if ($errortxt) {
-        $error["image"] = theme("error", $errortxt);
+        form_set_error('image', $errortxt);
       }
 
       // now let's reload size data
@@ -1036,13 +1036,15 @@ function _check_filesize_limits($image_file, $personal = 0) {
 
   $fsize = filesize($image_file);
 
+  /*
+  // FIXME: users can have multiple roles now!
   if (variable_get("image_personal_gallery_role", "0") == "1") {
     $max_num_per_role = variable_get('image_personal_gallery_max_role', array());
     $max_num = $max_num_per_role[$user->rid];
   }
-  else {
+  else {*/
     $max_num = variable_get("image_personal_gallery_max_num", "50");
-  }
+  //}
 
   if ($user_images->c >= $max_num && $personal) {
     $error = t("You can have at most %a images in your gallery.", array("%a" => $max_num));
