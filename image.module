@@ -49,6 +49,7 @@ function image_settings() {
   $output .= form_textfield("Gallery thumbs rows", "image_gallery_thumb_rows", variable_get("image_gallery_thumb_rows", "5"), 5, 255, "How many rows of thumbs in each page of the gallery.");
   $output .= form_textfield("Gallery thumbs columns", "image_gallery_thumb_cols", variable_get("image_gallery_thumb_cols", "3"), 5, 255, "How many columns of thumbs in each page of the gallery.");
   $output .= form_select("Gallery thumb order", "image_gallery_thumb_order", variable_get("image_gallery_thumb_order", "title"), array("title" => "title", "time" => "old -> new", "time desc" => "new -> old", "random" => "random", "weight" => "lighter -> heavier", "weight desc" => "heavier -> lighter"), "Order of thumbs. Lighter and heavier refer to weight property.");
+  $output .= form_select("Simple <i>Create</i> Form", "image_simple_add_form", variable_get("image_simple_add_form", 0), array("0" => "disabled", "1" => "enabled"), "Simplify the image add form by omitting the <b>Weight</b> field.");
 
   $output .= form_select("Personal photo gallery", "image_personal_gallery", variable_get("image_personal_gallery", "1"),   array("1" => "enabled", "0" => "disabled"), "Activate/deactivate personal photo gallery; use permission to control who can have it.");
   $output .= form_textfield("Personal gallery max number of pictures", "image_personal_gallery_max_num", variable_get("image_personal_gallery_max_num", "50"), 5, 255, "How many pictures users are allowed.");
@@ -98,7 +99,32 @@ function image_link($type, $node) {
   }
 
   if ($type == "admin" && user_access("administer images")) {
-    $links[] = l(t("images"), "admin/image");
+
+  $l_iptc = l("IPTC", "admin/image/help#iptc");
+  $dir_help = "<p>Admins may create many image nodes at once by uploading all images a folder on the Drupal web server. This upload happens outside of Drupal, usually using an ftp client.</p>";
+  $fast_help = "<h4>Fast Mode</h4>
+
+    <ul>
+     <li>creates all image nodes at once without user interaction</li>
+     <li>applies the same taxonomy term(s) to each node, thus creating a gallery</li>
+     <li>if $l_iptc data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>
+     <li>if the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li>
+    </ul>
+  ";
+  
+  $slow_help = "<h4>Slow Mode</h4>
+  <ul>
+    <li>manipulate each image individually (i.e. crop, rotate, etc.)</li>
+    <li>add custom titles, descriptions, etc.</li>
+  </ul>
+  ";
+  menu("admin/image", "image management", "_image_check_configuration", NULL, 8);
+    menu("admin/image/dir_upload/slow", "directory upload: slow", "_image_dir_upload", $dir_help. $slow_help, 2);
+    menu("admin/image/dir_upload/fast", "directory upload: fast", "_image_dir_upload_fast", $dir_help. $fast_help, 4);
+    // this page doesn't do anything
+    // menu("admin/image/gallery_admin", "administer galleries", "_image_gallery_admin", NULL, 6);
+
+    menu("admin/image/help", "help", "image_help", NULL, 12);
   }
 
   if ($type == "menu.create" && user_access("create images")) {
@@ -236,7 +262,9 @@ function image_form(&$node, &$help, &$error, &$param) {
       // **** first form in a new image ****
       $output .= implode("<p>", taxonomy_node_form("image", $node));
       $output .= form_textarea(t("Description"), "body", $node->body, 60, 5);
-      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, t("Weight of image; can be used to sort thumbnails."));
+      if (!variable_get("image_simple_add_form", 0)) {
+        $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, t("Weight of image; can be used to sort thumbnails."));
+      }  
 
       if (_image_can_personal()) {
         $output .= form_select(t("Personal"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can only be seen in the user's photo gallery."));
@@ -306,7 +334,9 @@ function image_form(&$node, &$help, &$error, &$param) {
       $output .= _image_render_iptc_exif(_image_iptc($ipct_info), "IPTC data");
       $output .= form_textarea(t("Description"), "body", $node->body, 60, 5);
       $output .= form_textarea(t("Teaser"), "teaser", $node->teaser, 60, 5);
-      $output .= form_textfield(t("Weight"), "weight", $node->weight, 5, 255, t("Weight of image; can be used to sort thumbnails."));
+      if (!variable_get("image_simple_add_form", 0)) {
+        $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, t("Weight of image; can be used to sort thumbnails."));
+      } 
 
       if (_image_can_personal()) {
         $output .= form_select(t("Personal"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can only be seen in the user's photo gallery."));
@@ -334,7 +364,9 @@ function image_form(&$node, &$help, &$error, &$param) {
       $output .= implode("<p>", taxonomy_node_form("image", $node));
       $output .= form_textarea(t("Description"), "body", $node->body, 60, 5);
       $output .= form_textarea(t("Teaser"), "teaser", $node->teaser, 60, 5);
-      $output .= form_textfield(t("Weight"), "weight", $node->weight, 5, 255, t("Weight of image; can be used to sort thumbnails."));
+      if (!variable_get("image_simple_add_form", 0)) {
+        $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, t("Weight of image; can be used to sort thumbnails."));
+      } 
 
       if (_image_can_personal()) {
         $output .= form_select(t("Personal"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can only be seen in the user's photo gallery."));
@@ -376,10 +408,12 @@ function image_form(&$node, &$help, &$error, &$param) {
 
       $output .= form_textarea(t("Description"), "body", $node->body, 60, 5);
       $output .= form_textarea(t("Teaser"), "teaser", $node->teaser, 60, 5);
-      $output .= form_textfield(t("Weight"), "weight", $node->weight, 5, 255, t("Weight of image; can be used to sort thumbnails."));
+      if (!variable_get("image_simple_add_form", 0)) {
+        $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, t("Weight of image; can be used to sort thumbnails."));
+      } 
 
       if (_image_can_personal()) {
-        $output .= form_select(t("Personal"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can only be seen in the user's photo gallery."));
+        $output .= form_select(t("Personal Gallery"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can be seen by everyone in the user's personal photo gallery."));
       }
 
       if (is_uploaded_file($HTTP_POST_FILES["edit"]["tmp_name"]["image"])) {
@@ -532,7 +566,7 @@ function _image_process($node) {
 
 function _image_filename($node) {
   if (!_image_check_ext($node->image_name)) {
-    echo "this extension is not allowed.";
+    echo "this file extension is not allowed.";
     exit();
   }
   return variable_get("image_default_path", "images/")._image_secure_strip_name($node->image_name);
@@ -541,7 +575,7 @@ function _image_filename($node) {
 
 function _image_thumbname($node) {
   if (!_image_check_ext($node->image_name)) {
-    echo "this extension is not allowed.";
+    echo "this file extension is not allowed.";
     exit();
   }
   $extension = strrchr($node->image_name, ".");
@@ -557,7 +591,6 @@ function _image_tempname($node) {
 
 
 function _image_check_ext($filename) {
-  // print "file name is $filename";
   return in_array(strtolower(strrchr($filename, ".")), array(".gif", ".jpg", ".png", ".jpeg"));
 }
 
@@ -1245,16 +1278,20 @@ function image_thumb_browser($data) {
 ***** admin function and friends
 ****/
 
-function _image_dir_upload($edit, $type = "slow") {
-  global $HTTP_SERVER_VARS, $type, $user;
+function  _image_dir_upload_fast() {
+   return _image_dir_upload("fast");
+}
+
+function _image_dir_upload($type = "slow") {
+  global $HTTP_SERVER_VARS, $type, $user, $edit;
 
   if (!$edit["dir"]) {
-    $output .= form_textfield("Directory to scan", "dir", variable_get("image_last_upload_dir", ""), 30, 255, "The path to the directory which holds the source image files. This path should be relative to Drupal root directory - don't forget the slash at the end.");
+    $output .= form_textfield("Directory to scan", "dir", variable_get("image_last_upload_dir", ""), 30, 255, "The path to the directory which holds the source image files. This path should be relative to Drupal root directory - don't forget the slash (/) at the end.");
     if ($type == "slow") {
       $output .= form_checkbox("Thumbnail", "thumb", $value = 1, $checked = 0, "Show resized image. Use only if you have large bandwidth.");
     }
     else {
-      $output .= form_checkbox("Delete images after insert", "del_images", $value = 1, $checked = 1, "If instructed, Drupal will delete all files in the above directory after creating the image nodes.");
+      $output .= form_checkbox("Delete images after insert", "del_images", $value = 1, $checked = 0, "If instructed, Drupal will delete all files in the above directory after creating the image nodes.");
       foreach (taxonomy_get_vocabularies("image") as $vocab) {
         $links[] .= l($vocab->name, "admin/taxonomy/add/term/$vocab->vid");
       }
@@ -1313,9 +1350,9 @@ function _image_dir_upload($edit, $type = "slow") {
           //override defaults with any data specified in iptc header
           $node = array_merge($node, _image_iptc_map(_image_tempname($node)));
 
-          // i would prefer to call node_submit() but it returns text, instead of status and error messages
-          $nid = node_save(array (), $node);
-          taxonomy_node_save($nid, $node["taxonomy"]);
+          $nid = node_save(array2object($node));
+
+          // taxonomy_node_save($nid, $node["taxonomy"]);
           if (!$alreadyprinted) {   // we only want to output this text once
             $output .= "\nYou may wish to view your new images: <p>\n";
             foreach ($node["taxonomy"] as $tid) {
@@ -1345,13 +1382,13 @@ function _image_check_configuration() {
   foreach ($dirs as $description => $key) {
     print $description.": <b>";
     if (!file_exists(variable_get($key[0], $key[1]))) {
-      print "<div style=\"color: red;\" class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system#$key[0]");
+      print "<div style=\"color: red;\" class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#$key[0]");
     }
     else if (!is_writable(variable_get($key[0], $key[1]))) {
       print "<div style=\"color: red;\" class=\"error\">NOT WRITABLE - change permissions on server";
     }
     else if (substr(variable_get($key[0], $key[1]), -1) != "/") {
-      print "<div style=\"color: red;\" class=\"error\">PATH DOES NOT END in SLASH (/) - fix in ". l("Site Configuration", "admin/system#$key[0]");
+      print "<div style=\"color: red;\" class=\"error\">PATH DOES NOT END in SLASH (/) - fix in ". l("Site Configuration", "admin/system/modules/image#$key[0]");
     }
     else {
       echo "<div style=\"color: green;\">OK";
@@ -1363,8 +1400,8 @@ function _image_check_configuration() {
   $convert = variable_get("image_convert_path", "misc/image/convert.exe");
   echo "ImageMagick convert :<b>";
   if ($convert) {
-    if (!is_executable($convert)) {
-      echo "<div style=\"color: red;\" class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system#image_convert");
+    if (!file_exists($convert)) {
+      echo "<div style=\"color: red;\" class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#image_convert");
     }
     else {
       echo "<div style=\"color: green;\">OK";
@@ -1379,8 +1416,8 @@ function _image_check_configuration() {
   $jhead = variable_get("image_jhead_path", "");
   echo "jhead :<b>";
   if ($jhead) {
-    if (!is_executable($jhead)) {
-      echo "<div style=\"color: red;\" class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system#image_jhead");
+    if (!file_exists($jhead)) {
+      echo "<div style=\"color: red;\" class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#image_jhead");
     }
     else {
       echo "<div style=\"color: green;\">OK";
@@ -1397,62 +1434,18 @@ function _image_check_configuration() {
   }
 }
 
-function _image_test() {
-  $file = 'tmpimg_marco';
-  if (strpos($file, "tmpimg")) {
-    echo "OK";
-  }
-  image_cron();
-}
 
-function _image_gallery_admin() {
-  if (!variable_get("image_nav_vocabulary", "")) {
-    $output = status("Error: you must assign a vocabulary to navigation before. Fix in ". l("Site Configuration", "admin/system"));
-  }
-  else {
-    // not sure what the intention is for this page
-  }
-  return $output;
-}
-
-function image_admin() {
-  global $op, $edit;
-
-  if (user_access("administer images")) {
-
-    $slow = l(t("slow"), "admin/image/dir_upload/slow");
-    $fast = l(t("fast"), "admin/image/dir_upload/fast");
-    $links[] = t("directory upload: "). $fast. ", ". $slow;
-    $links[] = l(t("gallery admin"), "admin/image/gallery");
-    $links[] = l(t("check configuration"), "admin/image/check_configuration");
-    $links[] = l(t("settings"), "admin/system/image");
-    $links[] = l(t("help"), "admin/image/help");
-    $links[] = l(t("test"), "admin/image/test");
-
-    print "<small>".  implode(" | ", $links) ."</small><hr>\n";
-
-    switch ($op) {
-      case "test":
-      _image_test();
-      break;
-      case "help":
-        image_help();
-        break;
-      case "dir_upload":
-      case "Directory upload":
-        print _image_dir_upload($edit);
-        break;
-      case "gallery":
-        print _image_gallery_admin($edit);
-        break;
-      default:
-        _image_check_configuration();
-    }
-  }
-  else {
-    print message_access();
-  }
-}
+/*
+**    function _image_gallery_admin() {
+**      if (!variable_get("image_nav_vocabulary", "")) {
+**        $output = status("Error: you must assign a vocabulary to navigation before. Fix in ". l("Site Configuration", "admin/system/modules/image"));
+**      }
+**      else {
+**        // not sure what the intention is for this page
+**      }
+**      return $output;
+**    }
+*/
 
 function image_help() {
 
@@ -1465,7 +1458,7 @@ The name of the binary on most unixoid systems is simply <i>convert</i>.</p>
 
 If you choose to use the GD library, you must install <a href="http://www.boutell.com/gd/">version 2.0 or higher</a>.
 
-<h4>IPTC</h4>
+<a name="iptc"><h4>IPTC</h4></a>
 JPEG images may be tagged with information about the image. This information talks about the
 caption, headline, creation date, location, and many other parameters about the image. To
 embed IPTC data in your images, use an IPTC aware editor like
@@ -1476,24 +1469,6 @@ embed IPTC data in your images, use an IPTC aware editor like
 <p>This module reads any IPTC info in your image, and uses it appropriately. Fast directory upload of IPTC
 images is the quickest and most complete way to add lots of images into Drupal. Further, you may tag
 your images while offline and only go online to do the upload/creation in Drupal.</p>
-
-<h4>Directory Upload</h4>
-Admins may create many image nodes at once by uploading all images a folder
-on the Drupal web server. This upload happens outside of Drupal, usually
-using an ftp client. After importing into Drupal, the images are deleted
-from the upload directory. After uploading, an admin may choose <b>fast</b>
-or <b>slow</b> from Admin -> Images. Slow mode enables the Admin to
-manipulate each image individually, and add custom title, description, etc.
-
-<h5>Fast Mode</h5>
-<ul>
-<li>creates all image nodes at once without user interaction</li>
-<li>applies the same taxonomy term(s) to each node, thus creating a gallery</li>
-<li>if IPTC data is present in the image, the headline and caption fields are
-used to populate the title and body respectively.</li>
-<li>if the image dimensions are bigger than the maximum allowed, the image is
-automatically scaled down.</li>
-</ul>
 
 <h4>Adding images into other nodes</h4>
 Sometimes, you want to add an image to another node like a blog entry or a story.

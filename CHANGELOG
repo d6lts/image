@@ -1,5 +1,14 @@
 8 March 2003
 ------------
+[Moshe Weitzman]
+- updated admin section to new menu structure and made some Help text more visible
+- fixed directory upload features. had broken with new node API.
+- improved a few error messages and help texts
+- added option to hide the Weight field on Compose form
+- replaced calls to is_executable() with file_exists()
+
+8 March 2003
+------------
 [Kjartan Mannes]
 - updated to work with latest node changes.
 

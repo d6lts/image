@@ -21,7 +21,7 @@ Installation
 2. Copy the image.module to the Drupal modules/ directory. Drupal should automatically detect it. Enable the module in Site Configuration -> Modules.
 
 3. There are a lot of options in admin: you should set at least imagemagick convert path for funny things on images, and some writeable directories to work.
-If Imagemagick is unavailable, you may use GD instead (version 2.01+. see http://www.boutell.com/gd/). Imaqge manipulation is not
+If Imagemagick is unavailable, you may use GD instead (version 2.01+. see http://www.boutell.com/gd/). Imaqge manipulation (i.e. rotate, crop, etc.) is not
 implemented if you choose GD.
 
 4. You can check your directory permissions in admin/image
