@@ -1,0 +1,735 @@
+# LANGUAGE translation of PROJECT
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+msgid ""
+msgstr ""
+"Project-Id-Version: Drupal\n"
+"POT-Creation-Date: 2004-09-07 18.01\n"
+"PO-Revision-Date: 2004-12-01 23:25+0100\n"
+"Last-Translator: MicheleF <michele@drupalitalia.it>\n"
+"Language-Team: Italian <m.ferrari@tiscali.it>\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Language-English: Italian\n"
+"X-Language-Local: Italiano\n"
+"X-Language-Flag: Qk22AQAAAAAAAHYAAAAoAAAAIAAAABQAAAABAAQAAAAAAEABAAAjCwAAIwsAABAAAAAQAAAAMdaEADnWjAA53owAQt6MAErelAA5Of8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AAAAAAAABmZmZmZlVVVVVVUAAAAAAAZmZmZmZVVVVVVVAAAAAAAGZmZmZmVVVVVVVQAAAAAABmZmZmZlVVVVVVUAAAAAAAZmZmZmZVVVVVVVAAAAAAAGZmZmZmVVVVVVVQAAAAAABmZmZmZlVVVVVVUAAAAAAAZmZmZmZVVVVVVVAAAAAAAGZmZmZmVVVVVVVQAAAAAABmZmZmZlVVVVVVUAAAAAAAZmZmZmZVVVVVVVAAAAAAAGZmZmZmVVVVVVVQAAAAAABmZmZmZlVVVVVVUAAAAAAAZmZmZmZVVVVVVVAAAAAAAGZmZmZmVVVVVVVREAAAAABmZmZmZlVVVVVVUTAAAAAAZmZmZmZVVVVVVVNDAAAAAGZmZmZmVVVVVVVTRBAAAABmZmZmZlVVVVVVUDMQAAAAZmZmZmZVVVVVVV\n"
+"X-Generator: poTranslator\n"
+"X-Poedit-Language: Italian\n"
+"X-Poedit-Country: ITALY\n"
+
+# d:\drupal-cvs\modules\image.module:9
+#: image.module:7
+msgid "<p>Admins may create many image nodes at once by uploading all images to a folder on the server. This upload happens outside of Drupal, usually using an FTP client.</p>"
+msgstr "<p>Gli amministratori possono creare più immagini in una volta caricando tutte le immagini in un folder sul server. Questo caricamento avviene fuori da Drupal, normalmente usando un client FTP.</p>"
+
+# d:\drupal-cvs\modules\image.module:30
+#: image.module:30
+msgid "Below is a status of image module's current configuration."
+msgstr "Sotto è lo stato della configurazione corrente del modulo image."
+
+# d:\drupal-cvs\modules\image.module:33
+#: image.module:33
+#, fuzzy
+msgid ""
+"\n"
+"      <h4>Fast Mode</h4><ul>\n"
+"      <li>Creates all image nodes at once without user interaction.</li>\n"
+"      <li>Applies the same taxonomy term(s) to each node, thus creating a gallery.</li>\n"
+"      <li>If IPTC data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>\n"
+"      <li>If the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li></ul>"
+msgstr ""
+"\n"
+"      <h4>Modo veloce</h4><ul>\n"
+"      <li>Create tutti i nodi immagine in una volta senza interazione utente.</li>\n"
+"      <li>Applica gli stess itermini di tassonomia ad ogni nodo, creando una galleria.</li>\n"
+"      <li>Se nell'immagine sono presenti dati IPTC, i campi headline e caption sono usati per popolare rispettivamente titolo e testo.</li>\n"
+"      <li>Se le dimensioni dell'immagine sono più grandi del massimo consentito, l'immagine viene automaticamente rimpicciolita.</li></ul>"
+
+# d:\drupal-cvs\modules\image.module:41
+#: image.module:41
+#, fuzzy
+msgid ""
+"\n"
+"      <h4>Slow Mode</h4><ul>\n"
+"      <li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>\n"
+"      <li>Add custom titles, descriptions, etc.</li></ul>"
+msgstr ""
+"\n"
+"      <h4>Modo lento</h4><ul>\n"
+"      <li>Manipola ogni immagine singolarmente (es.. crop, rotate, etc.).</li>\n"
+"      <li>Aggiunge titoli e descrizioni custom, ecc.</li></ul>"
+
+# d:\drupal-cvs\modules\image.module:47
+#: image.module:47
+msgid "Allow users to upload images and to display them in shared and personal image galleries."
+msgstr "Permette agli utenti di caricare immagini e visualizzarle in gallerie immagini condivise e personali."
+
+# d:\drupal-cvs\modules\image.module:50
+#: image.module:50
+msgid "Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced."
+msgstr "Le immagini possono essere caricate in gallerie condivise o personali. Una volta che le immagini sono caricate possono essere manipolate. Il sistema di immagini genererà automaticamente miniature per tutte le immagini che possono essere usate in altri nodi e nella navigazione delle immagini. Questi parametri permettono di controllare dove le immagini vengono inserite, ed eventuali restrizioni che debbano essere applicate."
+
+# d:\drupal-cvs\modules\image.module:53
+#: image.module:53
+msgid "An image you can insert into nodes, or see in image galleries."
+msgstr "Una immagine che potete inserire all'interno di nodi, o vedere in gallerie fotografiche."
+
+#: image.module:57
+msgid "You may link to images on this site <a href=\"%explanation-url\">using a special syntax</a>"
+msgstr ""
+
+#: image.module:61
+msgid "<p>You may quickly link to image nodes using a special syntax. The image code(s) will be replaced by thumbnail linked to full size image node. Syntax: <code>[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]</code>. Every parameter except node_id is <em>optional</em>.</p>"
+msgstr ""
+
+# d:\drupal-cvs\modules\image.module:80;324;1722;0
+#: image.module:72
+#: ;207;1550;0
+msgid "image"
+msgstr "immagine"
+
+# d:\drupal-cvs\modules\image.module:95
+#: image.module:87
+msgid "Explanation or submission guidelines"
+msgstr "Spiegazione o linee guida per l'inserimento"
+
+# d:\drupal-cvs\modules\image.module:95
+#: image.module:87
+msgid "This text will be displayed at the top of the image submission form.  It is useful for helping or instructing your users."
+msgstr "Questo testo verrà visualizzato all'inizio della maschera di inserimento immagine. E' utile per aiutare o istruire i vostri utenti."
+
+# d:\drupal-cvs\modules\image.module:97
+#: image.module:89
+msgid "Default image path"
+msgstr "Percorso di default per le immagini"
+
+# d:\drupal-cvs\modules\image.module:97
+#: image.module:89
+msgid "Default path for uploaded images relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."
+msgstr "Path di default per le immagini relativo alla vostra installazione Drupal; deve essere scrivibile e visibile dal Web. Non dimenticate lo slash (/) alla fine."
+
+# d:\drupal-cvs\modules\image.module:100
+#: image.module:92
+msgid "Default thumb path"
+msgstr "Percorso di default per le miniature"
+
+# d:\drupal-cvs\modules\image.module:100
+#: image.module:92
+msgid "Default path for thumbnails relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."
+msgstr "Path di default per le miniature relativo alla vostra installazione Drupal; deve essere scrivibile e visibile dal Web. Non dimenticate lo slash (/) alla fine."
+
+# d:\drupal-cvs\modules\image.module:103
+#: image.module:95
+msgid "Temporary image path"
+msgstr "Percorso temporaneo per le immagini"
+
+# d:\drupal-cvs\modules\image.module:103
+#: image.module:95
+msgid "Path for working directory relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."
+msgstr "Percorso per la directory di lavoro relativo alla  vostra installazione Drupal; deve essere scrivibile e visibile dal web. Non dimenticate lo slash (/) alla fine."
+
+# d:\drupal-cvs\modules\image.module:104
+#: image.module:96
+msgid "Maximum temporary image directory size"
+msgstr "Grandezza massima della directory temporanea per le immagini"
+
+# d:\drupal-cvs\modules\image.module:104
+#: image.module:96
+msgid "MBytes."
+msgstr "MBytes"
+
+# d:\drupal-cvs\modules\image.module:106
+#: image.module:98
+msgid "Stored images filenames"
+msgstr "Nome file immagine memorizzate"
+
+# d:\drupal-cvs\modules\image.module:106
+#: image.module:98
+msgid "The filename of an image stored on the server could be based on an unique random string or include the original filename. In the later case, the node id will be appended to the filename."
+msgstr "Il nome file di una immagine memorizzata sul server potrebbe essere basata su una stringa unica casuale o includere il nome file originale. Nell'ultimo caso, il n. di nodo verrà appeso alla fine del nome file."
+
+# d:\drupal-cvs\modules\image.module:108
+#: image.module:100
+msgid "Default max image size"
+msgstr "Grandezza massima di default per le immagini"
+
+# d:\drupal-cvs\modules\image.module:108
+#: image.module:100
+msgid "KBytes."
+msgstr "KBytes"
+
+# d:\drupal-cvs\modules\image.module:109
+#: image.module:101
+msgid "Default max image resolution"
+msgstr "Risoluzione massima di default per le immagini"
+
+# d:\drupal-cvs\modules\image.module:109
+#: image.module:101
+msgid "Example: 800x600."
+msgstr "Esempio: 800x600."
+
+# d:\drupal-cvs\modules\image.module:119
+#: image.module:103
+msgid "Default thumbnail resolution"
+msgstr "Risoluzione di default delle miniature"
+
+# d:\drupal-cvs\modules\image.module:119
+#: image.module:103
+msgid "Default size of thumbnails: format will be the same as original image. Use just one dimension, and put a \"x\" to specify height. Examples: \"100\" for width of 100; \"x200\" for height of 200."
+msgstr "Grandezza di default delle miniature: il formato sarà lo stesso dell'immagine originale. Usate solo una dimensione, e mettete un \"x\" per specificare. Esempi: \"100\" per una larghezza di 100; \"x200\" per un'altezza di 200."
+
+# d:\drupal-cvs\modules\image.module:132
+#: image.module:116
+msgid "Image library"
+msgstr "Libreria immagini"
+
+# d:\drupal-cvs\modules\image.module:132
+#: image.module:116
+msgid "Select the image library to be used during thumbnail generation and image manipulation.  Use ImageMagick if you can; GD produces worse thumbnails, might not support GIF and this module doesn't support image editing (rotate, crop etc) with it."
+msgstr "Selezionare la libreria immagini che deve essere usata durante le generazione della miniatura e la manipulazione delle immagini. Usate Imagemagick se potete; GD produce miniature peggiori, potrebbe non supportare file GIF e questo modulo non supporta modifiche alle immagini (rotate, crop ecc.)."
+
+# d:\drupal-cvs\modules\image.module:134
+#: image.module:118
+msgid "Imagemagick Convert path"
+msgstr "Percorso file Convert di Imagemagick"
+
+# d:\drupal-cvs\modules\image.module:134
+#: image.module:118
+msgid "Absolute path to ImageMagick convert file. Include the 'convert.exe' (or other filename) at the end. Leave it blank if you have selected GD library."
+msgstr "Percorso assoluto al file ImageMagick convert. Includete 'convert.exe' (o altro nomefile= alla fine. Lasciatelo vuoto se avete scelto la libreria GD."
+
+# d:\drupal-cvs\modules\image.module:137
+#: image.module:121
+msgid "Background Color"
+msgstr "Colore di sfondo"
+
+# d:\drupal-cvs\modules\image.module:137
+#: image.module:121
+msgid "Color used to fill in background when rotating images."
+msgstr "Colore usato per riempire lo sfondo durante la rotazione delle immagini."
+
+# d:\drupal-cvs\modules\image.module:144
+#: image.module:128
+msgid "jhead path"
+msgstr "percorso jhead"
+
+# d:\drupal-cvs\modules\image.module:144
+#: image.module:128
+msgid "Absolute path of jhead, for EXIF parsing; blank to disable."
+msgstr "Percorso assoluto per jhead, per analisi EXIF; blank per disabilitare."
+
+# d:\drupal-cvs\modules\image.module:149
+#: image.module:133
+msgid "<none>"
+msgstr "<nessuno>"
+
+# d:\drupal-cvs\modules\image.module:151
+#: image.module:135
+msgid "Gallery Navigation Vocabulary"
+msgstr "Vocabolario navigazione gallerie"
+
+# d:\drupal-cvs\modules\image.module:151
+#: image.module:135
+msgid "One of the taxonomy vocabularies will be the navigation tree. Select it here. Make sure that a term from this vocabulary is required."
+msgstr "Uno dei vocabolari della tassonomia sarà l'albero di navigazione. Selezionatelo qui. Accertatevi che un termine di questo vocabolario sia obbligatorio."
+
+# d:\drupal-cvs\modules\image.module:153
+#: image.module:137
+msgid "Gallery Thumbnails"
+msgstr "Miniature della galleria"
+
+# d:\drupal-cvs\modules\image.module:153
+#: image.module:137
+msgid "Set the thumbnail to be dislayed on the gallery page."
+msgstr "Specifica la miniatura che verrà visualizzata in ogni pagina della galleria."
+
+# d:\drupal-cvs\modules\image.module:154
+#: image.module:138
+msgid "Specify how many rows of thumbnails in each page of the gallery."
+msgstr "Specificate quante righe di miniature  saranno in ogni pagina della galleria."
+
+# d:\drupal-cvs\modules\image.module:155
+#: image.module:139
+msgid "Gallery Columns"
+msgstr "Colonne delle gallerie"
+
+# d:\drupal-cvs\modules\image.module:155
+#: image.module:139
+msgid "Specify how many columns of thumbnails in each page of the gallery."
+msgstr "Specificate quante colonne di miniature dovranno essere in ogni pagina della galleria."
+
+# d:\drupal-cvs\modules\image.module:156
+#: image.module:140
+msgid "Gallery Order"
+msgstr "Ordine delle gallerie"
+
+# d:\drupal-cvs\modules\image.module:156
+#: image.module:140
+msgid "Order of thumbnails within a gallery. Lighter and heavier refer to weight property."
+msgstr "Ordine delle miniature all'interno di una galleria. Più leggero e più pesante si riferiscono alla proprietà peso."
+
+# d:\drupal-cvs\modules\image.module:158
+#: image.module:142
+msgid "Personal Image Galleries"
+msgstr "Gallerie immagini personali"
+
+# d:\drupal-cvs\modules\image.module:158
+#: image.module:142
+msgid "Activate/deactivate personal image galleries site-wide.  When enabled you can use the \"has personal image gallery\" permission to control which roles have personal galleries."
+msgstr "Attiva/disattiva gallerie immagini personali. Quando abilitato, potete usare il permesso \"avere galleria immagini personale\" per controllare quali ruoli hanno la galleria personale."
+
+# d:\drupal-cvs\modules\image.module:160
+#: image.module:144
+msgid "Personal Gallery Picture Limit"
+msgstr "Limite Immagini galleria personale"
+
+# d:\drupal-cvs\modules\image.module:160
+#: image.module:144
+msgid "Set how many pictures users are allowed."
+msgstr "Imposta quante immagini possono caricare gli utenti."
+
+# d:\drupal-cvs\modules\image.module:161
+#: image.module:145
+msgid "Personal Gallery Picture Limit Per Role"
+msgstr "Limite gallerie immagini personali per ruolo"
+
+# d:\drupal-cvs\modules\image.module:161
+#: image.module:145
+msgid "Enabling this will allow for setting a maximum number of pictures per role."
+msgstr "Abilitando questo parametro permetterà di impostare il numero massimo di immagini per ruolo."
+
+# d:\drupal-cvs\modules\image.module:166
+#: image.module:150
+msgid "Personal Gallery Size Limit"
+msgstr "Limite grandezza galleria personale"
+
+# d:\drupal-cvs\modules\image.module:166
+#: image.module:150
+msgid "Set a maximum number of kilobytes allowed per user."
+msgstr "Imposta il numero massimo di kilobytes permessi per utente."
+
+# d:\drupal-cvs\modules\image.module:169
+#: image.module:153
+msgid "Disable Image Caching"
+msgstr "Disabilita caching immagini"
+
+# d:\drupal-cvs\modules\image.module:169
+#: image.module:153
+msgid "Enabling this will add random parameters to image URIs which will prevent the browser from caching."
+msgstr "Abilitando questo parametro aggiungerà parametri casuali all URI delle immagini, che eviterà il caching del browser."
+
+# d:\drupal-cvs\modules\image.module:212;314
+#: image.module:193
+#: ;216
+msgid "image galleries"
+msgstr "immagini"
+
+# d:\drupal-cvs\modules\image.module:328
+#: image.module:200
+msgid "images"
+msgstr "immagini"
+
+# d:\drupal-cvs\modules\image.module:329
+#: image.module:201
+msgid "directory upload: slow"
+msgstr "upload directory: lento"
+
+# d:\drupal-cvs\modules\image.module:330
+#: image.module:202
+msgid "directory upload: fast"
+msgstr "upload directory: veloce"
+
+# d:\drupal-cvs\modules\image.module:319
+#: image.module:212
+msgid "my image gallery"
+msgstr "le mie immagini"
+
+# d:\drupal-cvs\modules\image.module:321
+#: image.module:224
+#, fuzzy
+msgid "edit this image"
+msgstr "visualizza immagine"
+
+# d:\drupal-cvs\modules\image.module:1727
+#: image.module:224
+#, fuzzy
+msgid "Edit this image."
+msgstr "non è un'immagine."
+
+# d:\drupal-cvs\modules\image.module:230
+#: image.module:229
+msgid "%u's image gallery"
+msgstr "%u's Image Gallery"
+
+# d:\drupal-cvs\modules\image.module:230
+#: image.module:229
+msgid "View %u's image gallery."
+msgstr "Visualizzala galleria immagini di %u."
+
+# d:\drupal-cvs\modules\image.module:260
+#: image.module:259
+msgid "%t image gallery"
+msgstr "galleria immagini %t"
+
+# d:\drupal-cvs\modules\image.module:260
+#: image.module:259
+msgid "View %t image gallery."
+msgstr "Visualizza la galleria immagini %t."
+
+# d:\drupal-cvs\modules\image.module:289
+#: image.module:288
+msgid "previous image"
+msgstr "immagine precedente"
+
+# d:\drupal-cvs\modules\image.module:293
+#: image.module:292
+msgid "next image"
+msgstr "prossima immagine"
+
+# d:\drupal-cvs\modules\image.module:340
+#: image.module:307
+msgid "Image gallery"
+msgstr "Galleria immagini"
+
+# d:\drupal-cvs\modules\image.module:230
+#: image.module:307
+#, fuzzy
+msgid "view user's image gallery"
+msgstr "Visualizzala galleria immagini di %u."
+
+# d:\drupal-cvs\modules\image.module:398;1598
+#: image.module:366
+#: ;1427
+msgid "Thumbnail"
+msgstr "Miniatura"
+
+# d:\drupal-cvs\modules\image.module:402
+#: image.module:370
+msgid "EXIF data"
+msgstr "Dati EXIF"
+
+# d:\drupal-cvs\modules\image.module:406
+#: image.module:374
+msgid "IPTC data"
+msgstr "Dati IPTC"
+
+# d:\drupal-cvs\modules\image.module:414
+#: image.module:382
+msgid "Click \"Browse...\" to select an image to upload."
+msgstr "Click \"Browse...\" per selezionare un'immagine da caricare."
+
+# d:\drupal-cvs\modules\image.module:416
+#: image.module:384
+msgid "Description"
+msgstr "Descrizione"
+
+# d:\drupal-cvs\modules\image.module:420
+#: image.module:388
+msgid "Weight"
+msgstr "Peso"
+
+# d:\drupal-cvs\modules\image.module:420
+#: image.module:388
+msgid "Weight of image used to sort thumbnails.  Heavier thumbnails will fall to the bottom of the gallery."
+msgstr "Peso delle immagini usato per ordinare le miniature. Miniature più pesanti andranno al fondo della galleria."
+
+# d:\drupal-cvs\modules\image.module:424
+#: image.module:392
+msgid "Personal"
+msgstr "Personale"
+
+# d:\drupal-cvs\modules\image.module:424
+#: image.module:392
+msgid "A personal image can only be seen in the user's image gallery."
+msgstr "Una immagine personale può essere vista solo nella galleria immagini personale."
+
+# d:\drupal-cvs\modules\image.module:504;509
+#: image.module:439
+#: ;443
+msgid "The image file you are trying to upload is too big."
+msgstr "L'immagine che state cercando di caricare è troppo grande."
+
+# d:\drupal-cvs\modules\image.module:514
+#: image.module:447
+msgid "The image file was only partially uploaded. Please try again."
+msgstr "L'immagine è stata caricata solo parzialmente. Per favore riprovate."
+
+# d:\drupal-cvs\modules\image.module:519
+#: image.module:451
+msgid "You must select an image for upload."
+msgstr "Dovete selezionare un immagine da caricare."
+
+# d:\drupal-cvs\modules\image.module:553;750
+#: image.module:464
+#: ;523
+msgid "Error processing image file."
+msgstr "Errore elaborando il file immagine"
+
+# d:\drupal-cvs\modules\image.module:672
+#: image.module:486
+msgid "Uploaded file was not an image."
+msgstr "Il file caricato non è un'immagine"
+
+# d:\drupal-cvs\modules\image.module:674
+#: image.module:489
+msgid "image type '%type' is not supported."
+msgstr "il tipo immagine '%type' non è supportato."
+
+# d:\drupal-cvs\modules\image.module:712
+#: image.module:496
+msgid "The uploaded image(%ax%b) is too large (max %cx%d)."
+msgstr "L'iimmagine caricata (%ax%b) è troppo grande (max %cx%d)."
+
+# d:\drupal-cvs\modules\image.module:66
+#: image.module:651
+#: ;666
+#, fuzzy
+msgid "Image filter"
+msgstr "Galleria immagini"
+
+# d:\drupal-cvs\modules\image.module:1327
+#: image.module:665
+#, fuzzy
+msgid "Image codes"
+msgstr "Gallerie fotografiche"
+
+#: image.module:665
+msgid "When enabled, image codes will be replaced by thumb linked to real node. Syntax: [image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]; every param but node_id is optional."
+msgstr ""
+
+# d:\drupal-cvs\modules\image.module:827;876
+#: image.module:715
+#: ;720;745;750
+#, fuzzy
+msgid "Cannot save image."
+msgstr "Non posso salvare immagine su %path."
+
+# d:\drupal-cvs\modules\image.module:857
+#: image.module:734
+msgid "Cannot delete old image."
+msgstr "Non posso cancellare la vecchia immagine."
+
+# d:\drupal-cvs\modules\image.module:860
+#: image.module:737
+msgid "Cannot delete old thumb."
+msgstr "Non posso cancellare la vecchia miniatura."
+
+#: image.module:934
+msgid "Cannot create thumbnail. Current GD library has no read support for '%type' image format."
+msgstr ""
+
+#: image.module:965
+msgid "Cannot create thumbnail. Current GD library has no support for '%type' format image creation."
+msgstr ""
+
+#: image.module:978
+msgid "Imagemagick: you have to set <code>convert</code> path."
+msgstr ""
+
+# d:\drupal-cvs\modules\image.module:1164
+#: image.module:1032
+msgid "You can have at most %a images in your gallery."
+msgstr "Potete avere al massimo %a immagini nella vostra galleria."
+
+# d:\drupal-cvs\modules\image.module:1170
+#: image.module:1038
+msgid "You have %a kb for your gallery."
+msgstr "Avete %a kb per la vostra galleria."
+
+# d:\drupal-cvs\modules\image.module:1177
+#: image.module:1045
+msgid "File is too big (max %a kbytes)"
+msgstr "Il file è troppo grande (max %a kbytes)"
+
+# d:\drupal-cvs\modules\image.module:1185
+#: image.module:1053
+msgid "Upload directory is full."
+msgstr "La directory di caricamento è piena."
+
+# d:\drupal-cvs\modules\image.module:1234
+#: image.module:1102
+msgid "Resize/Crop"
+msgstr "Resize/Crop"
+
+# d:\drupal-cvs\modules\image.module:1244
+#: image.module:1112
+msgid "keep prop"
+msgstr "mantenere proporzioni"
+
+# d:\drupal-cvs\modules\image.module:1248
+#: image.module:1116
+msgid "Rotate"
+msgstr "Ruotare"
+
+# d:\drupal-cvs\modules\image.module:1251
+#: image.module:1119
+msgid "clockwise"
+msgstr "senso orario"
+
+# d:\drupal-cvs\modules\image.module:1252
+#: image.module:1120
+msgid "background"
+msgstr "sfondo"
+
+# d:\drupal-cvs\modules\image.module:1252
+#: image.module:1120
+msgid "white"
+msgstr "bianco"
+
+# d:\drupal-cvs\modules\image.module:1252
+#: image.module:1120
+msgid "black"
+msgstr "nero"
+
+# d:\drupal-cvs\modules\image.module:1256
+#: image.module:1124
+msgid "Convert"
+msgstr "Convert"
+
+# d:\drupal-cvs\modules\image.module:1257
+#: image.module:1125
+msgid "Quality (1-100)"
+msgstr "Qualità (1-100)"
+
+# d:\drupal-cvs\modules\image.module:1293;1328
+#: image.module:1161
+#: ;1196
+msgid "Home"
+msgstr "Home"
+
+# d:\drupal-cvs\modules\image.module:1296
+#: image.module:1164
+msgid "%u's Image Gallery"
+msgstr "%u's Image Gallery"
+
+# d:\drupal-cvs\modules\image.module:1327
+#: image.module:1195
+msgid "Image galleries"
+msgstr "Gallerie fotografiche"
+
+# d:\drupal-cvs\modules\image.module:1336
+#: image.module:1204
+msgid "Access Denied"
+msgstr "Accesso negato"
+
+# d:\drupal-cvs\modules\image.module:1495
+#: image.module:1327
+msgid "There is 1 image in this album."
+msgstr "C'è 1 immagine in questo album."
+
+# d:\drupal-cvs\modules\image.module:1495
+#: image.module:1327
+msgid "There are %a images in this album."
+msgstr "Ci sono %a immagini in questo album."
+
+# d:\drupal-cvs\modules\image.module:1497
+#: image.module:1329
+msgid "There are no images in this album."
+msgstr "Non ci sono immagini in questo album."
+
+# d:\drupal-cvs\modules\image.module:1500
+#: image.module:1332
+msgid "Last updated: "
+msgstr "Ultimo aggiornamento: "
+
+# d:\drupal-cvs\modules\image.module:1596
+#: image.module:1425
+msgid "Directory to scan"
+msgstr "Directory da analizzare"
+
+# d:\drupal-cvs\modules\image.module:1596
+#: image.module:1425
+msgid "The path to the directory which holds the source image files. This path should be relative to Drupal root directory - don't forget the slash (/) at the end."
+msgstr "Il percorso della directory che contiene i file sorgenti delle immagini. Questo percorso dovrebbe essere relativo alla directory root di Drupal - non dimenticate lo slash (/) alla fine."
+
+# d:\drupal-cvs\modules\image.module:1598
+#: image.module:1427
+msgid "Show resized image. Use only if you have large bandwidth."
+msgstr "Mostra immagini ampliate. Usate questo parametro solo se avete banda larga."
+
+# d:\drupal-cvs\modules\image.module:1601
+#: image.module:1430
+msgid "Delete images after insert"
+msgstr "Cancella immagini dopo inserimento"
+
+# d:\drupal-cvs\modules\image.module:1601
+#: image.module:1430
+msgid "If instructed, Drupal will delete all files in the above directory after creating the image nodes."
+msgstr "Se impostato, Drupal, cancellerà tutti i files nella directory specificata dopo avere creato le immagini."
+
+# d:\drupal-cvs\modules\image.module:1605
+#: image.module:1434
+msgid "Add new gallery"
+msgstr "Aggiungi una nuova galleria"
+
+# d:\drupal-cvs\modules\image.module:1605
+#: image.module:1434
+msgid "If needed, create a new term for this gallery by clicking on one of these vocabularies"
+msgstr "Se necessario, create un nuovo termine per questa galleria cliccando su uno di questi vocabolari"
+
+# d:\drupal-cvs\modules\image.module:1608
+#: image.module:1437
+msgid "Directory upload"
+msgstr "Caricamento di una directory"
+
+# d:\drupal-cvs\modules\image.module:1615
+#: image.module:1444
+msgid "is not a directory"
+msgstr "non è una directory"
+
+#: image.module:1452
+msgid "is not writable. Change permissions on server"
+msgstr "non è scrivibile. Cambia i permessi sul server"
+
+# d:\drupal-cvs\modules\image.module:1714
+#: image.module:1542
+msgid "You may wish to view your new images:"
+msgstr "Potete voler vedere le vostre nuove immagini:"
+
+# d:\drupal-cvs\modules\image.module:1717
+#: image.module:1545
+msgid "gallery"
+msgstr "galleria"
+
+#: image.module:1555
+msgid "is not an image."
+msgstr "non è un'immagine."
+
+#: image.module:1558
+msgid "image type is not supported."
+msgstr "tipo di immagine non è supportato."
+
+#: image.module:1705
+msgid "Role"
+msgstr "Ruolo"
+
+#: image.module:1705
+msgid "Limit"
+msgstr "Limite"
+
+# d:\drupal-cvs\modules\image.module:1800
+#: image.module:1713
+msgid "Set how many pictures each role listed above is allowed. \"Personal Gallery Picture Limit\" will be the default value for new roles."
+msgstr "Imposta quante immagini ogni ruolo listato può inserire. \"Limite immagini delle gallerie personali\" sarà il valore di default per i nuovi ruoli."
+
+#: image.module:79
+msgid "has personal image gallery"
+msgstr "possiede galleria immagini personale"
+
+#: image.module:79
+msgid "manipulate images"
+msgstr "manipola immagini"
+
+#: image.module:79
+msgid "access images"
+msgstr "accede alle immagini"
+
+#: image.module:79
+msgid "create images"
+msgstr "crea immagini"
+
+#: image.module:79
+msgid "administer images"
+msgstr "amministra immagini"
+
