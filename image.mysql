@@ -3,6 +3,7 @@ CREATE TABLE image (
   image_path varchar(255) not null,
   thumb_path varchar(255) not null,
   preview_path varchar(255) not null,
+  image_list longtext,
   format varchar(255) not null,
   width int unsigned not null,
   height int unsigned not null,

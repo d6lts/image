@@ -9,5 +9,4 @@ permissions to access images or manipulate them.
 
 This module requires ImageMagick (http://www.imagemagick.org) or GD (http://www.boutell.com/gd)
 
-Send comments to marco@porciletto.org.
-
+Send comments to drupal.org@ericscouten.com.

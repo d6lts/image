@@ -1,3 +1,17 @@
+28 July 2004
+------------
+[Gordon Heydon, changes applied by Eric Scouten]
+- Drop support for MSSQL (support has been dropped throughout Drupal).
+- Add new image filter syntax, continue to support old syntax
+- Add ability to store many sizes of each image (i.e. 640x480, 800x600, ... )
+- Add support for imlib2
+- Add new URL "image/view/(node id)" which returns the image by itself
+
+28 July 2004
+------------
+[Eric Scouten]
+- Add utility to update image.module's database from prior versions
+
 22 June 2004
 ---------------
 [Matt Westgate]
@@ -10,7 +24,7 @@
 
 22 July 2003
 ------------
-Gerhard Killesreiter
+[Gerhard Killesreiter]
 - updated for table prefix patch
 - file names are now <original filename>-$node->nid.ext
 
