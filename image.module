@@ -24,7 +24,7 @@ function image_help($section = "admin/help#image") {
       $output .= "<p>You can verify your directory and image library application configuration by visiting the <a href=\"". $base_url . "/?q=admin/image\">images administration screen</a>.</p>";
       $output .= "<h4>Adding images into other nodes</h4>";
       $output .= "<p>Sometimes, you want to add an image to another node like a blog entry or a story. You may do this by creating an image node in Drupal for the target image, and then referencing that image in your story, blog, etc. To enable this feature and learn the proper syntax, visit the <a href=\"" . $base_url . "/?q=admin/system/filters\">filters configuration screen</a>.</p>";
-      $output  = t($output); 
+      $output  = t($output);
       break;
     case 'admin/image':
       $output = t("Below is a status of image module's current configuration.");
@@ -35,13 +35,13 @@ function image_help($section = "admin/help#image") {
       $output .= "<li>Applies the same taxonomy term(s) to each node, thus creating a gallery.</li>";
       $output .= "<li>If IPTC data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>";
       $output .= "<li>If the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li></ul>";
-      $output  = $common . t($output); 
+      $output  = $common . t($output);
       break;
     case 'admin/image/dir_upload/slow':
       $output  = "<h4>Slow Mode</h4><ul>";
       $output .= "<li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>";
       $output .= "<li>Add custom titles, descriptions, etc.</li></ul>";
-      $output  = $common . t($output); 
+      $output  = $common . t($output);
       break;
     case 'admin/system/modules#description':
       $output = t("Allow users to upload images and to display them in shared and personal photo galleries.");
@@ -75,7 +75,7 @@ function image_perm() {
  */
 function image_settings() {
 
-  $output .= form_textarea(t("Explanation or submission guidelines"), "image_help", variable_get("image_help", ""), 70, 5, t("This text will be displayed at the top of the image submission form.  It is useful for helping or instructing your users."));
+  $output  = form_textarea(t("Explanation or submission guidelines"), "image_help", variable_get("image_help", ""), 70, 5, t("This text will be displayed at the top of the image submission form.  It is useful for helping or instructing your users."));
 
   $output .= form_textfield(t("Default image path"), "image_default_path", variable_get("image_default_path", "images/"), 30, 255, t("Default path for uploaded images relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."));
 
@@ -175,29 +175,33 @@ function image_link($type, $node, $main = 0) {
   $links = array();
 
   // Add page level link if the user has access permissions and a vocabulary has been selected for navigation
-  if ($type == "page" && user_access("access images") && variable_get("image_nav_vocabulary", "")) {
-    $links[] = l(t("photo galleries"), "image");
+  if ($type == "page") {
+    if (user_access("access images") && variable_get("image_nav_vocabulary", "")) {
+      $links[] = l(t("photo galleries"), "image");
+    }
   }
 
-  if ($type == "system" && user_access("access image") && variable_get("image_nav_vocabulary","")) {
-    menu("image", t("photo galleries"), "image_page", 0, 1);
-  }
+  if ($type == "system") {
+    // Add admin items if the user has administer permission
+    if (user_access("administer images")) {
+      menu("admin/image", t("images"), "_image_check_configuration");
+      menu("admin/image/dir_upload/slow", t("directory upload: slow"), "_image_dir_upload");
+      menu("admin/image/dir_upload/fast", t("directory upload: fast"), "_image_dir_upload_fast");
+    }
 
-  // Add admin items if the user has administer permission
-  if ($type == "system" && user_access("administer images")) {
-    menu("admin/image", "images", "_image_check_configuration");
-    menu("admin/image/dir_upload/slow", "directory upload: slow", "_image_dir_upload");
-    menu("admin/image/dir_upload/fast", "directory upload: fast", "_image_dir_upload_fast");
-  }
+    // Add a create link for images if the user has create permission
+    if ((user_access("create images") || _image_can_personal())) {
+      menu("node/add/image", t("image"), "node_page");
+    }
 
-  // Add a create link for images if the user has create permission
-  if ($type == "system" && (user_access("create images") || _image_can_personal())) {
-    menu("node/add/image", t("image"), "page");
-  }
+    // Add view personal gallery link if the user has personal gallery permission
+    if (user_access("access images") && _image_can_personal()) {
+      menu("image/uid/$user->uid", t("my photo gallery"), "image_page");
+    }
 
-  // Add view personal gallery link if the user has personal gallery permission
-  if ($type == "system" && user_access("access images") && _image_can_personal()) {
-    menu("image/uid/$user->uid", t("my photo gallery"), "page");
+    if (user_access("access image") && variable_get("image_nav_vocabulary","")) {
+      menu("image", t("photo galleries"), "image_page", 0, 1);
+    }
   }
 
   // Add links to an image node
@@ -324,7 +328,7 @@ function image_access($op, $node) {
 /**
  * Display the image node
  */
-function image_view($node, $main = 0) {
+function image_view($node, $main = 0, $page = 0) {
 
   $rand = "";
 
@@ -336,7 +340,7 @@ function image_view($node, $main = 0) {
   $node->teaser = check_output($node->teaser);
   $node->body = check_output($node->body);
 
-  return theme("node_image", $node, $rand, $main);
+  return theme("node_image", $node, $rand, $main, $page);
 }
 
 /**
@@ -674,7 +678,7 @@ function image_filter($text) {
 /**
  * Explanation of image filter syntax, linked to from beneath the compose form
  * when the compose_tips.module is enabled.
- * 
+ *
  * @see http://drupal.org/node/view/1516
  */
 function image_compose_tips() {
@@ -1144,18 +1148,14 @@ function image_page() {
 
       $galleryuser = user_load(array( "uid" => $uid));
 
-      print theme("header");
-      print theme("box", t("%u's Photo Gallery", array("%u" => $galleryuser->name)), theme("image_gallery_album", $null, $null, $images, $null, $galleryuser));
-      print theme("footer");
+      print theme("page", theme("image_gallery_album", $null, $null, $images, $null, $galleryuser), t("%u's Photo Gallery", array("%u" => $galleryuser->name)));
     }
     else if (!$tid) {
       // show albums
       $albums = taxonomy_get_children(0, variable_get("image_nav_vocabulary", ""));
       $albums = _image_album_properties($albums);
 
-      print theme("header");
-      print theme("box", t("Photo galleries"), theme("image_gallery_home", $albums));
-      print theme("footer");
+      print theme("page", theme("image_gallery_home", $albums), t("Photo galleries"));
     }
     else {
       // browse albums; show subalbums and thumbs
@@ -1188,15 +1188,11 @@ function image_page() {
         $n++;
       }
 
-      print theme("header");
-      print theme("box", t("Photo galleries"), theme("image_gallery_album", $parents, $subalbums, $images, $data));
-      print theme("footer");
+      print theme("page", theme("image_gallery_album", $parents, $subalbums, $images, $data), t("Photo galleries"));
     }
   }
   else {
-    print theme("header");
-    print theme("box", t("Access denied"), message_access());
-    print theme("footer");
+    print theme("page", message_access(), t("Access Denied"));
   }
 }
 
@@ -1268,9 +1264,8 @@ function _image_album_properties($albums) {
 
 /**
  * Theme function to render image node.
- *
  */
-function theme_node_image($node, $rand, $main = 0) {
+function theme_node_image($node, $rand, $main = 0, $page = 0) {
   global $base_url;
 
   if ($main)
@@ -1291,11 +1286,15 @@ function theme_node_image($node, $rand, $main = 0) {
     }
   }
 
-  return theme("node", $node, $main);
+  return theme("node", $node, $main, $page);
 }
 
+/**
+ * Theme function to render image gallery home.
+ */
 function theme_image_gallery_home($albums) {
   global $base_url;
+
   if ($albums) {
     $output .= "\n<div id=\"image\">\n<table>\n";
 
@@ -1326,6 +1325,9 @@ function theme_image_gallery_home($albums) {
   return $output;
 }
 
+/**
+ * Theme function to render image gallery album.
+ */
 function theme_image_gallery_album($parents, $subalbums, $images, $data, $galleryuser = null) {
   global $base_url;
 
@@ -1575,7 +1577,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
     }
     closedir($handle);
   }
-  return $output;
+  print theme("page", $output);
 }
 
 function _image_check_configuration() {
@@ -1669,7 +1671,7 @@ function _image_check_configuration() {
 
   $output .= theme("table", $headers, $rows);
 
-  return $output;
+  print theme("page", $output);
 }
 
 /**
