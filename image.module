@@ -1062,10 +1062,10 @@ function _image_get_subalbums($tid, $recurse = 0) {
 
 function _image_album_properties($albums) {
   // to every album add: how many images, last update, path of a thumbnail (, number of views, date of first image, something about comments)
-  taxonomy_get_tree(variable_get("image_nav_vocabulary", ""), $tree); #, $parent = 0, $depth = -1
+  $tree = taxonomy_get_tree(variable_get("image_nav_vocabulary", "")); #, $parent = 0, $depth = -1
   foreach (array_keys($albums) as $term_id) {
-    $children = array(); $terms = array();
-    taxonomy_get_tree(variable_get("image_nav_vocabulary", ""), $children, $term_id, 1);
+    $terms = array();
+    $children = taxonomy_get_tree(variable_get("image_nav_vocabulary", ""), $term_id, 1);
     $terms[] = $term_id;
     foreach ($children as $term) {
       $terms[] = $term->tid;
