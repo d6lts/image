@@ -108,6 +108,9 @@ function image_settings() {
     $output .= "<a name=\"image_convert\"></a>";
     $output .= form_textfield(t("Imagemagick Convert path"), "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, t("Absolute path to ImageMagick convert file. Include the 'convert.exe' (or other filename) at the end."));
   }
+  else {
+    variable_set("image_convert_path", "");
+  }
 
   $output .= "<a name=\"image_jhead\"></a>";
   $output .= form_textfield(t("jhead path"), "image_jhead_path", variable_get("image_jhead_path", ""), 50, 255, t("Absolute path of jhead, for EXIF parsing; blank to disable."));
@@ -238,9 +241,9 @@ function image_link($type, $node, $main = 0) {
         $sql = "
           SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path
           FROM {node} n, {term_node} t, {image} i
-          WHERE n.nid = t.nid AND n.nid = i.nid AND i.personal = 0 AND t.tid = ";
+          WHERE n.nid = t.nid AND n.nid = i.nid AND i.personal = 0 AND t.tid = '";
         $sql .= $term->tid;
-        $sql .= " ORDER BY "._image_get_thumb_order();
+        $sql .= "' ORDER BY "._image_get_thumb_order();
       }
     }
 
@@ -1489,8 +1492,10 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
         else {
           $size = getimagesize("$dir/$file", $iptc_info);
           if ((in_array($size[2], array(1,2,3))) && (_image_check_ext($file))) {
+
             // move to a temporary location. _insert() will later move to final destination
             $node->image_id = md5(rand());
+            $node->extension = _get_ext($file);
             $edit["del_images"] ? $action = "rename" : $action = "copy";
             if (!$action("$dir/$file", _image_tempname($node))) {
               die("cannot copy image to temporary location.");
