@@ -898,6 +898,9 @@ function image_update($node) {
  */
 function image_load($node) {
   $image = db_fetch_object(db_query("SELECT * FROM {image} WHERE nid = '%s'", $node->nid));
+  $image->img_format = $image->format;
+  unset($image->format);
+
   $image->iptc = unserialize($image->iptc);
   $image->exif = unserialize($image->exif);
   if (!($image->image_list = unserialize($image->image_list))) {
