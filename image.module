@@ -340,7 +340,7 @@ function image_view($node, $main = 0) {
   $node->teaser = check_output($node->teaser);
   $node->body = check_output($node->body);
 
-  print theme("node_image", $node, $rand, $main);
+  return theme("node_image", $node, $rand, $main);
 }
 
 /**
@@ -1295,7 +1295,7 @@ function theme_node_image($node, $rand, $main = 0) {
     }
   }
 
-  print theme("node", $node, $main);
+  return theme("node", $node, $main);
 }
 
 function theme_image_gallery_home($albums) {
