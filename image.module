@@ -92,7 +92,7 @@ function image_save($op, $node) {
   }
 
   if ($op == "create") {
-    return array("body" => filter($node->body), "teaser" => filter($node->teaser), "image_id", "image_name", "personal", "weight");
+    return array("body" => filter($node->body), "teaser" => filter($node->teaser), "image_id", "image_name", "personal", "weight", "moderate" => 0);
   }
 
   if ($op == "decline") {
@@ -127,7 +127,7 @@ function image_link($type, $node) {
   }
 
   if ($type == "menu.create" && user_access("post content")) {
-    $links[] = lm(t("create image"), array("mod" => "node", "op" => "add", "type" => "image"), "", array("link" => t("Add a new image.")));
+    $links[] = lm(t("create image"), array("mod" => "node", "op" => "add", "type" => "image"), "", array("title" => t("Add a new image.")));
   }
 
   if ($type == "menu.view" && user_access("access content") && _image_can_personal()) {

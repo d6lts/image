@@ -1,3 +1,8 @@
+23 June 2002
+------------------
+- fixed images appearing in submission queue
+- fixed a wrong title in a link
+
 12 June 2002
 ------------------
 - temporary revert back to method_exists instead of theme_invoke()s, which are still there but commented

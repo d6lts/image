@@ -240,8 +240,27 @@ navigate in photo gallery. Fix in Site Configuration "
 + image_cron() mistakenly deleted Drupal system files by when I set 'temp
 path' incorrectly. perhaps you can only delete files of type=image or add
 warning text in the description for the temp path form field.
-- My new images are appearing in the queue AND in the gallery
++ My new images are appearing in the queue AND in the gallery
 - when viewing an image, i see redundant link for 'edit this image' and
 'administer'. no big deal though
 
 
+Moshe
+----------------
+
+when you update an image, you *must* preview the image before submitting.
+why is that? is this a security concern?
+(node_validate)
+
+>perhaps related - i'd like for 'directory upload' to be more streamlined. in
+>fact, i'd like to add an IPTC caption and headline data to my images while
+>offline. then directory upload will create a node for each image, setting
+>its title and body from the corrosponding IPTC fields. Is this possible?
+
+mmm this is interesting and should not be difficult. there could be a "read title and body from iptc" checkbox. what fields should we use? I see caption (body?), headline (teaser?), object name (title?) but there are others too. I also see "categories", we could use that for taxonomy.
+
+Kika
+----------------
+- Upload image from URL (implemented in trip_image, check for sources)                            
+- Allow users to specify their profile image from their private albums and show                   
+  it in their personal page (using user() hook)  
