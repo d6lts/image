@@ -1,3 +1,9 @@
+12 June 2002
+------------------
+- temporary revert back to method_exists instead of theme_invoke()s, which are still there but commented
+- fixed taxonomy_get_tree calls
+
+
 11 June 2002
 ------------------
 - partial support for GD: only thumbnails
