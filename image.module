@@ -849,19 +849,21 @@ function image_insert($node) {
  * Update an image node's extra data in the datastore.
  */
 function image_update($node) {
-  if ($node->image_id) {
+  // if there is an image id, and there is a temp image, then we need to
+  // delete everything, and replace it with what is in the temp folder.
+  if ($node->image_id && file_exists(_image_tempname($node))) {
     $old_files = db_fetch_object(db_query("SELECT image_path, thumb_path, image_list FROM {image} WHERE nid = '%s'", $node->nid));
     $old_files->image_list = unserialize($old_files->image_list);
 
-    if (!unlink($old_files->image_path)) {
+    if (!@unlink($old_files->image_path)) {
       drupal_set_message(t('Cannot delete old image.'), 'error');
     }
-    if (!unlink($old_files->thumb_path)) {
+    if (!@unlink($old_files->thumb_path)) {
       drupal_set_message(t('Cannot delete old thumb.'), 'error');
     }
     foreach($old_files->image_list as $k => $v) {
       if ($v['fname']) {
-        if (!unlink($v['fname'])) {
+        if (!@unlink($v['fname'])) {
           drupal_set_message(t('Cannot delete static image.'), 'error');
         }
       }
