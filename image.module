@@ -475,7 +475,7 @@ function image_validate(&$node) {
       }
 
       // Check File Size
-      if ($errortxt = _check_filesize_limits($temp_file)) {
+      if ($errortxt = _check_filesize_limits($temp_file, $node->personal)) {
         $error["image"] = theme("error", $errortxt);
       }
       else {
@@ -999,7 +999,7 @@ function _image_strip_name($filename) {
   return strtolower(preg_replace("/[^A-Za-z0-9\.\-\+\/_]/","",$filename));
 }
 
-function _check_filesize_limits($image_file) {
+function _check_filesize_limits($image_file, $personal = 0) {
   global $user;
   $user_images = db_fetch_object(db_query("SELECT COUNT(*) AS c, SUM(i.filesize) AS size FROM {image} i, {node} n WHERE i.personal = 1 AND i.nid = n.nid AND n.uid = ".$user->uid));
 
@@ -1013,13 +1013,13 @@ function _check_filesize_limits($image_file) {
     $max_num = variable_get("image_personal_gallery_max_num", "50");
   }
 
-  if ($user_images->c >= $max_num) {
+  if ($user_images->c >= $max_num && $personal) {
     $error = t("You can have at most %a images in your gallery.", array("%a" => $max_num));
   }
 
   else {
     $max_kb = variable_get("image_gallery_max_kb", "1000") * 1000;
-    if (($user_images->size + $fsize) > $max_kb) {
+    if (($user_images->size + $fsize) > $max_kb && $personal) {
       $error = t("You have %a kb for your gallery.", array("%a" => $max_kb));
     }
 
