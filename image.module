@@ -8,40 +8,40 @@ function image_help($section = "admin/help#image") {
   $output = '';
   switch ($section) {
     case 'admin/help#image':
-      $output  = "<h4>Configuration</h4><h5>Image Library</h5>";
-      $output .= "<p><a href=\"http://www.imagemagick.org/\">Imagemagick</a> and <a href=\"http://www.boutell.com/gd/\">GD</a> are supported image libraries. Imagemagick is required for full image manipulation features and is suggested for better thumbnail quality.</p>";
-      $output .= "<p>Many ISPs already have Imagemagick installed and available for your use. If you are hosted on Linux and have shell access, type <i>which convert</i> at the command prompt This will tell you where the binary is, if it is in the path. The name of the binary on most unixoid systems is simply <i>convert</i>.</p>";
-      $output .= "<p>If you choose to use the GD library, you should install version 2.0 or higher. However, version 1.x of the GD library is supported, even if it produces lower quality images. In order to use GD PHP must be compiled with GD enabled.</p>";
-      $output .= "<a name=\"iptc\"><h5>IPTC</h5></a>";
-      $output .= "<p>JPEG images may be tagged with information about the image. This information talks about the caption, headline, creation date, location, and many other parameters about the image. To embed IPTC data in your images, use an IPTC aware editor like <a href=\"http://www.pixvue.com\">PixVue</a> (free, Windows only), <a href=\"http://www.adobe.com/products/photoshop/main.html\">Photoshop</a> (commercial, Windows/Mac), or <a href=\"http://www.photo.net/bboard/q-and-a-fetch-msg?msg_id=001Lso\">possibly GIMP</a> (Linux, Unix, Windows).</p>";
-      $output .= "<p>This module reads any IPTC info in your image, and uses it appropriately. Fast directory upload of IPTC images is the quickest and most complete way to add lots of images into Drupal. Further, you may tag your images while offline and only go online to do the upload/creation in Drupal.</p>";
-      $output .= "<h5>EXIF</h5>";
-      $output .= "<p>JPEG images may also be tagged with information about the camera settings used to take the picture.</p>";
-      $output .= "<p>This module can read EXIF information about your images via <a href=\"http://www.sentex.net/~mwandel/jhead/\">jhead</a>.</p>";
-      $output .= "<h5>Image Storage</h5>";
-      $output .= "<p>All directories must be readable and writeable for the user id that the web server runs under.</p>";
-      $output .= "<h5>Verifiying Configuration</h5>";
-      $output .= "<p>You can verify your directory and image library application configuration by visiting the <a href=\"". $base_url . "/?q=admin/image\">images administration screen</a>.</p>";
-      $output .= "<h4>Adding images into other nodes</h4>";
-      $output .= "<p>Sometimes, you want to add an image to another node like a blog entry or a story. You may do this by creating an image node in Drupal for the target image, and then referencing that image in your story, blog, etc. To enable this feature and learn the proper syntax, visit the <a href=\"" . $base_url . "/?q=admin/system/filters\">filters configuration screen</a>.</p>";
-      $output  = t($output);
+      $output  = t("
+      <h4>Configuration</h4><h5>Image Library</h5>
+      <p><a href=\"%imagemagick-url\">Imagemagick</a> and <a href=\"%gd-url\">GD</a> are supported image libraries. Imagemagick is required for full image manipulation features and is suggested for better thumbnail quality.</p>
+      <p>Many ISPs already have Imagemagick installed and available for your use. If you are hosted on Linux and have shell access, type <em>which convert</em> at the command prompt This will tell you where the binary is, if it is in the path. The name of the binary on most unixoid systems is simply <em>convert</em>.</p>
+      <p>If you choose to use the GD library, you should install version 2.0 or higher. However, version 1.x of the GD library is supported, even if it produces lower quality images. In order to use GD PHP must be compiled with GD enabled.</p>
+      <a name=\"iptc\"><h5>IPTC</h5></a>
+      <p>JPEG images may be tagged with information about the image. This information talks about the caption, headline, creation date, location, and many other parameters about the image. To embed IPTC data in your images, use an IPTC aware editor like <a href=\"%pixvue-url\">PixVue</a> (free, Windows only), <a href=\"%photoshop-url\">Photoshop</a> (commercial, Windows/Mac), or <a href=\"%gimp-url\">possibly GIMP</a> (Linux, Unix, Windows).</p>
+      <p>This module reads any IPTC info in your image, and uses it appropriately. Fast directory upload of IPTC images is the quickest and most complete way to add lots of images into Drupal. Further, you may tag your images while offline and only go online to do the upload/creation in Drupal.</p>
+      <h5>EXIF</h5>
+      <p>JPEG images may also be tagged with information about the camera settings used to take the picture.</p>
+      <p>This module can read EXIF information about your images via <a href=\"%jhead-url\">jhead</a>.</p>
+      <h5>Image Storage</h5>
+      <p>All directories must be readable and writeable for the user id that the web server runs under.</p>
+      <h5>Verifiying Configuration</h5>
+      <p>You can verify your directory and image library application configuration by visiting the <a href=\"%image-url\">images administration screen</a>.</p>
+      <h4>Adding images into other nodes</h4>
+      <p>Sometimes, you want to add an image to another node like a blog entry or a story. You may do this by creating an image node in Drupal for the target image, and then referencing that image in your story, blog, etc. To enable this feature and learn the proper syntax, visit the <a href=\"" . $base_url . "/?q=admin/system/filters\">filters configuration screen</a>.</p>", array("%imagemagick-url" => "http://www.imagemagick.org/", "%gd-url" => "http://www.boutell.com/gd/", "%pixvue-url" => "http://www.pixvue.com", "%photoshop-url" => "http://www.adobe.com/products/photoshop/main.html", "%gimp-url" => "http://www.photo.net/bboard/q-and-a-fetch-msg?msg_id=001Lso", "%jhead-url" => "http://www.sentex.net/~mwandel/jhead/", "%images-url" => url("admin/image")));
       break;
     case 'admin/image':
       $output = t("Below is a status of image module's current configuration.");
       break;
     case 'admin/image/dir_upload/fast':
-      $output  = "<h4>Fast Mode</h4><ul>";
-      $output .= "<li>Creates all image nodes at once without user interaction.</li>";
-      $output .= "<li>Applies the same taxonomy term(s) to each node, thus creating a gallery.</li>";
-      $output .= "<li>If IPTC data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>";
-      $output .= "<li>If the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li></ul>";
-      $output  = $common . t($output);
+      $output  = t("
+      <h4>Fast Mode</h4><ul>
+      <li>Creates all image nodes at once without user interaction.</li>
+      <li>Applies the same taxonomy term(s) to each node, thus creating a gallery.</li>
+      <li>If IPTC data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>
+      <li>If the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li></ul>");
       break;
     case 'admin/image/dir_upload/slow':
-      $output  = "<h4>Slow Mode</h4><ul>";
-      $output .= "<li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>";
-      $output .= "<li>Add custom titles, descriptions, etc.</li></ul>";
-      $output  = $common . t($output);
+      $output  = t("
+      <h4>Slow Mode</h4><ul>
+      <li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>
+      <li>Add custom titles, descriptions, etc.</li></ul>");
       break;
     case 'admin/system/modules#description':
       $output = t("Allow users to upload images and to display them in shared and personal photo galleries.");
