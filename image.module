@@ -185,7 +185,7 @@ function image_link($type, $node, $main = 0) {
 
   // Add a create link for images if the user has create permission
   if ($type == "system" && (user_access("create images") || _image_can_personal())) {
-    menu("node/add/image", t("image"), "image_page");
+    menu("node/add/image", t("image"), "page");
   }
 
   // Add view personal gallery link if the user has personal gallery permission
