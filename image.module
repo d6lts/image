@@ -1145,11 +1145,12 @@ function image_page() {
         $images[] = $image;
       }
 
-      $null = array();
-
       $galleryuser = user_load(array( "uid" => $uid));
 
-      print theme("page", theme("image_gallery_album", $null, $null, $images, $null, $galleryuser), t("%u's Photo Gallery", array("%u" => $galleryuser->name)));
+      $breadcrumb[] = l(t("Home"), "");
+      drupal_set_breadcrumb($breadcrumb);
+
+      print theme("page", theme("image_gallery_album", $images), t("%u's Photo Gallery", array("%u" => $galleryuser->name)));
     }
     else if (!$tid) {
       // show albums
@@ -1157,7 +1158,7 @@ function image_page() {
       $albums = _image_album_properties($albums);
       $image_nav_vocabulary = taxonomy_get_vocabulary(variable_get("image_nav_vocabulary", ""));
 
-      print theme("page", theme("image_gallery_home", $albums, $image_nav_vocabulary->description), t("Photo galleries"));
+      print theme("page", theme("image_gallery_home", $albums, $image_nav_vocabulary->description));
     }
     else {
       // browse albums; show subalbums and thumbs
@@ -1172,14 +1173,20 @@ function image_page() {
         $images[] = $image;
       }
 
+      // Build breadcrumb trail
       $parents[] = taxonomy_get_term($tid);
       $n = 0;
-      while ($parent = taxonomy_get_parents($parents[$n]->tid)) {
-        $parents = array_merge($parents, $parent);
-        $n++;
+      while ($parent = taxonomy_get_parents($parents[$n++]->tid)) {
+         $parents = array_merge($parents, $parent);
+         $breadcrumb[] = l($parents[$n]->name, 'image/tid/'. $parents[$n]->tid);
       }
+      $title = $parents[0]->name;
+      $breadcrumb[] = l(t('Photo galleries'), 'image');
+      $breadcrumb[] = l(t('Home'), '');
+      $breadcrumb = array_reverse($breadcrumb);
+      drupal_set_breadcrumb($breadcrumb);
 
-      print theme("page", theme("image_gallery_album", $parents, $subalbums, $images), t("Photo galleries"));
+      print theme("page", theme("image_gallery_album", $images, $subalbums), $title);
     }
   }
   else {
@@ -1324,21 +1331,10 @@ function theme_image_gallery_home($albums, $gallery_description = '') {
 /**
  * Theme function to render image gallery album.
  */
-function theme_image_gallery_album($parents, $subalbums, $images, $galleryuser = null) {
+function theme_image_gallery_album($images, $subalbums ) {
   global $base_url;
 
   $output = '';
-
-  if (!$galleryuser) {
-    $t[] = l(t("galleries"), "image");
-    foreach (array_reverse(array_values($parents)) as $p) {
-      $t[] = l($p->name, "image/tid/$p->tid");
-    }
-    if ($t) {
-      $output .= "&nbsp;".implode(":", $t);
-      $output .= "<hr>";
-    }
-  }
 
   $sub = theme("image_gallery_home", $subalbums);
   if ($sub) {
