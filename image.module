@@ -1540,10 +1540,6 @@ function _image_dir_upload($type = "slow") {
             _image_make_thumbnail($node->image_path, $node->thumb_path);      
   
             $nid = node_save(array2object($node));
-  
-            if (function_exists("taxonomy_node_save")) {
-              taxonomy_node_save($nid, $node->taxonomy);
-            }
             
             if (!$alreadyprinted) {  // we only want to output this text once
               $output .= "\n" . t("You may wish to view your new images:") ." <p>\n";
@@ -1618,13 +1614,13 @@ function _image_check_configuration() {
     }
   }
   else {
-    echo "<div classs=\"disabled\">disabled";
+    echo "<div class=\"disabled\">disabled";
   }
   echo "</div>";
 
   // check if he assigned a vocabulary, for photo album navigation
   if (!variable_get("image_nav_vocabulary", "")) {
-    echo "Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ". l("Site Configuration", "admin/system/modules/image#image_nav_vocabulary");
+    echo "<div class=\"error\">Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ". l("Site Configuration", "admin/system/modules/image#image_nav_vocabulary"). "</div>";
   }
 }
 
