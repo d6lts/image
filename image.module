@@ -851,7 +851,7 @@ function _image_max_filesize($image_file, $tid = 0, $personal = 0) {
 
 function _image_personal_limit($image_file) {
   global $user;
-  $user_images = db_fetch_object(db_query("SELECT COUNT(*) AS c, SUM(filesize) AS size FROM image i, node n WHERE i.nid = n.nid AND n.uid = ".$user->uid));
+  $user_images = db_fetch_object(db_query("SELECT COUNT(*) AS c, SUM(filesize) AS size FROM image i, node n WHERE i.personal = 1 AND i.nid = n.nid AND n.uid = ".$user->uid));
 
   $max_num = variable_get("image_personal_gallery_max_num", "50");
   if ($user_images->c == $max_num) {
