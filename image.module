@@ -479,7 +479,7 @@ function image_validate(&$node) {
             $error["image"] = theme("error", t("Uploaded file was not an image."));
           }
           else {
-            $error["image"] = theme("error", t($image_details['type'] ." image type is not supported."));
+            $error["image"] = theme("error", t("image type '%type' is not supported.", array("%type" => $image_details['type'])));
           }
         }
         else {
@@ -920,7 +920,7 @@ function _image_make_thumbnail($imagename, $thumbname) {
         $im = $function($imagename);
       }
       else {
-        $error = t('Cannot create thumbnail. Current GD library has no read support for '.$image_details['type'].' image format.');
+        $error = t("Cannot create thumbnail. Current GD library has no read support for '%type' image format.", array("%type" => $image_details['type']));
         continue;
       }
 
@@ -951,7 +951,7 @@ function _image_make_thumbnail($imagename, $thumbname) {
         imageDestroy($th);
       }
       else {
-        $error = t('Cannot create thumbnail. Current GD library has no support for '.$image_details['type'].' format image creation.');
+        $error = t("Cannot create thumbnail. Current GD library has no support for '%type' format image creation.", array("%type" => $image_details['type']));
       }
 
       imageDestroy($im);

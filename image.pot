@@ -3,7 +3,7 @@
 #
 msgid ""
 msgstr "Project-Id-Version: PROJECT\n"
-"POT-Creation-Date: 2003-12-08 19:09+0100\n"
+"POT-Creation-Date: 2003-12-08 21:11+0100\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -336,6 +336,10 @@ msgid "Uploaded file was not an image."
 msgstr ""
 
 #: image.module
+msgid "image type '%type' is not supported."
+msgstr ""
+
+#: image.module
 msgid "The uploaded image(%ax%b) is to large (max %cx%d)."
 msgstr ""
 
@@ -361,6 +365,14 @@ msgstr ""
 
 #: image.module
 msgid "Cannot delete old thumb."
+msgstr ""
+
+#: image.module
+msgid "Cannot create thumbnail. Current GD library has no read support for '%type' image format."
+msgstr ""
+
+#: image.module
+msgid "Cannot create thumbnail. Current GD library has no support for '%type' format image creation."
 msgstr ""
 
 #: image.module
