@@ -1,3 +1,10 @@
+3 October 2002 
+----------------------
+[Gerhard Killesreiter]
+
+_image_check_configuration: Add test for slashes at the end of dirs.
+                            Changed some echos to prints
+
 2 October 2002
 ----------------
 [Moshe Weitzman]

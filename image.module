@@ -1200,7 +1200,7 @@ function image_gallery_album($parents, $subalbums, $images, $data) {
   }
   
   $output .= method_exists($theme, "image_thumb_browser") ? $theme->image_thumb_browser($data) : image_thumb_browser($data);
-  //$output .= theme_invoke("image_thumb_browser", $data);
+  //$output .= theme_inv
   
   return $output;
 }
@@ -1352,12 +1352,15 @@ function _image_check_configuration() {
     "Temporary image path" => array("image_temp_path", "./") 
     );
   foreach ($dirs as $description => $key) {
-    echo $description.": <b>";
+    print $description.": <b>";
     if (!file_exists(variable_get($key[0], $key[1]))) {
-      echo "<div style=\"color: red;\" class=\"error\">DOES NOT EXIST - fix in ".la("Site Configuration", array("mod" => "system"), $key[0]);
+      print "<div style=\"color: red;\" class=\"error\">DOES NOT EXIST - fix in ".la("Site Configuration", array("mod" => "system"), $key[0]);
     }
     else if (!is_writable(variable_get($key[0], $key[1]))) {
-      echo "<div style=\"color: red;\" class=\"error\">NOT WRITABLE - change permissions on server";
+      print "<div style=\"color: red;\" class=\"error\">NOT WRITABLE - change permissions on server";
+    }
+    else if (substr(variable_get($key[0], $key[1]), -1) != "/") {
+      print "<div style=\"color: red;\" class=\"error\">PATH DOES NOT END in SLASH (/) - fix in ".la("Site Configuration", array("mod" => "system"), $key[0]);
     }
     else {
       echo "<div style=\"color: green;\">OK";
