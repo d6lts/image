@@ -787,7 +787,8 @@ function image_insert($node) {
     drupal_set_message(t('Cannot save thumbnail image to %path.', array('%path' => $node->thumb_path)), 'error');
   }
 
-  if (is_array($image->image_list)) {
+  // Rename generated sizes.
+  if (is_array($node->image_list)) {
     foreach ($node->image_list as $k => $v) {
       $node->image_list[$k]['fname'] = _image_filename($node, $k);
       if (!rename(_image_tempname($node, $k), $node->image_list[$k]['fname'])) {
