@@ -153,6 +153,8 @@ TODO (+ = done):
 - support gd
 - recheck personal limit
 - probably convert path should not be a variable, but more hardwired (security); besides, convert path is troublesome on win32
+- index table
+- recheck in photo gallery the number of images reported, it seems wrong if you have images in subgalleries
 
 ***
 Moshe:

@@ -236,7 +236,7 @@ function image_view($node) {
   if ($op != t("Preview")) {
     $output .= "<p>". $theme->links(link_node($node, $main)) ."</p>";
   }
-  $theme->box(t("Image"), $output);
+  $theme->box(check_output($node->title), $output);
 }
 
 
@@ -310,7 +310,7 @@ function image_form(&$node, &$help, &$error, &$param) {
         echo $error_string;
       }
       
-      $size = getimagesize(_image_tempname($node), &$ipct_info);
+      $size = getimagesize(_image_tempname($node), $ipct_info);
       if (user_access("manipulate images")) {
         $output .= _images_transform_form($size, filesize(_image_tempname($node)));
       }
@@ -379,7 +379,7 @@ function image_form(&$node, &$help, &$error, &$param) {
         echo $error_string;
       }
 
-      $size = getimagesize(_image_tempname($node), &$ipct_info);
+      $size = getimagesize(_image_tempname($node), $ipct_info);
       if (user_access("manipulate images")) {
         $output .= _images_transform_form($size, filesize(_image_tempname($node)));
       }
@@ -653,7 +653,7 @@ function image_insert($node) {
     die("cannot save image.");
   }
   
-  $size = getimagesize($image_path, &$ipct_info);
+  $size = getimagesize($image_path, $ipct_info);
   $formats = array("1" => "gif", "2" => "jpg", "3" => "png");
   $iptc = _image_iptc($ipct_info);
   $exif = _image_get_exif($image_path);
@@ -690,7 +690,7 @@ function image_update($node) {
       die("cannot save image.");
     }
     
-    $size = getimagesize($image_path, &$ipct_info);
+    $size = getimagesize($image_path, $ipct_info);
     $formats = array("1" => "gif", "2" => "jpg", "3" => "png");
     $iptc = _image_iptc($ipct_info);
     $exif = _image_get_exif($image_path);
