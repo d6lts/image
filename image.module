@@ -1197,7 +1197,7 @@ function image_gallery_album($parents, $subalbums, $images, $data) {
     $output .= "</table>";
   }
 
-  $output .= theme("image_thumb_browser", $data)
+  $output .= theme("image_thumb_browser", $data);
 
   return $output;
 }
