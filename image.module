@@ -70,7 +70,7 @@ function image_settings() {
   }
   $vocs[0] = t("<none>");
   $output .= "<a name=\"image_nav_vocabulary\"></a>";
-  $output .= form_select(t("Gallery Navigation Vocabulary"), "image_nav_vocabulary", variable_get("image_nav_vocabulary", ""),   $vocs, t("One of the taxonomy vocabularies will be the navigation tree. Select it here."));
+  $output .= form_select(t("Gallery Navigation Vocabulary"), "image_nav_vocabulary", variable_get("image_nav_vocabulary", ""),   $vocs, t("One of the taxonomy vocabularies will be the navigation tree. Select it here. Make sure that a term from this vocabulary is required."));
 
   $output .= form_select(t("Gallery Thumbnails"), "image_gallery_thumb", variable_get("image_gallery_thumb", "last"), array("last" => "last", "random" => "random"), t("Set the thumbnail to be dislayed on the gallery page."));
   $output .= form_textfield("Gallery Rows", "image_gallery_thumb_rows", variable_get("image_gallery_thumb_rows", "5"), 5, 255, t("Specify how many rows of thumbnails in each page of the gallery."));
