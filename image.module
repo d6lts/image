@@ -427,13 +427,17 @@ function image_validate(&$node) {
 
   // If we uploaded a file pre-process it
   if (!is_uploaded_file($upload_file) && (arg(3) != "file")) {
-    switch($_FILES["edit"]["error"]["image"]) {
-      case 1:
-      case 2:
-        $errortxt = t("The image you are trying to upload is too big.");
+    switch($_FILES["edit"]["error"]["image"]) { // Note: error code is returned only since PHP 4.2.0
+      case 1:  // The uploaded file exceeds the upload_max_filesize directive in php.ini.
+        $errortxt = t("The image file you are trying to upload is too big.");
+        watchdog("error", "uploaded file exceeds the upload_max_filesize directive in php.ini: ". $upload_name);
         break;
-      case 3:
-        $errortxt = t("The image you are trying to upload was only partially uploaded.");
+      case 2:  // The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
+        $errortxt = t("The image file you are trying to upload is too big.");
+        watchdog("error", "uploaded file exceeds the MAX_FILE_SIZE directive: ". $upload_name);
+        break;
+      case 3:  // The uploaded file was only partially uploaded.
+        $errortxt = t("The image file was only partially uploaded. Please try again.");
         break;
       default:
         if (!empty($_POST['op']) && arg(3) != "file" && empty($node->image_id) && empty($node->existing)) {
@@ -1154,8 +1158,9 @@ function image_page() {
       // show albums
       $albums = taxonomy_get_children(0, variable_get("image_nav_vocabulary", ""));
       $albums = _image_album_properties($albums);
+      $image_nav_vocabulary = taxonomy_get_vocabulary(variable_get("image_nav_vocabulary", ""));
 
-      print theme("page", theme("image_gallery_home", $albums), t("Photo galleries"));
+      print theme("page", theme("image_gallery_home", $albums, $image_nav_vocabulary->description), t("Photo galleries"));
     }
     else {
       // browse albums; show subalbums and thumbs
@@ -1292,10 +1297,15 @@ function theme_node_image($node, $rand, $main = 0, $page = 0) {
 /**
  * Theme function to render image gallery home.
  */
-function theme_image_gallery_home($albums) {
+function theme_image_gallery_home($albums, $gallery_description = '') {
   global $base_url;
 
+  $output = '';
+
   if ($albums) {
+    if ($gallery_description) {
+      $output .="<div id=\"image-gallery-description\">". $gallery_description ."</div>";
+    }
     $output .= "\n<div id=\"image\">\n<table>\n";
 
     foreach ($albums as $tid => $album) {
@@ -1330,6 +1340,8 @@ function theme_image_gallery_home($albums) {
  */
 function theme_image_gallery_album($parents, $subalbums, $images, $data, $galleryuser = null) {
   global $base_url;
+
+  $output = '';
 
   if (!$galleryuser) {
     $t[] = l(t("galleries"), "image");
@@ -1513,6 +1525,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
             $node->personal = 0;
             $node->weight = 5;
             $node->moderate = 0;
+            $node->comment = variable_get("comment_image", "2");
 
             $node->image_path = _image_tempname($node);
             $node->thumb_path = _image_tempthumbname($node);
