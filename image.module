@@ -643,17 +643,33 @@ function image_validate(&$node) {
 }
 
 /**
+ * Hook which handles filtering.
+ */
+function image_filter($op, $text = "") {
+  switch ($op) {
+    case 'name':
+      return t("Image filter");
+    case 'settings':
+      return image_filter_settings();
+    case 'process':
+      return image_filter_process($text);
+    default:
+      return $text;
+  }
+}
+
+/**
  * Function used to discover what filters are supplied by this module.
  */
-function image_conf_filters() {
-  $output = form_select(t("Image filter"), "image_filter_enabled", variable_get("image_filter_enabled", 0), array("Disabled", "Enabled"), t("When enabled, image codes will be replaced by thumb linked to real node. Syntax: [image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]; every param but node_id is optional."));
-  return $output;
+function image_filter_settings() {
+  $output = form_select(t("Image codes"), "image_filter_enabled", variable_get("image_filter_enabled", 0), array("Disabled", "Enabled"), t("When enabled, image codes will be replaced by thumb linked to real node. Syntax: [image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]; every param but node_id is optional."));
+  return form_group(t("Image filter"), $output);
 }
 
 /**
  * Actually execute filter on given text.
  */
-function image_filter($text) {
+function image_filter_process($text) {
   if (variable_get("image_filter_enabled", 0)) {
     // *** [image:NID,(left|center|right)] ***
     // first we find every tag
