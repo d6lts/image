@@ -63,6 +63,7 @@ function image_conf_options() {
 function image_cron() {
   // Clean up temp dir
   
+  $old = getcwd();
   chdir(variable_get("image_temp_path", "./"));
   if ($handle = opendir(".")) {
     while (($file = readdir($handle)) != false) {
@@ -75,6 +76,7 @@ function image_cron() {
     }
     closedir($handle);
   }
+  chdir ($old);
 }
 
 
