@@ -213,7 +213,7 @@ function image_link($type, $node, $main = 0) {
     }
 
     // If we are not on the main page then display prev/next links
-    if (!$main && $slq) {
+    if (!$main && $sql) {
       $result = db_query($sql);
 
       while ($image = db_fetch_object($result)) {
