@@ -189,40 +189,40 @@ function image_link($type, $node, $main = 0) {
     else {
     
       $vid = variable_get("image_nav_vocabulary", "");
-      
-      if (arg(3) == "tid") {
-        $tid = arg(4);
-        $term = taxonomy_get_term($tid);
-      } 
-      else if (isset($node->taxonomy)) {
-        foreach ($node->taxonomy as $tid) {
-          if ($term = taxonomy_get_term($tid)) {
-            if ($term->vid == $vid) break;
+      if ($vid != "") {
+        if (arg(3) == "tid") {
+          $tid = arg(4);
+          $term = taxonomy_get_term($tid);
+        } 
+        else if (isset($node->taxonomy)) {
+          foreach ($node->taxonomy as $tid) {
+            if ($term = taxonomy_get_term($tid)) {
+              if ($term->vid == $vid) break;
+            }
           }
         }
-      }
-      else {
-        $terms = array_keys(taxonomy_node_get_terms_by_vocabulary($node->nid, $vid));
-        $tid = $terms[0];
-        $term = taxonomy_get_term($tid);
-      }    
-            
-      $links[] = l(t("%t photo gallery", array("%t" => $term->name)), "image/tid/" . $term->tid, array("title" => t("View %t photo gallery.", array("%t" => $terms->name))));
-      
-      $sql = "
-        SELECT n.nid, title, teaser, body, thumb_path
-        FROM node n, term_node t, image i
-        WHERE n.nid = t.nid
-        AND n.nid = i.nid
-        AND i.personal = 0
-        AND t.tid = ";
-      $sql .= $term->tid;
-      $sql .= " ORDER BY "._image_get_thumb_order();    
-            
+        else {
+          $terms = array_keys(taxonomy_node_get_terms_by_vocabulary($node->nid, $vid));
+          $tid = $terms[0];
+          $term = taxonomy_get_term($tid);
+        }    
+              
+        $links[] = l(t("%t photo gallery", array("%t" => $term->name)), "image/tid/" . $term->tid, array("title" => t("View %t photo gallery.", array("%t" => $terms->name))));
+        
+        $sql = "
+          SELECT n.nid, title, teaser, body, thumb_path
+          FROM node n, term_node t, image i
+          WHERE n.nid = t.nid
+          AND n.nid = i.nid
+          AND i.personal = 0
+          AND t.tid = ";
+        $sql .= $term->tid;
+        $sql .= " ORDER BY "._image_get_thumb_order();    
+      }            
     }
 
     // If we are not on the main page then display prev/next links
-    if (!$main) {    
+    if (!$main && $slq) {    
       $result = db_query($sql);
 
       while ($image = db_fetch_object($result)) {
