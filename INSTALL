@@ -1,15 +1,20 @@
 Readme
 ------
 
-This module is about enables and admins and optionally users to upload images into drupal.
+This module allow users with proper permissions to upload images into drupal. Thumbnails are created
+automaticaly.
 
-Send comments to marco@porciletto.org.
+Images could be posted individualy to the front page, included in stories or grouped in galleries.
+Galleries are either personal, i.e linked to a user, or global to the drupal site.
+
+Admin could administer images and set various parameters such as, among others, maximum image size,
+permissions to access images or manipulate them.
 
 
 Requirements
 ------------
 
-This module requires Drupal CVS from February 2003 or later.
+This module requires ImageMagick (http://www.imagemagick.org) or GD (http://www.boutell.com/gd)
 
 
 Installation
@@ -20,9 +25,7 @@ Installation
 
 2. Copy the image.module to the Drupal modules/ directory. Drupal should automatically detect it. Enable the module in Site Configuration -> Modules.
 
-3. There are a lot of options in admin: you should set at least imagemagick convert path for funny things on images, and some writeable directories to work.
-If Imagemagick is unavailable, you may use GD instead (version 2.01+. see http://www.boutell.com/gd/). Imaqge manipulation (i.e. rotate, crop, etc.) is not
-implemented if you choose GD.
+3. There are a lot of options in admin: you should set at least imagemagick convert path for funny things on images, and some writeable directories to work. If Imagemagick is unavailable, you may use GD instead (version 2.01+ is recommended, but version 1.x should work); see http://www.boutell.com/gd/). Image manipulation (i.e. rotate, crop, etc.) is not implemented if you choose GD.
 
 4. You can check your directory permissions in admin/image
 
@@ -35,5 +38,4 @@ Author
 ------
 
 Marco Molinari <marco@porciletto.org>
-
 
