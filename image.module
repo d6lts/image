@@ -347,11 +347,8 @@ function image_view($node, $main = 0, $page = 0) {
 /**
  * Return form for adding and editing image nodes
  */
-function image_form(&$node, &$help, &$error, &$param) {
+function image_form(&$node, &$error, &$param) {
   global $base_url;
-
-  // Help
-  $help = variable_get("image_help", "");
 
   // Taxonomy select form
   $output .= implode("", taxonomy_node_form("image", $node));
@@ -1406,7 +1403,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
 
   $links = array();
   $output = '';
-  
+
   if ($type == "fast" && !ini_get("safe_mode")) {
     set_time_limit(480);
   }
