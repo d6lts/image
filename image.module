@@ -193,7 +193,7 @@ function image_link($type, $node) {
 function image_user($type, $ahem, &$user) {
   if (user_access("access images")) {
     if ($type == "view_public") {
-      $output .= form_item("Photo gallery", "<a href=\"?q=image/uid/$user->uid\">view user's photo gallery</a>");
+      $output .= form_item("Photo gallery", l(t("view user's photo gallery"), "image/uid/$user->uid"));
     }
 
     return $output;
@@ -243,15 +243,23 @@ function image_view($node, $main = 0) {
     // if we edit we must care about caching
     $rand = rand();
   }
-
+  
   theme("image_render_node", $node, $image_path, $main);
 }
 
 function image_form(&$node, &$help, &$error, &$param) {
-  global $tid, $file;
+  global $tid, $file, $base_url;
 
-  $op = arg(1);
-
+  $op = $_POST["op"];
+  if (!$op) {
+    if (arg(0) == "admin") {
+      $op = arg(2);
+    }
+    else {
+      $op = arg(1);
+	}
+  }
+  
   /*
     we can be here if:
     - we try to add a new image
@@ -279,7 +287,7 @@ function image_form(&$node, &$help, &$error, &$param) {
       if ($file) {
         $output .= form_hidden("file", $file);
         $output .= "File: $file<br>";
-        $output .= "<img src=\"$file\"><br>";
+        $output .= "<img src=\"$base_url/$file\"><br>";
       }
       else {
         $output .= form_file("Image", "image", 50, t("Click \"Browse...\" to select an image to upload."));
@@ -378,7 +386,7 @@ function image_form(&$node, &$help, &$error, &$param) {
         $output .= form_select(t("Personal"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can only be seen in the user's photo gallery."));
       }
 
-      $output .= "<div align=\"center\"><img src=\"$node->thumb_path\" /></div>";
+      $output .= "<div align=\"center\"><img src=\"$base_url/$node->thumb_path\" /></div>";
       $output .= form_file("Image", "image", 50, t("Click \"Browse...\" to select an image to upload. If you don't want to change the image you don't need to upload again."));
 
       srand ((double) microtime() * 1000000);
@@ -427,7 +435,7 @@ function image_form(&$node, &$help, &$error, &$param) {
       }
 
       $original_node = db_fetch_object(db_query("SELECT image_path, thumb_path FROM image WHERE nid = '%s'", $node->nid));
-      $output .= "<div align=\"center\"><img src=\"$original_node->thumb_path\" /></div>";
+      $output .= "<div align=\"center\"><img src=\"$base_url/$original_node->thumb_path\" /></div>";
       $output .= form_file(t("Image"), "image", 50, t("Click \"Browse...\" to select an image to upload. If you don't want to change the image you don't need to upload again."));
 
       $output .= form_hidden("image_id", $node->image_id);
@@ -1192,9 +1200,10 @@ function _image_album_properties($albums) {
 ***/
 
 function image_render_node($node, $image_path, $main = 0) {
+  global $base_url;
   $op = $_POST["op"];
   /*
-  $output .= "<p align='center'><b>". check_output($node->title) ."</b></p><p align='center'><img src=\"$image_path?".$rand."\"></p><p align='center'>". check_output($node->body) ."</p>";
+  $output .= "<p align='center'><b>". check_output($node->title) ."</b></p><p align='center'><img src=\"$base_url/$image_path?".$rand."\"></p><p align='center'>". check_output($node->body) ."</p>";
 
   if ($op != t("Preview")) {
     $output .= "<p>". theme("links", link_node($node, $main)) ."</p>";
@@ -1203,22 +1212,23 @@ function image_render_node($node, $image_path, $main = 0) {
   */
 
   if(variable_get("image_random_suffix", "0")){
-    $node->body = "\n<div id=\"image\">\n  <p align='center'><img src=\"$image_path?".$rand."\"></p>\n  <p align='center'>". check_output($node->body) ."</p>\n</div> <!-- end of IMAGE div -->";
+    $node->body = "\n<div id=\"image\">\n  <p align='center'><img src=\"$base_url/$image_path?".$rand."\"></p>\n  <p align='center'>". check_output($node->body) ."</p>\n</div> <!-- end of IMAGE div -->";
   }
   else {
-    $node->body = "\n<div id=\"image\">\n  <p align='center'><img src=\"$image_path\"></p>\n  <p align='center'>". check_output($node->body) ."</p>\n</div> <!-- end of IMAGE div -->";
+    $node->body = "\n<div id=\"image\">\n  <p align='center'><img src=\"$base_url/$image_path\"></p>\n  <p align='center'>". check_output($node->body) ."</p>\n</div> <!-- end of IMAGE div -->";
   }
   theme("node", $node);
 }
 
 function image_gallery_home($albums) {
+  global $base_url;
   if ($albums) {
     $output .= "\n<div id=\"image\">\n<table>\n";
 
     foreach ($albums as $tid => $album) {
       $output .= "<tr>\n  <td align=\"center\">";
       if ($album->thumb) {
-        $output .= l("<img src=\"".$album->thumb."\" border=\"0\">", "image/tid/$album->tid");
+        $output .= l("<img src=\"$base_url/".$album->thumb."\" border=\"0\">", "image/tid/$album->tid");
       }
       $output .= "</td>\n  <td>";
       $output .= "<p class=\"album-name\">".l($album->name, "image/tid/$album->tid")."</p>";
@@ -1243,6 +1253,7 @@ function image_gallery_home($albums) {
 }
 
 function image_gallery_album($parents, $subalbums, $images, $data) {
+  global $base_url;
   $t[] = l(t("galleries"), "image");
   foreach (array_reverse(array_values($parents)) as $p) {
     $t[] = l($p->name, "image/tid/$p->tid");
@@ -1265,7 +1276,7 @@ function image_gallery_album($parents, $subalbums, $images, $data) {
       if ($n % $thumbs_cols == 0) {
         $output .= "<tr>";
       }
-      $output .= "<td valign=\"top\"><div align=\"center\">".l("<img src=\"".$image->thumb_path."\" border=\"0\">", "node/view/$image->nid")."</div><p class=\"title\">".$image->title."</p><p class=\"teaser\">".$image->teaser."</p></td>\n";
+      $output .= "<td valign=\"top\"><div align=\"center\">".l("<img src=\"$base_url/".$image->thumb_path."\" border=\"0\">", "node/view/$image->nid")."</div><p class=\"title\">".$image->title."</p><p class=\"teaser\">".$image->teaser."</p></td>\n";
 
       if ($n % $thumbs_cols == $thumbs_cols - 1) {
         $output .= "</tr>";
@@ -1282,7 +1293,8 @@ function image_gallery_album($parents, $subalbums, $images, $data) {
 }
 
 function image_inline_img($img) {
-  return l("<img src=\"$img->thumb_path\" align=\"$img->align\" border=\"$img->border\" hspace=\"$img->hspace\" vspace=\"$img->vspace\" alt=\"$img->teaser\" />", "node/view/$img->nid");
+  global $base_url;
+  return l("<img src=\"$base_url/$img->thumb_path\" align=\"$img->align\" border=\"$img->border\" hspace=\"$img->hspace\" vspace=\"$img->vspace\" alt=\"$img->teaser\" />", "node/view/$img->nid");
 }
 
 function image_thumb_browser($data) {
@@ -1338,7 +1350,9 @@ function  _image_dir_upload_fast() {
 }
 
 function _image_dir_upload($type = "slow") {
-  global $type, $user, $edit;
+  global $type, $user, $base_url;
+
+  $edit = $_POST["edit"];
 
   $links = array();
 
@@ -1374,7 +1388,7 @@ function _image_dir_upload($type = "slow") {
         if ($type == "slow") {
           if ($edit["thumb"]) {
             $output .= l($file, "node/add/image/file/". $dir."/".$file);
-            $output .= " <img src=\"$dir/$file\" height=\"100\">";
+            $output .= " <img src=\"$base_url/$dir/$file\" height=\"100\">";
           }
           else {
             $output .= l($file, "node/add/image/". $dir."/".$file);
