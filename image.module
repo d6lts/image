@@ -34,14 +34,14 @@ function image_settings() {
   $output .= form_textarea(t("Explanation or submission guidelines"), "image_help", variable_get("image_help", ""), 70, 5, t("This text will be displayed at the top of the image submission form.  It is useful for helping or instructing your users."));
 
   $output .= form_textfield(t("Default image path"), "image_default_path", variable_get("image_default_path", "images/"), 30, 255, t("Default path for uploaded images relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."));
-  
+
   $output .= "<a name=\"image_default_thumb_path\"></a>";
   $output .= form_textfield(t("Default thumb path"), "image_default_thumb_path", variable_get("image_default_thumb_path", "images/thumbs/"), 30, 255, t("Default path for thumbnails relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."));
-  
+
   $output .= "<a name=\"image_temp_path\"></a>";
   $output .= form_textfield(t("Temporary image path"), "image_temp_path", variable_get("image_temp_path", "./"), 30, 255, t("Path for working directory relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."));
   $output .= form_textfield(t("Maximum temporary image directory size"), "image_temp_path_size", variable_get("image_temp_path_size", 5), 6, 255, t("MBytes."));
-  
+
   $output .= form_textfield(t("Default max image size"), "image_default_max_weight", variable_get("image_default_max_weight", "200"), 6, 255, t("KBytes."));
   $output .= form_textfield(t("Default max image resolution"), "image_default_max_size", variable_get("image_default_max_size", "1024x768"), 10, 255, t("Example: 800x600."));
 
@@ -55,23 +55,23 @@ function image_settings() {
     $libraries = array("imagemagick" => "imagemagick", "gd1" => "gd1");
   }
   $output .= form_select(t("Image library"), "image_lib", variable_get("image_lib", "imagemagick"), $libraries, t("Select the image library to be used during thumbnail generation and image manipulation.  Use ImageMagick if you can; GD produces worse thumbnails, might not support GIF and this module doesn't support image editing (rotate, crop etc) with it."));
-  
+
   if (variable_get("image_lib", "imagemagick") == "imagemagick") {
     $output .= form_textfield(t("Background Color"), "image_background", variable_get("image_background", "#000000"), 7, 7, t("Color used to fill in background when rotating images."));
     $output .= "<a name=\"image_convert\"></a>";
     $output .= form_textfield(t("Imagemagick Convert path"), "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, t("Absolute path to ImageMagick convert file. Include the 'convert.exe' (or other filename) at the end."));
   }
-  
+
   $output .= "<a name=\"image_jhead\"></a>";
   $output .= form_textfield(t("jhead path"), "image_jhead_path", variable_get("image_jhead_path", ""), 50, 255, t("Absolute path of jhead, for EXIF parsing; blank to disable."));
-     
+
   foreach (taxonomy_get_vocabularies("image") as $vid => $voc) {
     $vocs[$vid] = $voc->name;
   }
   $vocs[0] = t("<none>");
   $output .= "<a name=\"image_nav_vocabulary\"></a>";
   $output .= form_select(t("Gallery Navigation Vocabulary"), "image_nav_vocabulary", variable_get("image_nav_vocabulary", ""),   $vocs, t("One of the taxonomy vocabularies will be the navigation tree. Select it here."));
-  
+
   $output .= form_select(t("Gallery Thumbnails"), "image_gallery_thumb", variable_get("image_gallery_thumb", "last"), array("last" => "last", "random" => "random"), t("Set the thumbnail to be dislayed on the gallery page."));
   $output .= form_textfield("Gallery Rows", "image_gallery_thumb_rows", variable_get("image_gallery_thumb_rows", "5"), 5, 255, t("Specify how many rows of thumbnails in each page of the gallery."));
   $output .= form_textfield(t("Gallery Columns"), "image_gallery_thumb_cols", variable_get("image_gallery_thumb_cols", "3"), 5, 255, t("Specify how many columns of thumbnails in each page of the gallery."));
@@ -139,7 +139,7 @@ function image_link($type, $node, $main = 0) {
        <li>If the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li>
       </ul>
     ";
-  
+
     $slow_help = "<h4>Slow Mode</h4>
       <ul>
         <li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>
@@ -164,36 +164,36 @@ function image_link($type, $node, $main = 0) {
 
   // Add links to an image node
   if ($type == "node" && $node->type == "image") {
-  
+
   	// If you have access to update this node display update link
     if (image_access("update", $node)) {
       $links[] = l(t("edit this image"), "node/edit/$node->nid", array("title" => t("Edit this image.")));
     }
 
     // Display personal gallery links if this is a personal gallery photo
-    if ($node->personal) { 
+    if ($node->personal) {
       $links[] = l(t("%u's photo gallery", array("%u" => $node->name)), "image/uid/$node->uid", array("title" => t("View %u's photo gallery.", array("%u" => $node->name))));
-      
+
       $sql = "
         SELECT n.nid, title, teaser, body, thumb_path
-        FROM node n,  image i
+        FROM {node} n, {image} i
         WHERE n.nid = i.nid
         AND i.personal = 1
         AND n.uid = ";
       $sql .= $node->uid;
-      $sql .= " ORDER BY "._image_get_thumb_order();    
-      
+      $sql .= " ORDER BY "._image_get_thumb_order();
+
     }
 
     // If this is not a personal gallery photo the display normal links
     else {
-    
+
       $vid = variable_get("image_nav_vocabulary", "");
       if ($vid != "") {
         if (arg(3) == "tid") {
           $tid = arg(4);
           $term = taxonomy_get_term($tid);
-        } 
+        }
         else if (isset($node->taxonomy)) {
           foreach ($node->taxonomy as $tid) {
             if ($term = taxonomy_get_term($tid)) {
@@ -205,24 +205,24 @@ function image_link($type, $node, $main = 0) {
           $terms = array_keys(taxonomy_node_get_terms_by_vocabulary($node->nid, $vid));
           $tid = $terms[0];
           $term = taxonomy_get_term($tid);
-        }    
-              
+        }
+
         $links[] = l(t("%t photo gallery", array("%t" => $term->name)), "image/tid/" . $term->tid, array("title" => t("View %t photo gallery.", array("%t" => $terms->name))));
-        
+
         $sql = "
           SELECT n.nid, title, teaser, body, thumb_path
-          FROM node n, term_node t, image i
+          FROM {node} n, {term_node} t, {image} i
           WHERE n.nid = t.nid
           AND n.nid = i.nid
           AND i.personal = 0
           AND t.tid = ";
         $sql .= $term->tid;
-        $sql .= " ORDER BY "._image_get_thumb_order();    
-      }            
+        $sql .= " ORDER BY "._image_get_thumb_order();
+      }
     }
 
     // If we are not on the main page then display prev/next links
-    if (!$main && $slq) {    
+    if (!$main && $slq) {
       $result = db_query($sql);
 
       while ($image = db_fetch_object($result)) {
@@ -238,16 +238,16 @@ function image_link($type, $node, $main = 0) {
           $prev->title = $image->title;
         }
       }
-    
+
       if ($prev) {
         $links[] = l(t("previous image"), "node/view/$prev->nid", array("title" => $prev->title));
       }
-    
+
       if ($next) {
         $links[] = l(t("next image"), "node/view/$next->nid", array("title" => $next->title));
       }
     }
- 
+
   }
 
   return $links ? $links : array();
@@ -268,13 +268,13 @@ function image_user($type, $ahem, &$user) {
 
 /**
  * Function to determine whether a user has access to this node or not.
- * 
+ *
  * Return 0 (or False) if the user should be denied access.
  * Return Any other value if the user should be granted access.
  */
 function image_access($op, $node) {
   global $user;
-  
+
   // For node view allow access if the node status is approved and they have access permissions
   if ($op == "view") {
     return ($node->status && user_access("access images"));
@@ -305,10 +305,10 @@ function image_view($node, $main = 0) {
   if (variable_get("image_random_suffix", "0") || $node->image_id) {
     $rand = rand();
   }
-  
+
   $node->teaser = check_output($node->teaser);
   $node->body = check_output($node->body);
-  
+
   theme("node_image", $node, $rand, $main);
 }
 
@@ -317,53 +317,53 @@ function image_view($node, $main = 0) {
  */
 function image_form(&$node, &$help, &$error, &$param) {
   global $base_url;
- 
+
   // Help
   $help = variable_get("image_help", "");
-  
+
   // Taxonomy select form
   $output .= implode("", taxonomy_node_form("image", $node));
-  
+
   if ($node->image_path) {
     $output .= form_item(t("Thumbnail"), "<img src=\"$base_url/$node->thumb_path\">");
   }
-  
+
   if ($node->exif) {
     $output .= form_item(t("EXIF data"), _image_render_iptc_exif($node->exif));
   }
-  
+
   if ($node->iptc) {
     $output .= form_item(t("IPTC data"), _image_render_iptc_exif($node->iptc));
   }
-  
+
   if (user_access("manipulate images")  && $node->image_path) {
     $output .= _images_transform_form($node);
   }
-        
+
   $output .= "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"".variable_get("image_default_max_weight", "200") * 1000 ."\">";
   $output .= form_file("Image", "image", 50, t("Click \"Browse...\" to select an image to upload.") . $error["image"]);
-  
+
   $output .= form_textarea(t("Description"), "body", $node->body, 60, 5);
-  
+
   $order = variable_get("image_gallery_thumb_order", "title");
   if ($order == "weight" || $order == "weight desc") {
     $output .= form_textfield(t("Weight"), "weight", $node->weight, 5, 255, t("Weight of image used to sort thumbnails.  Heavier thumbnails will fall to the bottom of the gallery."));
-  } 
-  
+  }
+
   if (_image_can_personal() && user_access("create images")) {
     $output .= form_select(t("Personal"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can only be seen in the user's photo gallery."));
   }
-  
+
   $output .= form_hidden("existing", $node->existing);
-  
+
   $output .= form_hidden("image_id", $node->image_id);
   $output .= form_hidden("extension", $node->extension);
-    
+
   $output .= "<br/>";
-  
+
   // the guy who thought about this $param array is a genius
   $param["options"] = 'enctype="multipart/form-data" name="image_forms"';
-  
+
   return $output;
 }
 
@@ -378,7 +378,7 @@ function image_validate(&$node) {
     $node->existing = 1;
   }
 
-  // If this is a slow directory upload pull the file name out of the query string  
+  // If this is a slow directory upload pull the file name out of the query string
   if (arg(3) == "file" && !$node->image_id) {
     $upload_file = "";
     $i = 4;
@@ -393,10 +393,11 @@ function image_validate(&$node) {
     $upload_file = $_FILES["edit"]["tmp_name"]["image"];
     $upload_name = $_FILES["edit"]["name"]["image"];
   }
-  
+  if(!$node->image_id) $node->image_id = basename($upload_name, strrchr($upload_name, "."));
+
   // If we uploaded a file pre-process it
   if ($upload_file && $upload_file != "none") {
-  
+
     if (!is_uploaded_file($upload_file) && arg(3) != "file") {
       switch($_FILES["edit"]["error"]["image"]) {
         case 1:
@@ -415,28 +416,24 @@ function image_validate(&$node) {
       if ($errortxt) {
         $error["image"] = theme("theme_error", $errortxt);
       }
-    }  
+    }
     else {
-    
       // Check File Size
       if ($errortxt = _check_filesize_limits($upload_file)) {
         $error["image"] = theme("theme_error", $errortxt);
       }
       else {
-      
         $size = getimagesize($upload_file, $ipct_info);
         // Check to make sure what was uploaded is  an image
         if ((!in_array($size[2], array(1,2,3))) || (!_image_check_ext($upload_name))) {
           $error["image"] =  theme("theme_error", t("Uploaded file was not an image."));
         }
         else {
-                   
           $max_dim = split("x", variable_get("image_default_max_size", "1024x768"));
           if ($size[0] > $max_dim[0] || $size[1] > $max_dim[1]) {
             $error["image"] = theme("theme_error", t("The uploaded image(%ax%b) is to large (max %cx%d).", array("%a" => $size[0], "%b" => $size[1], "%c" => $max_dim[0], "%d" => $max_dim[1])));
           }
           else {
-                             
             // Generate image_id if necessary
             if (!$node->image_id) {
               srand ((double) microtime() * 1000000);
@@ -445,8 +442,8 @@ function image_validate(&$node) {
             // If we already have an image_id and an uploaded file delete it.
             else if (file_exists(_image_tempname($node))) {
               unlink(_image_tempname($node));
-            }        
-             
+            }
+
             // Pull out iptc data and populate any node elements that are not already set.
             if ($proposed = _image_iptc_map($ipct_info)) {
               foreach ($proposed as $key => $value) {
@@ -455,10 +452,10 @@ function image_validate(&$node) {
                 }
               }
             }
-              
+
             // Save off the extension for the final filename
-            $node->extension = _get_ext(upload_name);
-             
+            $node->extension = _get_ext($upload_name);
+
             // Move file to temp area
             if (arg(3) == "file") {
               if (!rename($upload_file, _image_tempname($node))) {
@@ -468,27 +465,27 @@ function image_validate(&$node) {
             else if (!move_uploaded_file($upload_file, _image_tempname($node))) {
               $error["image"] = theme("theme_error", t("Error processing image file."));
             }
-              
+
             // Generate Thumbnail
             $errortxt = _image_make_thumbnail(_image_tempname($node), _image_tempthumbname($node));
             if ($errortxt) {
               $error["image"] = theme("theme_error", $errortxt);
             }
-                        
+
           } // Dimension Check
-                   
+
         } // File Type Check
-        
+
       } // Filesize Check
-        
+
     } // Uploaded File Check
-    
+
   } // Image to process check
-    
+
   else if (!$node->image_id && !$node->existing) {
     $error["image"] = theme("theme_error", t("You must select an image for upload."));
   }
-  
+
   // If we have uploaded a new image so set the correct thumb and image paths
   if ($node->image_id) {
     $node->image_path = _image_tempname($node);
@@ -497,22 +494,22 @@ function image_validate(&$node) {
   // If we are editing an existing node and the image_path is not already set
   // load it from the database.
   else if ($node->existing && !$node->image_path) {
-    $old_files = db_fetch_object(db_query("SELECT image_path, thumb_path FROM image WHERE nid = '%s'", $node->nid));
+    $old_files = db_fetch_object(db_query("SELECT image_path, thumb_path FROM {image} WHERE nid = '%s'", $node->nid));
     $node->image_path = $old_files->image_path;
-    $node->thumb_path = $old_files->thumb_path;  
+    $node->thumb_path = $old_files->thumb_path;
   }
 
   // Load up image node attributes if we have a file
   if ($node->image_path) {
-  
+
     // We only need to load this if it hasn't already been loaded.
     if (!$size) {
       $size = getimagesize($node->image_path, $ipct_info);
     }
-  
+
     $node->iptc = _image_iptc($ipct_info);
     $node->exif = _image_get_exif($node->image_path);
-  
+
     $formats = array("1" => "gif", "2" => "jpg", "3" => "png");
     $node->format = $formats[$size[2]];
     $node->width = $size[0];
@@ -528,57 +525,57 @@ function image_validate(&$node) {
     $cropx = $_POST["cropx"];
     $cropy = $_POST["cropy"];
     $quality = $_POST["quality"];
-                        
+
     if ($cropx || $cropy) {
       $trasform_string .= " -crop ".$width."x".$height."+".$cropx."+".$cropy;
     }
     else if (($width && ($width != $node->width)) || ($height && ($height != $node->height))) {
       $trasform_string .= " -scale ".$width."x".$height ." -filter QUADRATIC";
     }
-    
+
     if ($rotate) {
       $trasform_string .= " -rotate ".$rotate . " -background " . variable_get("image_background", "#000000");
     }
-    
+
     if ($quality) {
       $trasform_string .= " -quality ".$quality;
     }
-    
+
     if ($trasform_string && (variable_get("image_lib", "imagemagick") == "imagemagick")) {
       // Generate image_id if necessary
       if (!$node->image_id) {
         srand ((double) microtime() * 1000000);
         $node->image_id = md5(rand());
-        
+
         // If this is an existing node then copy the orignal file
         if ($node->existing) {
           copy($node->image_path, _image_tempname($node));
         }
-        
+
         $node->image_path = _image_tempname($node);
         $node->thumb_path = _image_tempthumbname($node);
-        
+
       }
 
       echo _image_convert($node->image_path, $node->image_path, $trasform_string);
-      
+
       // Generate New Thumbnail
-      $errortxt = _image_make_thumbnail($node->image_path, $node->thumb_path);      
+      $errortxt = _image_make_thumbnail($node->image_path, $node->thumb_path);
       if ($errortxt) {
         $error["image"] = theme("theme_error", $errortxt);
       }
-      
+
       // now let's reload size data
       $size = getimagesize($node->image_path, $ipct_info);
       $node->width = $size[0];
       $node->height = $size[1];
-      $node->filesize = filesize($node->image_path);      
-      
+      $node->filesize = filesize($node->image_path);
+
       $node->manipulated = 1;
     }
-    
+
   }
-    
+
   // Force clear of personal flag if personal gallery is disabled or not allowed for this user
   if (!_image_can_personal()) {
     $node->personal = 0;
@@ -587,7 +584,7 @@ function image_validate(&$node) {
   else if (!isset($node->personal)) {
     $node->personal = 1;
   }
-  
+
   return $error;
 
 }
@@ -609,7 +606,7 @@ function image_filter($text) {
     // first we find every tag
     if (preg_match_all("/\[image:(\d+)(,(left|right|top|middle|bottom|absmiddle|texttop|baseline))?(,(\d+))?(,(\d+))?(,(\d+))?\]/i", $text, $match)) {
       // then we make the html
-      $result = db_query("SELECT n.nid, teaser, thumb_path FROM image i, node n WHERE i.nid = n.nid AND n.nid IN ('".implode("','", array_map("check_query", $match[1]))."')");
+      $result = db_query("SELECT n.nid, teaser, thumb_path FROM {image} i, {node} n WHERE i.nid = n.nid AND n.nid IN ('".implode("','", array_map("check_query", $match[1]))."')");
       $n = 0;
       while ($img = db_fetch_object($result)) {
         $img->align = $match[3][$n];
@@ -632,8 +629,8 @@ function image_filter($text) {
 function image_compose_tips() {
   if (variable_get("image_filter_enabled", 0)) {
     return array(t("You may quickly link to image nodes using a special syntax. The image code(s) will be replaced by thumbnail linked to full size image node. Syntax: <i>[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]</i>. Every parameter except node_id is <i>optional</i>."));
-  }  
-}  
+  }
+}
 
 /**
  * Insert a new image nodes extra data into the datastore.
@@ -642,18 +639,18 @@ function image_insert($node) {
 
   $node->image_path = _image_filename($node);
   $node->thumb_path = _image_thumbname($node);
-  
+
   // Rename Image
   if (!rename(_image_tempname($node), $node->image_path)) {
     die(t("Cannot save image."));
   }
-  
+
   // Rename Thumbnail
   if (!rename(_image_tempthumbname($node), $node->thumb_path)) {
     die(t("Cannot save image."));
   }
 
-  db_query("INSERT INTO image (nid, image_path, thumb_path, format, width, height, filesize, iptc, exif, personal, weight) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", $node->nid, $node->image_path, $node->thumb_path, $node->format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight);
+  db_query("INSERT INTO {image} (nid, image_path, thumb_path, format, width, height, filesize, iptc, exif, personal, weight) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", $node->nid, $node->image_path, $node->thumb_path, $node->format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight);
 }
 
 /**
@@ -661,7 +658,7 @@ function image_insert($node) {
  */
 function image_update($node) {
   if ($node->image_id) {
-    $old_files = db_fetch_object(db_query("SELECT image_path, thumb_path FROM image WHERE nid = '%s'", $node->nid));
+    $old_files = db_fetch_object(db_query("SELECT image_path, thumb_path FROM {image} WHERE nid = '%s'", $node->nid));
 
     if (!unlink($old_files->image_path)) {
       echo t("Cannot delete old image.");
@@ -672,29 +669,29 @@ function image_update($node) {
 
     $node->image_path = _image_filename($node);
     $node->thumb_path = _image_thumbname($node);
-  
+
     // Rename Image
     if (!rename(_image_tempname($node), $node->image_path)) {
       die(t("Cannot save image."));
     }
-  
+
     // Rename Thumbnail
     if (!rename(_image_tempthumbname($node), $node->thumb_path)) {
       die(t("Cannot save image."));
     }
   }
 
-  db_query("UPDATE image SET image_path = '%s', thumb_path = '%s', format = '%s', width = '%s', height = '%s', filesize = '%s', iptc = '%s', exif = '%s', personal = '%s', weight = '%s' WHERE nid = '%s'", $node->image_path, $node->thumb_path, $node->format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight, $node->nid);
+  db_query("UPDATE {image} SET image_path = '%s', thumb_path = '%s', format = '%s', width = '%s', height = '%s', filesize = '%s', iptc = '%s', exif = '%s', personal = '%s', weight = '%s' WHERE nid = '%s'", $node->image_path, $node->thumb_path, $node->format, $node->width, $node->height, $node->filesize, serialize($node->iptc), serialize($node->exif), $node->personal, $node->weight, $node->nid);
 }
 
 /**
  * Function called to load image data given a node.
  */
 function image_load($node) {
-  $image = db_fetch_object(db_query("SELECT * FROM image WHERE nid = '%s'", $node->nid));
+  $image = db_fetch_object(db_query("SELECT * FROM {image} WHERE nid = '%s'", $node->nid));
   $image->iptc = unserialize($image->iptc);
   $image->exif = unserialize($image->exif);
-  
+
   return $image;
 }
 
@@ -703,7 +700,7 @@ function image_load($node) {
  * Remove the image related data to the given node.
  */
 function image_delete(&$node) {
-  db_query("DELETE FROM image WHERE nid = '%s'", $node->nid);
+  db_query("DELETE FROM {image} WHERE nid = '%s'", $node->nid);
   unlink($node->image_path);
   unlink($node->thumb_path);
 }
@@ -712,14 +709,14 @@ function image_delete(&$node) {
  * Returns the final image filename
  */
 function _image_filename($node) {
-  return variable_get("image_default_path", "images/")."img_"._image_strip_name($node->image_id).$node->extension;
+  return variable_get("image_default_path", "images/")."img_"._image_strip_name($node->image_id) ."-". $node->nid . $node->extension;
 }
 
 /**
- * Returns the final thumbnail filename 
+ * Returns the final thumbnail filename
  */
 function _image_thumbname($node) {
-  return variable_get("image_default_thumb_path", "images/thumbs/")."thumb_"._image_strip_name($node->image_id).$node->extension;
+  return variable_get("image_default_thumb_path", "images/thumbs/")."thumb_"._image_strip_name($node->image_id) ."-". $node->nid . $node->extension;
 }
 
 /**
@@ -754,15 +751,15 @@ function _image_check_ext($filename) {
 function _image_iptc_map($iptc_info) {
 
   $iptc = _image_iptc($iptc_info);
-  
+
   if ($iptc["headline"]) {
     $proposed["title"] = $iptc["headline"];
   }
   // Photo shop displays graphic_name as title so map it if there is no headline
   else if ($iptc["graphic_name"]) {
     $proposed["title"] = $iptc["graphic_name"];
-  } 
-     
+  }
+
   if ($iptc["caption"]) {
     $proposed["body"] = $iptc["caption"];
   }
@@ -859,10 +856,10 @@ function _image_make_thumbnail($imagename, $thumbname) {
   $lib = variable_get("image_lib", "imagemagick");
   if ($lib == "imagemagick") {
     return _image_convert($imagename, $thumbname, "-scale ".variable_get("image_default_thumb_size", "100")." -filter QUADRATIC");
-  
+
   // Added support for version 1.xx and 2.xx of the GD library
   } else if ($lib == "gd2") {
-    
+
     $size = GetImageSize($imagename);
     if ($size[2] == "2") {
       $type = "jpeg";
@@ -887,9 +884,9 @@ function _image_make_thumbnail($imagename, $thumbname) {
     $function($th, $thumbname);
 
     imageDestroy($th);
-    
+
   } else if ($lib == "gd1") {
-    
+
     $size = @getimagesize($imagename);
     if ($size[2] == "2") {
       $type = "jpeg";
@@ -915,7 +912,7 @@ function _image_make_thumbnail($imagename, $thumbname) {
 
     $function = "image".$type;
     $function($th, $thumbname);
-    
+
     imageDestroy($th);
 
   }
@@ -933,7 +930,7 @@ function _image_convert($source, $dest, $filter) {
   $source = _image_escape_shell($source);
   $dest = _image_escape_shell($dest);
   $err = exec("$_imagick_convert $filter $source $dest");
-  
+
   return $err;
 }
 
@@ -966,7 +963,7 @@ function _image_strip_name($filename) {
 
 function _check_filesize_limits($image_file) {
   global $user;
-  $user_images = db_fetch_object(db_query("SELECT COUNT(*) AS c, SUM(filesize) AS size FROM image i, node n WHERE i.personal = 1 AND i.nid = n.nid AND n.uid = ".$user->uid));
+  $user_images = db_fetch_object(db_query("SELECT COUNT(*) AS c, SUM(filesize) AS size FROM {image} i, {node} n WHERE i.personal = 1 AND i.nid = n.nid AND n.uid = ".$user->uid));
 
   $fsize = filesize($image_file);
 
@@ -974,50 +971,50 @@ function _check_filesize_limits($image_file) {
   if ($user_images->c == $max_num) {
     $error = t("You can have at most %a images in your gallery.", array("%a" => $max_num));
   }
-  
+
   else {
     $max_kb = variable_get("image_gallery_max_kb", "1000") * 1000;
     if (($user_images->size + $fsize) > $max_kb) {
       $error = t("You have %a kb for your gallery.", array("%a" => $max_kb));
     }
-    
+
     else {
-  
+
       $max_img_size = variable_get("image_default_max_weight", "200") * 1000;
       if ($fsize > $max_img_size)  {
-        $error = t("File is too big (max %a kbytes)", array("%a" => $max_img_size));      
+        $error = t("File is too big (max %a kbytes)", array("%a" => $max_img_size));
       }
-      
+
       else {
         $max_tmp_kb = variable_get("image_temp_path_size", 5) * 1000 * 1000;
         $tmp_dir_kb = _dirsize(variable_get("image_temp_path", "./"));
-        
+
         if ($tmp_dir_kb + $fsize > $max_tmp_kb) {
           $error = t("Upload directory is full.");
         }
       }
     }
   }
-  
+
   return $error;
 }
 
 function _dirsize($directory) {
 
   if (!is_dir($directory)) {
-    return -1; 
+    return -1;
   }
-  
-  $size = 0; 
-  
-  if ($DIR = opendir($directory)) { 
 
-    while (($dirfile = readdir($DIR)) !== false) { 
-    
+  $size = 0;
+
+  if ($DIR = opendir($directory)) {
+
+    while (($dirfile = readdir($DIR)) !== false) {
+
     if (is_link($directory . '/' . $dirfile) || $dirfile == '.' || $dirfile == '..') {
         continue;
       }
-     
+
       if (is_file($directory . '/' . $dirfile)) {
         $size += filesize($directory . '/' . $dirfile);
       }
@@ -1032,9 +1029,9 @@ function _dirsize($directory) {
       }
     }
     closedir($DIR);
-  } 
+  }
 
-  return $size;  
+  return $size;
 }
 
 function _images_transform_form($node) {
@@ -1098,7 +1095,7 @@ function image_page() {
     // view user personal gallery
       $sql = "
         SELECT n.nid, title, body, thumb_path
-        FROM node n, image i, users u
+        FROM {node} n, {image} i, {users} u
         WHERE n.nid = i.nid
         AND i.personal = 1
         AND n.uid = u.uid
@@ -1109,15 +1106,15 @@ function image_page() {
       $sql .= _image_get_thumb_order();
 
       $result = db_query($sql, $uid);
-      
+
       while ($image = db_fetch_object($result)) {
         $images[] = $image;
       }
 
       $null = array();
-      
+
       $galleryuser = user_load(array( "uid" => $uid));
-      
+
       theme("header");
       theme("box", t("%u's Photo Gallery", array("%u" => $galleryuser->name)), theme("image_gallery_album", $null, $null, $images, $null, $galleryuser));
       theme("footer");
@@ -1138,7 +1135,7 @@ function image_page() {
 
       $sql = "
         SELECT n.nid, title, teaser, body, thumb_path
-        FROM node n, term_node t, image i
+        FROM {node} n, {term_node} t, {image} i
         WHERE n.nid = t.nid
         AND n.nid = i.nid
         AND t.tid = '%s'
@@ -1232,7 +1229,7 @@ function _image_album_properties($albums) {
     }
     $result = db_query("
           SELECT COUNT(*) AS c
-          FROM term_node t, node n, image i
+          FROM {term_node} t, {node} n, {image} i
           WHERE t.nid = n.nid
           AND i.nid = n.nid
           AND tid IN (".implode(",", $terms).")
@@ -1244,8 +1241,8 @@ function _image_album_properties($albums) {
 
     $last_update = db_fetch_object(db_query("
         SELECT created, thumb_path
-        FROM node n, image i
-        LEFT JOIN term_node t ON n.nid = t.nid
+        FROM {node} n, {image} i
+        LEFT JOIN {term_node} t ON n.nid = t.nid
         WHERE n.nid = i.nid
         AND t.tid IN (".implode(",", $terms).")
         AND type = 'image'
@@ -1259,8 +1256,8 @@ function _image_album_properties($albums) {
     if (variable_get("image_gallery_thumb", "last") == "random") {
       $random = db_fetch_object(db_query("
           SELECT thumb_path
-          FROM node n, image i
-          LEFT JOIN term_node t ON n.nid = t.nid
+          FROM {node} n, {image} i
+          LEFT JOIN {term_node} t ON n.nid = t.nid
           WHERE n.nid = i.nid
           AND t.tid IN (".implode(",", $terms).")
           AND type = 'image'
@@ -1276,7 +1273,7 @@ function _image_album_properties($albums) {
 }
 
 /**
- * Theme function to render image node.  
+ * Theme function to render image node.
  *
  */
 function node_image($node, $rand, $main = 0) {
@@ -1299,7 +1296,7 @@ function node_image($node, $rand, $main = 0) {
       $node->body = "<img class=\"image\" src=\"$base_url/$node->image_path\">". $node->body;
     }
   }
-  
+
   theme("node", $node, $main);
 }
 
@@ -1337,7 +1334,7 @@ function image_gallery_home($albums) {
 
 function image_gallery_album($parents, $subalbums, $images, $data, $galleryuser = null) {
   global $base_url;
-  
+
   if (!$galleryuser) {
     $t[] = l(t("galleries"), "image");
     foreach (array_reverse(array_values($parents)) as $p) {
@@ -1435,10 +1432,10 @@ function  _image_dir_upload_fast() {
    return _image_dir_upload("fast");
 }
 
-function _image_dir_upload($type = "slow") {
+function _image_dir_upload($type = "slow", $edit = NULL) {
   global $user, $base_url;
 
-  $edit = $_POST["edit"];
+  if(!$edit) $edit = $_POST["edit"];
 
   $links = array();
 
@@ -1482,52 +1479,64 @@ function _image_dir_upload($type = "slow") {
           $output .= "<br />";
         }
         else {
-
           $size = getimagesize("$dir/$file", $iptc_info);
           if ((in_array($size[2], array(1,2,3))) && (_image_check_ext($file))) {
-  
             // move to a temporary location. _insert() will later move to final destination
             $node->image_id = md5(rand());
             $edit["del_images"] ? $action = "rename" : $action = "copy";
             if (!$action("$dir/$file", _image_tempname($node))) {
               die("cannot copy image to temporary location.");
             }
-  
-            $node->title = basename($file, ".jpg");
+
+            $basename = basename($file, strrchr($file, "."));
+            if ($edit[$basename]["title"]) {
+              $node->title = $edit[$basename]["title"];
+            }
+            else {
+              $node->title = $basename;
+            }
+            if (!$edit["uid"]) {
+              $node->uid = $user->uid;
+            }
+            else {
+              $node->uid = $edit["uid"];
+            }
+            if ($edit[$basename]["body"]) {
+              $node->body = $edit[$basename]["body"];
+            }
             $node->type = "image";
-            $node->uid = $user->uid;
             $node->taxonomy = $edit["taxonomy"];
             $node->personal = 0;
             $node->weight = 5;
             $node->moderate = 0;
-            
+
             $node->image_path = _image_tempname($node);
-            $node->thumb_path = _image_tempthumbname($node);           
-  
+            $node->thumb_path = _image_tempthumbname($node);
+
             $node->iptc = _image_iptc($ipct_info);
             $node->exif = _image_get_exif($node->image_path);
-          
+
             $formats = array("1" => "gif", "2" => "jpg", "3" => "png");
             $node->format = $formats[$size[2]];
             $node->width = $size[0];
             $node->height = $size[1];
-            $node->filesize = filesize($node->image_path);               
-             
+            $node->filesize = filesize($node->image_path);
+
             //scale down image if needed
             if (variable_get("image_lib", "imagemagick") == "imagemagick") {
               $max_size = split("x", variable_get("image_default_max_size", "1024x768"));
               if ($size[0] > $max_size[0] || $size[1] > $max_size[1]) {
                 $trasform_string .= " -scale ".$max_size[0]."x".$max_size[1] ." -filter QUADRATIC";
                 _image_convert(_image_tempname($node), _image_tempname($node), $trasform_string);
-                
+
                 // Reset size;
                 $size = getimagesize($node->image_path, $iptc_info);
                 $node->width = $size[0];
                 $node->height = $size[1];
-                $node->filesize = filesize($node->image_path);               
+                $node->filesize = filesize($node->image_path);
               }
             }
-                    
+
             //override defaults with any data specified in iptc header
             // Pull out iptc data and populate any node elements that are not already set.
             if ($proposed = _image_iptc_map($ipct_info)) {
@@ -1535,12 +1544,12 @@ function _image_dir_upload($type = "slow") {
                 $node->$key = $value;
               }
             }
-            
+
             // Generate Thumbnail
-            _image_make_thumbnail($node->image_path, $node->thumb_path);      
-  
+            _image_make_thumbnail($node->image_path, $node->thumb_path);
+
             $nid = node_save(array2object($node));
-            
+
             if (!$alreadyprinted) {  // we only want to output this text once
               $output .= "\n" . t("You may wish to view your new images:") ." <p>\n";
               foreach ($node->taxonomy as $tid) {
@@ -1551,10 +1560,8 @@ function _image_dir_upload($type = "slow") {
               $alreadyprinted = true;
             }
             $output .= "--  ". t("image") .": ". l($node->title, "node/view/$nid"). "<br />";
-            
           }
         }
-
       }
     }
     closedir($handle);
@@ -1627,41 +1634,41 @@ function _image_check_configuration() {
 
 function image_help() {
   global $base_url;
-  
+
 ?>
 
 <h4>Configuration</h4>
 
 <h5>Image Library</h5>
 
-<p><a href="">Imagemagick</a> and <a href="http://www.boutell.com/gd/">GD</a> are supported image libraries.
-Imagemacik is required for full image manipulation features and is suggested for better thumbnail quality.</p>
+<p><a href="http://www.imagemagick.org/">Imagemagick</a> and <a href="http://www.boutell.com/gd/">GD</a> are supported image libraries. 
+Imagemagick is required for full image manipulation features and is suggested for better thumbnail quality.</p>
 
 <p>Many ISPs already have Imagemagick installed and available for your use.
-If you are hosted on Linux and have shell access, type <i>which convert</i>
-at the command prompt This will tell you where the binary is, if it is in the path.
-The name of the binary on most unixoid systems is simply <i>convert</i>.</p>
+ If you are hosted on Linux and have shell access, type <i>which convert</i>
+ at the command prompt This will tell you where the binary is, if it is in the path.
+ The name of the binary on most unixoid systems is simply <i>convert</i>.</p>
 
 <p>If you choose to use the GD library, you should install version 2.0 or higher.
-However, version 1.x of the GD library is supported, even if it produces lower quality images. 
-In order to use GD PHP must be compiled with GD enabled.</p>
+ However, version 1.x of the GD library is supported, even if it produces lower quality images.
+ In order to use GD PHP must be compiled with GD enabled.</p>
 
 <a name="iptc"><h5>IPTC</h5></a>
 
 <p>JPEG images may be tagged with information about the image. This information talks about the
-caption, headline, creation date, location, and many other parameters about the image. To
-embed IPTC data in your images, use an IPTC aware editor like
-<a href="http://www.pixvue.com">PixVue</a> (free, Windows only),
-<a href="http://www.adobe.com/products/photoshop/main.html">Photoshop</a>
-(commercial, Windows/Mac)on , or <a href="http://www.photo.net/bboard/q-and-a-fetch-msg?msg_id=001Lso">possibly GIMP</a> (Linux).</p>
+ caption, headline, creation date, location, and many other parameters about the image. To
+ embed IPTC data in your images, use an IPTC aware editor like
+ <a href="http://www.pixvue.com">PixVue</a> (free, Windows only),
+ <a href="http://www.adobe.com/products/photoshop/main.html">Photoshop</a>
+ (commercial, Windows/Mac), or <a href="http://www.photo.net/bboard/q-and-a-fetch-msg?msg_id=001Lso">possibly GIMP</a> (Linux, Unix, Windows).</p>
 
 <p>This module reads any IPTC info in your image, and uses it appropriately. Fast directory upload of IPTC
-images is the quickest and most complete way to add lots of images into Drupal. Further, you may tag
-your images while offline and only go online to do the upload/creation in Drupal.</p>
+ images is the quickest and most complete way to add lots of images into Drupal. Further, you may tag
+ your images while offline and only go online to do the upload/creation in Drupal.</p>
 
 <h5>EXIF</h5>
 
-<p>JPEG images may also be tagged with inforamtion about the camera settings used to take the picture.</p>
+<p>JPEG images may also be tagged with information about the camera settings used to take the picture.</p>
 
 <p>This module can read EXIF information about your images via <a href="http://www.sentex.net/~mwandel/jhead/">jhead</a>.</p>
 
@@ -1675,9 +1682,9 @@ your images while offline and only go online to do the upload/creation in Drupal
 
 <h4>Adding images into other nodes</h4>
 <p>Sometimes, you want to add an image to another node like a blog entry or a story.
-You may do this by creating an image node in Drupal for the target image, and then
-referencing that image in your story, blog, etc. To enable this feature and learn the
-proper syntax, visit the <a href="<?php echo $base_url; ?>/?q=admin/system/filters">filters configuration screen</a>.</p>
+ You may do this by creating an image node in Drupal for the target image, and then
+ referencing that image in your story, blog, etc. To enable this feature and learn the
+ proper syntax, visit the <a href="<?php echo $base_url; ?>/?q=admin/system/filters">filters configuration screen</a>.</p>
 
 <?php
 }

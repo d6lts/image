@@ -1,3 +1,9 @@
+22 July 2003
+------------
+Gerhard Killesreiter
+- updated for table prefix patch
+- file names are now <original filename>-$node->nid.ext
+
 9 June 2003 (Summarization of several patches)
 -----------
 [Craig Courtney]
