@@ -1,3 +1,11 @@
+1 October 2002
+------------------
+[Gerhard Killesreiter]
+- All configurable directories now need slashes at the end.
+  You will need to add a slash to the temp directory in
+  your config page.
+
+
 14 July 2002
 ------------------
 - actual image is now rendered by theme->node() adding author and date, and can be overridden by themes
