@@ -64,11 +64,26 @@ function image_block($op = "list", $delta = 0) {
     // listing of blocks, such as on the admin/system/block page
     if ($op == "list") {
         $blocks[0]["info"] = t("Image Gallery");
+        $blocks[1]["info"] = t("Latest Images");
     } elseif (user_access('access images')) {
-        // our block content
-        $blocks["subject"] = t(variable_get("image_block_title", "Image Galleries"));
-        $albums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
-        $blocks["content"] = theme_image_block($albums);
+	switch($delta) {
+          case 0:
+            $title = variable_get("image_block_gallery_title", t("Image Galleries"));
+
+            $blocks["subject"] = t($title);
+            $albums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
+            $blocks["content"] = theme_image_block($albums);
+
+	    break;
+
+          case 1:
+            $title = variable_get("image_block_latest_title", t("Latest Images"));
+
+            $blocks["subject"] = t($title);
+            $blocks["content"] = image_block_latest();
+
+	    break;
+	  }
     }
     return $blocks;
 }
@@ -171,7 +186,11 @@ function image_settings() {
 
   $output .= form_select(t("Disable Image Caching"), "image_random_suffix", variable_get("image_random_suffix", "0"), array("0" => "disabled", "1" => "enabled"), t("Enabling this will add random parameters to image URIs which will prevent the browser from caching."));
 
-  $output .= form_textfield(t("Title for image block"), "image_block_title", variable_get("image_block_title", "Image Galleries"), 20, 80, t("The title to display in the image block, if enabled"));
+  $output .= form_textfield(t("Title for image galleries block"), "image_block_gallery_title", variable_get("image_block_gallery_title", "Image Galleries"), 20, 80, t("The title to display in the image galleries block, if enabled"));
+
+  $output .= form_textfield(t("Title for latest images block"), "image_block_latest_title", variable_get("image_block_latest_title", "Latest Images"), 20, 80, t("The title to display in the latest image block, if enabled"));
+
+  $output .= form_textfield(t("Number of thumbnails to show"), "image_block_last_image_num", variable_get("image_block_last_image_num", "3"), 20, 80, t("Number of latest thumbnails to show."));
 
   return $output;
 }
@@ -1606,6 +1625,20 @@ function theme_image_block($albums) {
       $output .= "<li class=\"collapsed\">" . l($album->name, "image/tid/" . $album->tid) . "</li>";
   }
   $output .= "</ul></div>";
+  return $output;
+}
+
+/**
+ * Block to display the last n images added to the galleries
+ */
+function image_block_latest () {
+  $max_rows = variable_get("image_block_last_image_num", "3");
+
+  $result = db_query_range("SELECT i.nid, i.thumb_path FROM {image} i, {node} n WHERE i.nid = n.nid ORDER BY n.changed DESC", 0, $max_rows);
+  while ($image = db_fetch_object($result)) {
+    $img = '<img src="'. $image->thumb_path . '"</img>';
+    $output .= '<div id="image">' . l($img, "node/$image->nid") . '</div>';
+  }
   return $output;
 }
 
