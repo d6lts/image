@@ -49,8 +49,18 @@ function image_help($section = "admin/help#image") {
     case 'admin/system/modules/image':
       $output = t("Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced.");
       break;
-  }
+      
+    case 'filter#short-tip':
+      if (variable_get("image_filter_enabled", 0)) {
+        return t("You may link to images on this site <a href=\"%explanation-url\">using a special syntax</a>", array("%explanation-url" => url("filter/tips", NULL, 'image')));
+      }
 
+    case 'filter#long-tip':
+      if (variable_get("image_filter_enabled", 0)) {
+        return t("<p>You may quickly link to image nodes using a special syntax. The image code(s) will be replaced by thumbnail linked to full size image node. Syntax: <code>[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]</code>. Every parameter except node_id is <em>optional</em>.</p>");
+      }
+  }
+  
   return $output;
 }
 
@@ -675,18 +685,6 @@ function image_filter($text) {
     }
   }
   return $text;
-}
-
-/**
- * Explanation of image filter syntax, linked to from beneath the compose form
- * when the compose_tips.module is enabled.
- *
- * @see http://drupal.org/node/view/1516
- */
-function image_compose_tips() {
-  if (variable_get("image_filter_enabled", 0)) {
-    return array(t("You may quickly link to image nodes using a special syntax. The image code(s) will be replaced by thumbnail linked to full size image node. Syntax: <i>[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]</i>. Every parameter except node_id is <i>optional</i>."));
-  }
 }
 
 /**
