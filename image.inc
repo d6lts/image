@@ -632,4 +632,5 @@ function _get_gd_image_types() {
   }
   return $supported_types;
 }
+
 ?>
