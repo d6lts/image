@@ -1285,7 +1285,7 @@ function image_page() {
       $thumb_num = variable_get("image_gallery_thumb_rows", "5") * variable_get("image_gallery_thumb_cols", "3");
       $images = array();
 
-      $sql  = "SELECT n.nid, n.title, n.body, i.thumb_path FROM {node} n, {image} i, {users} u WHERE n.nid = i.nid AND i.personal = 1 AND n.status = 1 AND n.uid = u.uid AND u.uid = '". $uid . "' AND n.moderate = 0 ORDER BY ". _image_get_thumb_order();
+      $sql = "SELECT n.nid, n.title, n.teaser, n.body, i.image_path, i.thumb_path FROM {node} n, {image} i, {users} u WHERE n.nid = i.nid AND i.personal = 1 AND n.status = 1 AND n.uid = u.uid AND u.uid = '". $uid . "' AND n.moderate = 0 ORDER BY ". _image_get_thumb_order();
       $result = pager_query($sql, $thumb_num, 0);
       while ($image = db_fetch_object($result)) {
         $images[] = $image;
@@ -1413,6 +1413,10 @@ function node_image_content(&$node, $rand, $main = 0, $page = 0) {
   global $base_url;
 
   if ($main) {
+    // check if the thumbnail file exists, and create it if it doesn't
+    if (!file_exists($node->thumb_path)) {
+      _image_make_thumbnail($node->image_path, $node->thumb_path);
+    }
     if($rand) {
       $node->teaser = "<img class=\"thumb\" src=\"$base_url/$node->thumb_path?".$rand."\" />" . $node->teaser;
     }
@@ -1486,7 +1490,8 @@ function theme_image_gallery_home($albums, $gallery_description = '') {
     foreach ($albums as $tid => $album) {
       $output .= "<tr>\n<td align=\"left\">";
       if ($album->thumb) {
-        $output .= l("<img src=\"$base_url/". $album->thumb ."\" border=\"0\" />", "image/tid/$album->tid");
+        $size = getImageSize($album->thumb);
+        $output .= l("<img alt=\"".$image->title."\" ".$size[3]." src=\"$base_url/". $album->thumb ."\" border=\"0\" />", "image/tid/$album->tid");
       }
       $output .= "</td>\n<td>";
       $output .= "<p class=\"album-name\">". l($album->name, "image/tid/$album->tid") ."</p>";
@@ -1533,7 +1538,12 @@ function theme_image_gallery_album($images, $subalbums = NULL) {
       if ($n % $thumbs_cols == 0) {
         $output .= "<tr>";
       }
-      $output .= "<td valign=\"top\"><div align=\"center\">".l("<img src=\"$base_url/".$image->thumb_path."\" border=\"0\" />", "node/$image->nid")."</div><p class=\"title\">".$image->title."</p><p class=\"teaser\">".$image->teaser."</p></td>\n";
+      // check if the thumbnail file exists, and create it if it doesn't
+      if (!file_exists($image->thumb_path)) {
+        _image_make_thumbnail($image->image_path, $image->thumb_path);
+      }
+      $size = getImageSize($image->thumb_path);
+      $output .= "<td valign=\"top\"><div align=\"center\">".l("<img alt=\"".$image->title."\" ".$size[3]." src=\"$base_url/".$image->thumb_path."\" border=\"0\" />", "node/$image->nid")."</div><p class=\"title\">".$image->title."</p><p class=\"teaser\">".$image->teaser."</p></td>\n";
 
       if ($n % $thumbs_cols == $thumbs_cols - 1) {
         $output .= "</tr>";
