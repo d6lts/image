@@ -68,6 +68,7 @@ function image_settings() {
   foreach (taxonomy_get_vocabularies("image") as $vid => $voc) {
     $vocs[$vid] = $voc->name;
   }
+  $vocs[0] = t("<none>");
   $output .= "<a name=\"image_nav_vocabulary\"></a>";
   $output .= form_select(t("Gallery Navigation Vocabulary"), "image_nav_vocabulary", variable_get("image_nav_vocabulary", ""),   $vocs, t("One of the taxonomy vocabularies will be the navigation tree. Select it here."));
   
