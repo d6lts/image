@@ -24,7 +24,7 @@ function image_help($section = "admin/help#image") {
       <h5>Verifiying Configuration</h5>
       <p>You can verify your directory and image library application configuration by visiting the <a href=\"%image-url\">images administration screen</a>.</p>
       <h4>Adding images into other nodes</h4>
-      <p>Sometimes, you want to add an image to another node like a blog entry or a story. You may do this by creating an image node in Drupal for the target image, and then referencing that image in your story, blog, etc. To enable this feature and learn the proper syntax, visit the <a href=\"" . $base_url . "/?q=admin/system/filters\">filters configuration screen</a>.</p>", array("%imagemagick-url" => "http://www.imagemagick.org/", "%gd-url" => "http://www.boutell.com/gd/", "%pixvue-url" => "http://www.pixvue.com", "%photoshop-url" => "http://www.adobe.com/products/photoshop/main.html", "%gimp-url" => "http://www.photo.net/bboard/q-and-a-fetch-msg?msg_id=001Lso", "%jhead-url" => "http://www.sentex.net/~mwandel/jhead/", "%images-url" => url("admin/image")));
+      <p>Sometimes, you want to add an image to another node like a blog entry or a story. You may do this by creating an image node in Drupal for the target image, and then referencing that image in your story, blog, etc. To enable this feature and learn the proper syntax, visit the <a href=\"" . $base_url . "/?q=admin/filters\">filters configuration screen</a>.</p>", array("%imagemagick-url" => "http://www.imagemagick.org/", "%gd-url" => "http://www.boutell.com/gd/", "%pixvue-url" => "http://www.pixvue.com", "%photoshop-url" => "http://www.adobe.com/products/photoshop/main.html", "%gimp-url" => "http://www.photo.net/bboard/q-and-a-fetch-msg?msg_id=001Lso", "%jhead-url" => "http://www.sentex.net/~mwandel/jhead/", "%images-url" => url("admin/image")));
       break;
     case 'admin/image':
       $output = t("Below is a status of image module's current configuration.");
@@ -1607,13 +1607,13 @@ function _image_check_configuration() {
   foreach ($dirs as $description => $key) {
     $row[] = $description;
     if (!file_exists(variable_get($key[0], $key[1]))) {
-      $row[] = "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#$key[0]") ."</div>";
+      $row[] = "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/settings/image#$key[0]") ."</div>";
     }
     else if (!is_writable(variable_get($key[0], $key[1]))) {
       $row[] = "<div class=\"error\">NOT WRITABLE - change permissions on server</div>";
     }
     else if (substr(variable_get($key[0], $key[1]), -1) != "/") {
-      $row[] = "<div class=\"error\">PATH DOES NOT END in SLASH (/) - fix in ". l("Site Configuration", "admin/system/modules/image#$key[0]") ."</div>";
+      $row[] = "<div class=\"error\">PATH DOES NOT END in SLASH (/) - fix in ". l("Site Configuration", "admin/settings/image#$key[0]") ."</div>";
     }
     else {
       $row[] = "<div class=\"ok\">OK</div>";
@@ -1627,7 +1627,7 @@ function _image_check_configuration() {
   $row[] = "ImageMagick convert";
   if ($convert) {
     if (!file_exists($convert)) {
-      $row[] = "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#image_convert") ."</div>";
+      $row[] = "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/settings/image#image_convert") ."</div>";
     }
     else {
       $row[] = "<div class=\"ok\">OK</div>";
@@ -1659,7 +1659,7 @@ function _image_check_configuration() {
   $row[] = "Jhead";
   if ($jhead) {
     if (!file_exists($jhead)) {
-      $row[] = "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#image_jhead") ."</div>";
+      $row[] = "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/settings/image#image_jhead") ."</div>";
     }
     else {
       $row[] = "<div class=\"ok\">OK</div>";
@@ -1674,7 +1674,7 @@ function _image_check_configuration() {
   // check if he assigned a vocabulary, for image album navigation
   $row[] = "Image vocabulary";
   if (!variable_get("image_nav_vocabulary", "")) {
-    $row[] = "<div class=\"error\">Warning: you must assign a vocabulary to navigate in image gallery. Fix in ". l("Site Configuration", "admin/system/modules/image#image_nav_vocabulary"). "</div>";
+    $row[] = "<div class=\"error\">Warning: you must assign a vocabulary to navigate in image gallery. Fix in ". l("Site Configuration", "admin/settings/image#image_nav_vocabulary"). "</div>";
   }
   else {
     $row[] = "<div class=\"ok\">assigned</div>";
