@@ -5,6 +5,8 @@ Moshe Weitzman
 Alastair Maw
 Bruno Rocci
 Craig Courtney
+Gordon Heydon
+Eric Scouten
 and of course Dries and Kjartan, and probably others I forgot.
 
 Thank you, guys!
