@@ -302,32 +302,35 @@ function image_link($type, $node, $main = 0) {
 /**
  * Implementation of hook_menu().
  */
-function image_menu() {
+function image_menu($may_cache) {
   global $user;
 
   $items = array();
-  $access = user_access('access images');
 
-  // Add page level link if user has access permissions
-  // and a vocabulary has been selected for navigation
-  if (variable_get('image_nav_vocabulary', '')) {
-    $items[] = array('path' => 'image', 'title' => t('image galleries'), 'callback' => 'image_page', 'access' => $access, 'type' => MENU_SUGGESTED_ITEM);
+  if ($may_cache) {
+    $access = user_access('access images');
+  
+    // Add page level link if user has access permissions
+    // and a vocabulary has been selected for navigation
+    if (variable_get('image_nav_vocabulary', '')) {
+      $items[] = array('path' => 'image', 'title' => t('image galleries'), 'callback' => 'image_page', 'access' => $access, 'type' => MENU_SUGGESTED_ITEM);
+    }
+  
+    // Add view personal gallery link if the user has personal gallery permission
+    if (_image_can_personal()) {
+      $items[] = array('path' => "image/uid/$user->uid", 'title' => t('my image gallery'), 'access' => $access);
+    }
+    $items[] = array('path' => 'image/view', 'title' => t('display image'), 'callback' => 'image_display', 'access' => $access, 'type' => MENU_CALLBACK);
+  
+    // Add a create link for images if the user has create permission
+    $items[] = array('path' => 'node/add/image', 'title' => t('image'), 'access' => (user_access('create images') || _image_can_personal()));
+  
+    // Add admin items if the user has administer permission
+    $access = user_access('administer images');
+    $items[] = array('path' => 'admin/image', 'title' => t('images'), 'callback' => '_image_check_configuration', 'access' => $access);
+    $items[] = array('path' => 'admin/image/dir_upload/slow', 'title' => t('directory upload: slow'), 'callback' => '_image_dir_upload', 'access' => $access, 'type' => MENU_LOCAL_TASK);
+    $items[] = array('path' => 'admin/image/dir_upload/fast', 'title' => t('directory upload: fast'), 'callback' => '_image_dir_upload_fast','access' => $access, 'type' => MENU_LOCAL_TASK);
   }
-
-  // Add view personal gallery link if the user has personal gallery permission
-  if (_image_can_personal()) {
-    $items[] = array('path' => "image/uid/$user->uid", 'title' => t('my image gallery'), 'access' => $access);
-  }
-  $items[] = array('path' => 'image/view', 'title' => t('display image'), 'callback' => 'image_display', 'access' => $access, 'type' => MENU_CALLBACK);
-
-  // Add a create link for images if the user has create permission
-  $items[] = array('path' => 'node/add/image', 'title' => t('image'), 'access' => (user_access('create images') || _image_can_personal()));
-
-  // Add admin items if the user has administer permission
-  $access = user_access('administer images');
-  $items[] = array('path' => 'admin/image', 'title' => t('images'), 'callback' => '_image_check_configuration', 'access' => $access);
-  $items[] = array('path' => 'admin/image/dir_upload/slow', 'title' => t('directory upload: slow'), 'callback' => '_image_dir_upload', 'access' => $access, 'type' => MENU_LOCAL_TASK);
-  $items[] = array('path' => 'admin/image/dir_upload/fast', 'title' => t('directory upload: fast'), 'callback' => '_image_dir_upload_fast','access' => $access, 'type' => MENU_LOCAL_TASK);
 
   return $items;
 }
