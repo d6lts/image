@@ -1,3 +1,22 @@
+2 October 2002
+----------------
+[Moshe Weitzman]
+
+added a fast directory upload option. this enables an admin to load
+a bunch of images into drupal in a single pass. the same taxonomy terms
+are applied to all, thus creating a gallery. if IPTC info is present, it
+is used to populate the title, body, and teaser fields. IPTC tagging is
+a great way to prep your images while offline See Help for more info on IPTC tools.
+
+If IPTC info is present during standard image node compose, it
+is proposed as the node title, body and teaser
+
+imagemagick created thumbnails use 'scale' instead of 'resize'.
+this is more compatible with prior versions of imagemagick,
+and ISPs don't update this library often.
+
+added some Help, particularly for IPTC and directory upload functions. much more is needed.
+
 1 October 2002
 ------------------
 [Gerhard Killesreiter]
