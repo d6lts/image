@@ -1384,12 +1384,12 @@ function theme_image_gallery_album($parents, $subalbums, $images, $data, $galler
   return $output;
 }
 
-function image_inline_img($img) {
+function theme_image_inline_img($img) {
   global $base_url;
   return l("<img src=\"$base_url/$img->thumb_path\" align=\"$img->align\" border=\"$img->border\" hspace=\"$img->hspace\" vspace=\"$img->vspace\" alt=\"$img->teaser\" />", "node/view/$img->nid");
 }
 
-function image_thumb_browser($data) {
+function theme_image_thumb_browser($data) {
   if ($data) {
     $output = '
     <hr>
