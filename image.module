@@ -144,7 +144,6 @@ function image_link($type, $node) {
       $result = db_query($sql, $terms[0]);
       
       while ($image = db_fetch_object($result)) {
-        echo $next->nid."*".$prev->nid."-";
         if ($stop == 1) {
           $next->nid = $image->nid;
           $next->title = $image->title;
@@ -258,11 +257,11 @@ function image_form(&$node, &$help, &$error, &$param) {
     if ($op == "add") {
       // **** first form in a new image ****
       $output .= implode("<p>", taxonomy_node_form("image", $node));
-      $output .= form_textarea("Description", "body", $node->body, 60, 5);
-      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, "Weight of image; can be used to sort thumbnails.");
+      $output .= form_textarea(t("Description"), "body", $node->body, 60, 5);
+      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, t("Weight of image; can be used to sort thumbnails."));
       
       if (_image_can_personal()) {
-        $output .= form_select("Personal", "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), "A personal image can only be seen in the user's photo gallery.");
+        $output .= form_select(t("Personal"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can only be seen in the user's photo gallery."));
       }
       
       if ($file) {
@@ -318,15 +317,15 @@ function image_form(&$node, &$help, &$error, &$param) {
       $output .= implode("<p>", taxonomy_node_form("image", $node));
       $output .= _image_render_iptc_exif(_image_get_exif(_image_tempname($node)), "EXIF data");
       $output .= _image_render_iptc_exif(_image_iptc($ipct_info), "IPTC data");
-      $output .= form_textarea("Description", "body", $node->body, 60, 5);
+      $output .= form_textarea(t("Description"), "body", $node->body, 60, 5);
       $output .= form_textarea(t("Teaser"), "teaser", $node->teaser, 60, 5);
-      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, "Weight of image; can be used to sort thumbnails.");
+      $output .= form_textfield(t("Weight"), "weight", $node->weight, 5, 255, t("Weight of image; can be used to sort thumbnails."));
       
       if (_image_can_personal()) {
-        $output .= form_select("Personal", "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), "A personal image can only be seen in the user's photo gallery.");
+        $output .= form_select(t("Personal"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can only be seen in the user's photo gallery."));
       }
       
-      $output .= form_file("Image", "image", 50, $upload_text);
+      $output .= form_file(t("Image"), "image", 50, $upload_text);
       $output .= form_hidden("image_id", $node->image_id);
       
       if (file_exists(_image_filename($node)) && ($node->image_name)) {
@@ -346,12 +345,12 @@ function image_form(&$node, &$help, &$error, &$param) {
     if ($op == "edit") {
       // **** first form ****
       $output .= implode("<p>", taxonomy_node_form("image", $node));
-      $output .= form_textarea("Description", "body", $node->body, 60, 5);
+      $output .= form_textarea(t("Description"), "body", $node->body, 60, 5);
       $output .= form_textarea(t("Teaser"), "teaser", $node->teaser, 60, 5);
-      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, "Weight of image; can be used to sort thumbnails.");
+      $output .= form_textfield(t("Weight"), "weight", $node->weight, 5, 255, t("Weight of image; can be used to sort thumbnails."));
       
       if (_image_can_personal()) {
-        $output .= form_select("Personal", "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), "A personal image can only be seen in the user's photo gallery.");
+        $output .= form_select(t("Personal"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can only be seen in the user's photo gallery."));
       }
       
       $output .= "<div align=\"center\"><img src=\"$node->thumb_path\" /></div>";
@@ -388,12 +387,12 @@ function image_form(&$node, &$help, &$error, &$param) {
       $output .= _image_render_iptc_exif(_image_get_exif(_image_tempname($node)), "EXIF data");
       $output .= _image_render_iptc_exif(_image_iptc($ipct_info), "IPTC data");
       
-      $output .= form_textarea("Description", "body", $node->body, 60, 5);
+      $output .= form_textarea(t("Description"), "body", $node->body, 60, 5);
       $output .= form_textarea(t("Teaser"), "teaser", $node->teaser, 60, 5);
-      $output .= form_textfield("Weight", "weight", $node->weight, 5, 255, "Weight of image; can be used to sort thumbnails.");
+      $output .= form_textfield(t("Weight"), "weight", $node->weight, 5, 255, t("Weight of image; can be used to sort thumbnails."));
       
       if (_image_can_personal()) {
-        $output .= form_select("Personal", "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), "A personal image can only be seen in the user's photo gallery.");
+        $output .= form_select(t("Personal"), "personal", $node->personal, array("0" => "disabled", "1" => "enabled"), t("A personal image can only be seen in the user's photo gallery."));
       }
       
       if (is_uploaded_file($HTTP_POST_FILES["edit"]["tmp_name"]["image"])) {
@@ -402,7 +401,7 @@ function image_form(&$node, &$help, &$error, &$param) {
       
       $original_node = db_fetch_object(db_query("SELECT image_path, thumb_path FROM image WHERE nid = '%s'", $node->nid));
       $output .= "<div align=\"center\"><img src=\"$original_node->thumb_path\" /></div>";
-      $output .= form_file("Image", "image", 50, t("Click \"Browse...\" to select an image to upload. If you don't want to change the image you don't need to upload again."));
+      $output .= form_file(t("Image"), "image", 50, t("Click \"Browse...\" to select an image to upload. If you don't want to change the image you don't need to upload again."));
       
       $output .= form_hidden("image_id", $node->image_id);
       $output .= form_hidden("image_name", basename($node->image_path));
@@ -442,7 +441,6 @@ function image_conf_filters() {
 
 
 function image_filter($text) {
-  #echo "entro";
   if (variable_get("image_filter_enabled", 0)) {
     // *** [image:NID,(left|center|right)] ***
     // first we find every tag
@@ -492,7 +490,7 @@ function _image_process($node) {
     // let's start with gif, jpg, png
     
     if ((!in_array($size[2], array(1,2,3))) || (!_image_check_ext($HTTP_POST_FILES["edit"]["name"]["image"]))) {
-      echo "<div style=\"color: red;\" class=\"error\">uploaded file was not an image.</div>";
+      echo "<div style=\"color: red;\" class=\"error\">".t("uploaded file was not an image.")."</div>";
       $HTTP_POST_FILES = array();
     }
     else if (!copy($image_file, _image_tempname($node))) {
@@ -673,7 +671,7 @@ function image_update($node) {
   global $HTTP_POST_FILES;
 
   if (is_uploaded_file($HTTP_POST_FILES["edit"]["tmp_name"]["image"])) {
-    echo t("<div style=\"color: red;\" class=\"error\">"."Warning: you must preview an image before submitting; new file has not been saved.")."</div><br/>"; 
+    echo "<div style=\"color: red;\" class=\"error\">".t("Warning: you must preview an image before submitting; new file has not been saved.")."</div><br/>"; 
   }
   
   if ($node->image_name) {
@@ -758,6 +756,7 @@ function _image_secure_strip_name($filename) {
       "ÁÉÍÓÚÑÀÈÌÒÙÄËÏÖÜÂÊÎÔÛáéíóúñàèìòùäëïöüâêîôûç ",
       "aeiounaeiouaeiouaeiouaeiounaeiouaeiouaeiouc_");
   
+  // strip / too
   return strtolower(preg_replace("/[^A-Za-z0-9\.\-\+_]/","",$filename));
 }
 
@@ -766,13 +765,13 @@ function _image_max_filesize($image_file, $tid = 0, $personal = 0) {
   // check whether uploaded file is too big (kbytes or physical size)
   $max_weight = variable_get("image_default_max_weight", "200");
   if (filesize($image_file) > $max_weight * 1000) {
-    $error .= "<div style=\"color: red; text-align: center\" class=\"error\">file is too big (max $max_weight kbytes).</div>";
+    $error .= "<div style=\"color: red; text-align: center\" class=\"error\">".t("file is too big (max %a kbytes)", array("%a" => $max_weight))."</div>";
   }
   
   $size = getimagesize($image_file);
   $max_size = split("x", variable_get("image_default_max_size", "1024x768"));
   if ($size[0] > $max_size[0] || $size[1] > $max_size[1]) {
-    $error .= "<div style=\"color: red; text-align: center\" class=\"error\">file is too big (max ".variable_get("image_default_max_size", "1024x768").").</div>";
+    $error .= "<div style=\"color: red; text-align: center\" class=\"error\">".t("file is too big (max %a)", array("%a" => variable_get("image_default_max_size", "1024x768")))."</div>";
   }
   
   return $error;
@@ -784,12 +783,12 @@ function _image_personal_limit($image_file) {
   
   $max_num = variable_get("image_personal_gallery_max_num", "50");
   if ($user_images->c == $max_num) {
-    $error .= "<div style=\"color: red; text-align: center\" class=\"error\">you can have at most $max_num images in your gallery.</div>";
+    $error .= "<div style=\"color: red; text-align: center\" class=\"error\">".t("you can have at most  images in your gallery.", array("%a" => $max_num))."</div>";
   }
   
   $max_kb = variable_get("image_gallery_max_kb", "1000") * 1000;
   if (($user_images->size + filesize($image_file)) > $max_kb) {
-    $error .= "<div style=\"color: red; text-align: center\" class=\"error\">you have $max_kb kb for your gallery.</div>";
+    $error .= "<div style=\"color: red; text-align: center\" class=\"error\">".t("you have %a kb for your gallery.", array("%a" => $max_kb))."</div>";
   }
   return $error;
 }
@@ -799,7 +798,7 @@ function _images_transform_form($size, $bytes) {
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <tr valign="top">
     <td> 
-      <p align="left"><b>resize:</b><br>
+      <p align="left"><b>'.t("resize").':</b><br>
         <input type="text" name="sizex" size="7" value="'.$size[0].'" onChange="if (prop.checked) { sizey.value = Math.round(sizex.value * originaly.value / originalx.value) }">
         x <br>
         <input type="text" name="sizey" size="7" value="'.$size[1].'" onChange="if (prop.checked) { sizex.value = Math.round(sizey.value * originalx.value / originaly.value) }">
@@ -807,19 +806,19 @@ function _images_transform_form($size, $bytes) {
         <input type="hidden" name="originalx" value="'.$size[0].'">
         <input type="hidden" name="originaly" value="'.$size[1].'"><br>
         <input type="checkbox" name="prop" value="1" checked>
-        keep prop
+        '.t("keep prop").'
       </p>
     </td>
     <td> 
-      <div align="left"><b>rotate:</b><br>
+      <div align="left"><b>'.t("rotate").':</b><br>
         <input type="text" name="rotate" size="7">
         <br>
-        (clockwise)<br><!--
-        <input type="text" name="background" size="7" value="FFFFFF"><br>background<br>(<a onclick="javascript:image_forms.background.value=\'FFFFFF\'; return false" href=\'#\'>white</a> - <a onclick="javascript:image_forms.background.value=\'000000\'; return false" href=\'#\'>black</a>)-->
+        ('.t("clockwise").')<br><!--
+        <input type="text" name="background" size="7" value="FFFFFF"><br>'.t("background").'<br>(<a onclick="javascript:image_forms.background.value=\'FFFFFF\'; return false" href=\'#\'>'.t("white").'</a> - <a onclick="javascript:image_forms.background.value=\'000000\'; return false" href=\'#\'>'.t("black").'</a>)-->
       </div>
     </td>
     <td> 
-      <div align="left"><b>crop:</b><br>
+      <div align="left"><b>'.t("crop").':</b><br>
         <input type="text" name="cropx" size="7">
         x <br>
         <input type="text" name="cropy" size="7">
@@ -830,24 +829,24 @@ function _images_transform_form($size, $bytes) {
         h </div>
     </td>
     <td> 
-      <div align="left"><b>convert to:</b><br><!--
+      <div align="left"><b>'.t("convert").':</b><br><!--
         <select name="convert">
-          <option selected>no change</option>
+          <option selected>'.t("no change").'</option>
           <option value="jpg">jpeg</option>
           <option value="gif">gif</option>
           <option value="png">png</option>
         </select>
         <br>-->
         
-        <input type="text" name="quality" size="5" maxlength="3"> quality<br>
+        <input type="text" name="quality" size="5" maxlength="3"> '.t("quality").'<br>
         (1-100) <br>
         '.$bytes.' bytes
       </div>
     </td>
     <td> 
-      <div align="left"><b>revert:</b>
+      <div align="left"><b>'.t("revert").':</b>
         <input type="checkbox" name="revert" value="1"><br>
-        back to original
+        '.t("back to original").'
       </div>
     </td>
   </tr>
@@ -903,20 +902,14 @@ function image_page() {
       
       $null = array();
       $theme->header();
-      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_album") ? $theme->gallery_album($parents, $subalbums, $images) : _image_gallery_album($null, $null, $images));
+      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_album") ? $theme->gallery_album($parents, $subalbums, $images) : _image_gallery_album($null, $null, $images, array()));
       $theme->footer();    
     }
     else if (!$tid) {
       // show albums
       $albums = taxonomy_get_children(0, variable_get("image_nav_vocabulary", ""));
       
-      #print_r($albums);
-      #foreach (array_keys($albums) as $term_id) {
-        #_image_album_properties($albums, $term_id);
-      #}
-      _image_album_properties($albums);
-      #print_r($albums);
-      
+      _image_album_properties($albums); 
             
       $theme->header();
       $theme->box(t("Photo galleries"), method_exists($theme, "gallery_home") ? $theme->gallery_home($albums) : _image_gallery_home($albums));
@@ -925,9 +918,6 @@ function image_page() {
     else {
       // browse albums; show subalbums and thumbs
       $subalbums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
-      #foreach (array_keys($subalbums) as $term_id) {
-      #  _image_album_properties($subalbums, $term_id);
-      #}
       _image_album_properties($albums);
       
       $sql = "
@@ -1067,12 +1057,12 @@ function _image_gallery_home(&$albums) {
     $output .= lm($album->name, array("mod" => "image", "tid" => $album->tid))."<br>";
     $output .= check_output($album->description)."<br>";
     if ($album->image_count) {
-      $output .= "There are ".format_plural($album->image_count, "image", "images")." in this album.";
+      $output .= ($album->image_count) == 1 ? t("There is 1 image in this album.") : t("There are %a images in this album.", array("%a" => $album->image_count));
     } else {
-      $output .= "There are no images in this album.";
+      $output .= t("There are no images in this album.");
     }
     if ($album->last_updated) {
-      $output .= "<br>Last updated: ".format_date($album->last_updated);
+      $output .= "<br>".t("Last updated: ").format_date($album->last_updated);
     }
     $output .= "</td></tr>";
   }
@@ -1137,38 +1127,41 @@ return '
 }
 
 function _gallery_thumb_browser($data) {
-  #print_r($data);
-  $output = '
-  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-    <tr> 
-      <td colspan="5"><div align="center">'.$data["total_images"].' images in this album on '.$data["total_pages"].' pages</div></td>
-    </tr>
-    <tr>
-      <td width="10%">'.(($data["page"] > 1) ? lm("|&lt;", array("mod" => "image", "tid" => $data["tid"], "page" => 1)) : "").'</td>
-      <td width="10%">'.(($data["page"] > 1) ? lm("&lt;&lt;", array("mod" => "image", "tid" => $data["tid"], "page" => $data["page"] - 1)) : "").'</td>
-      <td>
-        <div align="center">';
-        
-  for ($n = 1; $n <= $data["total_pages"]; $n++) {
-    if ($n == $data["page"]) {
-      $p[] = "<b>&raquo;$n&laquo;</b>";
-    } else {
-      $p[] = lm($n, array("mod" => "image", "tid" => $data["tid"], "page" => $n));
+  if ($data) {
+    $output = '
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr> 
+        <td colspan="5"><div align="center">'.t("%a images in this album on %b pages.", array("%a" => $data["total_images"], "%b" => $data["total_pages"])).' </div></td>
+      </tr>
+      <tr>
+        <td width="10%">'.(($data["page"] > 1) ? lm("|&lt;", array("mod" => "image", "tid" => $data["tid"], "page" => 1)) : "").'</td>
+        <td width="10%">'.(($data["page"] > 1) ? lm("&lt;&lt;", array("mod" => "image", "tid" => $data["tid"], "page" => $data["page"] - 1)) : "").'</td>
+        <td>
+          <div align="center">';
+
+    for ($n = 1; $n <= $data["total_pages"]; $n++) {
+      if ($n == $data["page"]) {
+        $p[] = "<b>&raquo;$n&laquo;</b>";
+      } else {
+        $p[] = lm($n, array("mod" => "image", "tid" => $data["tid"], "page" => $n));
+      }
     }
+    if ($p) {
+      $output .= implode("&nbsp;&#149;&nbsp;", $p);
+    }
+
+    $output .= '
+          </div>
+        </td>
+        <td width="10%"> 
+          <div align="right">'.(($data["page"] < $data["total_pages"]) ? lm("&gt;&gt;", array("mod" => "image", "tid" => $data["tid"], "page" => $data["page"] + 1)) : "").'</div>
+        </td>
+        <td width="10%"> 
+          <div align="right">'.(($data["page"] < $data["total_pages"]) ? lm("&gt;|", array("mod" => "image", "tid" => $data["tid"], "page" => $data["total_pages"])) : "").'</div>
+        </td>
+      </tr>
+    </table>';
   }
-  $output .= implode("&nbsp;&#149;&nbsp;", $p);
-          
-  $output .= '
-        </div>
-      </td>
-      <td width="10%"> 
-        <div align="right">'.(($data["page"] < $data["total_pages"]) ? lm("&gt;&gt;", array("mod" => "image", "tid" => $data["tid"], "page" => $data["page"] + 1)) : "").'</div>
-      </td>
-      <td width="10%"> 
-        <div align="right">'.(($data["page"] < $data["total_pages"]) ? lm("&gt;|", array("mod" => "image", "tid" => $data["tid"], "page" => $data["total_pages"])) : "").'</div>
-      </td>
-    </tr>
-  </table>';
   
   return $output;
 }
@@ -1274,36 +1267,6 @@ function _image_check_configuration() {
 }
 
 function _image_test() {
-  $text = "[image:86,left] e non solo: [image:87,right]"; echo "OK";
-  // first we find every tag
-  if (preg_match_all("/\[image:(\d+),(left|right)\]/i", $text, $match)) {
-    // then we make the html
-    $result = db_queryd("SELECT n.nid, body, thumb_path FROM image i, node n WHERE i.nid = n.nid AND n.nid IN ('".implode("','", array_map("check_query", $match[1]))."')");
-    $n = 0;
-    while ($img = db_fetch_object($result)) {
-      $img->align = $match[2][$n];
-      $match[3][] = method_exists($theme, "gallery_inline_img") ? $theme->gallery_inline_img($img) : _gallery_inline_img($img);
-      $n++;
-    }
-
-    $text = str_replace($match[0], $match[3], $text);
-  }
-  
-  
-  #$text = eregi_replace("\[image:(\n+),(left|right)\]", "nodo \1 posizione \2", $text);
-  /*
-  $text = preg_replace("/\[image:(\d+),(left|right)\]/ie", "'<table border=\"0\" cellspacing=\"0\" cellpadding=\"5\"><tr><td><div align=\"center\">\<img src=\"'.db_result(db_queryd("SELECT thumb_path FROM image WHERE nid = '%s'", '\\1')).'\"></div></td></tr><tr><td><div align=\"center\"><i>'.db_result(db_queryd("SELECT body FROM node WHERE nid = '%s'", "\\1")).'</i></div></td></tr></table>", $text);
-  $text = preg_replace("/\[image:(\d+),(left|right)\]/ie", "'<table border=\"0\" cellspacing=\"0\" cellpadding=\"5\"><tr><td><div align=\"center\">\<img src=\"'.strtolower('\\1')")), $text);*/
-  /*
-  if (preg_match ("/\[image:(\d+),(left|right)\]/i", $text, $m)) {
-    echo "ok";
-    print_r($m);
-  }
-  else {
-    echo "no";
-  }
-  */
-  echo $text;
 }
 
 function _image_gallery_admin() {
@@ -1312,7 +1275,6 @@ function _image_gallery_admin() {
     exit();
   }
   
-  #echo "tbd";
   exit();
 }
 
@@ -1326,11 +1288,9 @@ function image_admin() {
     $links[] = la(t("check configuration"), array("mod" => "image", "op" => "check_configuration"));
     $links[] = la(t("settings"), array("mod" => "system"), "image");
     $links[] = la(t("help"), array("mod" => "image", "op" => "help"));
-    $links[] = la(t("test"), array("mod" => "image", "op" => "test"));
+    #$links[] = la(t("test"), array("mod" => "image", "op" => "test"));
     
     print "<small>".  implode(" | ", $links) ."</small><hr>\n";
-
-    #echo $op;
 
     switch ($op) {
       case "test":

@@ -89,6 +89,7 @@ an image submitted (like events, profile); temp upload, preview, cron to delete 
 - xhtml
 - shadow to thumbs?
 - recreate thumbs
+- in the browsers, an "up" command
 
 security:
 + verify file extension and format; change blanks to underscores
@@ -143,7 +144,7 @@ TODO (+ = done):
 + personal gallery has exchanged settings
 + paging & browser bar
 - integrate history
-- t() everything
++ t() everything
 - blocks
 - hashing of files
 - change die() in trigger_error()?
