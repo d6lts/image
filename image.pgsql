@@ -12,3 +12,5 @@ CREATE TABLE image (
   personal smallint not null default '0',
   weight smallint not null default '0'
 );
+
+CREATE INDEX image_nid_idx ON image(nid);
