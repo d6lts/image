@@ -84,6 +84,8 @@ function image_settings() {
   $output .= form_textfield(t("Temporary image path"), "image_temp_path", variable_get("image_temp_path", "./"), 30, 255, t("Path for working directory relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."));
   $output .= form_textfield(t("Maximum temporary image directory size"), "image_temp_path_size", variable_get("image_temp_path_size", 5), 6, 255, t("MBytes."));
 
+  $output .= form_select(t("Stored images filenames"), "image_default_filename", variable_get("image_default_filename", "random"), array("random" => "random string", "original" => "original filename"), t("The filename of an image stored on the server could be based on an unique random string or include the original filename. In the later case, the node id will be appended to the filename."));
+
   $output .= form_textfield(t("Default max image size"), "image_default_max_weight", variable_get("image_default_max_weight", "200"), 6, 255, t("KBytes."));
   $output .= form_textfield(t("Default max image resolution"), "image_default_max_size", variable_get("image_default_max_size", "1024x768"), 10, 255, t("Example: 800x600."));
 
@@ -188,7 +190,7 @@ function image_link($type, $node, $main = 0) {
 
   // Add a create link for images if the user has create permission
   if ($type == "system" && (user_access("create images") || _image_can_personal())) {
-    menu("node/add/image", t("create image"), "image_page", NULL, 0);
+    menu("node/add/image", t("image"), "image_page", NULL, 0);
   }
 
   // Add view personal gallery link if the user has personal gallery permission
@@ -207,7 +209,7 @@ function image_link($type, $node, $main = 0) {
     if ($node->personal) {
       $links[] = l(t("%u's photo gallery", array("%u" => $node->name)), "image/uid/$node->uid", array("title" => t("View %u's photo gallery.", array("%u" => $node->name))));
 
-      $sql = "SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path FROM {node} n, {image} i WHERE n.nid = i.nid AND i.personal = 1 AND n.uid = ";
+      $sql  = "SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path FROM {node} n, {image} i WHERE n.nid = i.nid AND i.personal = 1 AND n.moderate = 0 AND n.uid = ";
       $sql .= $node->uid;
       $sql .= " ORDER BY "._image_get_thumb_order();
 
@@ -237,12 +239,11 @@ function image_link($type, $node, $main = 0) {
 
         $links[] = l(t("%t photo gallery", array("%t" => $term->name)), "image/tid/" . $term->tid, array("title" => t("View %t photo gallery.", array("%t" => $terms->name))));
 
-        $sql = "
-          SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path
-          FROM {node} n, {term_node} t, {image} i
-          WHERE n.nid = t.nid AND n.nid = i.nid AND i.personal = 0 AND t.tid = '";
-        $sql .= $term->tid;
-        $sql .= "' ORDER BY "._image_get_thumb_order();
+        $sql = "SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path FROM {node} n, {term_node} t, {image} i WHERE n.nid = t.nid AND n.nid = i.nid AND i.personal = 0 AND n.moderate = 0";
+        if (isset($term->tid)) {
+          $sql .= " AND t.tid = " . $term->tid;
+        }
+        $sql .= " ORDER BY "._image_get_thumb_order();
       }
     }
 
@@ -481,8 +482,7 @@ function image_validate(&$node) {
 
               // Generate image_id if necessary
               if (!$node->image_id) {
-                srand ((double) microtime() * 1000000);
-                $node->image_id = md5(rand());
+                $node->image_id = _image_id($upload_name);
               }
               // If we already have an image_id and an uploaded file delete it.
               else if (file_exists(_image_tempname($node))) {
@@ -525,9 +525,10 @@ function image_validate(&$node) {
 
   } // Image to process check
 
-  else if (!$node->image_id && !$node->existing) {
+  else if (!empty($_POST['op']) && arg(3) != "file"){
     $error["image"] = theme("theme_error", t("You must select an image for upload."));
   }
+
 
   // If we have uploaded a new image so set the correct thumb and image paths
   if ($node->image_id) {
@@ -587,8 +588,7 @@ function image_validate(&$node) {
     if ($trasform_string && (variable_get("image_lib", "imagemagick") == "imagemagick")) {
       // Generate image_id if necessary
       if (!$node->image_id) {
-        srand ((double) microtime() * 1000000);
-        $node->image_id = md5(rand());
+        $node->image_id = _image_id($upload_name);
 
         // If this is an existing node then copy the orignal file
         if ($node->existing) {
@@ -1153,16 +1153,7 @@ function image_page() {
   if (user_access("access images") && variable_get("image_nav_vocabulary", "")) {
     if ($uid) {
     // view user personal gallery
-      $sql = "
-        SELECT n.nid, n.title, n.body, i.thumb_path
-        FROM {node} n, {image} i, {users} u
-        WHERE n.nid = i.nid
-        AND i.personal = 1
-        AND n.uid = u.uid
-        AND u.uid = '%s'
-        ORDER BY
-      ";
-
+      $sql  = "SELECT n.nid, n.title, n.body, i.thumb_path FROM {node} n, {image} i, {users} u WHERE n.nid = i.nid AND i.personal = 1 AND n.uid = u.uid AND u.uid = '%s' AND n.moderate = 0 ORDER BY ";
       $sql .= _image_get_thumb_order();
 
       $result = db_query($sql, $uid);
@@ -1193,19 +1184,12 @@ function image_page() {
       $subalbums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
       $subalbums = _image_album_properties($subalbums);
 
-      $sql = "
-        SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path
-        FROM {node} n, {term_node} t, {image} i
-        WHERE n.nid = t.nid
-        AND n.nid = i.nid
-        AND t.tid = '%s'
-        AND i.personal = 0
-      ";
+      $sql = "SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path FROM {node} n, {term_node} t, {image} i WHERE n.nid = t.nid AND n.nid = i.nid AND t.tid = '%s' AND i.personal = 0 AND n.moderate = 0";
 
       $result = db_query($sql, $tid);
       $data["total_images"] = db_num_rows($result);
 
-      $sql .= "ORDER BY "._image_get_thumb_order();
+      $sql .= " ORDER BY "._image_get_thumb_order();
 
       $thumb_num = variable_get("image_gallery_thumb_rows", "5") * variable_get("image_gallery_thumb_cols", "3");
       if (!$page) {$page = 1;}
@@ -1286,19 +1270,17 @@ function _image_album_properties($albums) {
     foreach ($children as $term) {
       $terms[] = $term->tid;
     }
-    $result = db_query("SELECT COUNT(*) AS c FROM {term_node} t, {node} n, {image} i WHERE t.nid = n.nid AND i.nid = n.nid AND t.tid IN (". implode(",", $terms) .") AND i.personal = 0");
+    $result = db_query("SELECT COUNT(*) AS c FROM {term_node} t, {node} n, {image} i WHERE t.nid = n.nid AND i.nid = n.nid AND t.tid IN (". implode(",", $terms) .") AND i.personal = 0 AND n.moderate = 0");
     while ($term = db_fetch_object($result)) {
       $albums[$term_id]->image_count = $term->c;
     }
 
-    $last_update = db_fetch_object(db_query_range("SELECT n.created, i.thumb_path FROM {node} n INNER JOIN {image} i ON n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (". implode(",", $terms) .") AND n.type = 'image' AND i.personal = 0 ORDER BY n.created DESC", 0, 1));
+    $last_update = db_fetch_object(db_query_range("SELECT n.created, i.thumb_path FROM {node} n INNER JOIN {image} i ON n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (". implode(",", $terms) .") AND n.type = 'image' AND i.personal = 0 AND n.moderate = 0 ORDER BY n.created DESC", 0, 1));
     $albums[$term_id]->last_updated = $last_update->created;
     $albums[$term_id]->thumb = $last_update->thumb_path;
 
     if (variable_get("image_gallery_thumb", "last") == "random") {
-      $nodes = db_fetch_object(db_query("SELECT MIN(nid) as min, MAX(nid) as max FROM {node} WHERE type = 'image'"));
-      $id = rand($nodes->min, $nodes->max);
-      $random = db_fetch_object(db_query_range("SELECT i.thumb_path FROM {node} n INNER JOIN {image} i ON n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (". implode(",", $terms) .") AND n.type = 'image' AND i.personal = 0 AND n.nid >= ". $id, 0, 1));
+      $random = db_fetch_object(db_query_range("SELECT i.thumb_path FROM {node} n INNER JOIN {image} i ON  n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid WHERE t.tid IN (".implode(",", $terms).") AND n.type = 'image' AND i.personal = 0 AND n.moderate = 0 ORDER BY RAND()", 0, 1));
       $albums[$term_id]->thumb = $random->thumb_path;
     }
   }
@@ -1518,7 +1500,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
           if ((in_array($size[2], array(1,2,3))) && (_image_check_ext($file))) {
 
             // move to a temporary location. _insert() will later move to final destination
-            $node->image_id = md5(rand());
+            $node->image_id = _image_id($file);
             $node->extension = _get_ext($file);
             $edit["del_images"] ? $action = "rename" : $action = "copy";
             if (!$action("$dir/$file", _image_tempname($node))) {
@@ -1651,7 +1633,7 @@ function _image_check_configuration() {
   }
   $rows[] = $row;
   unset($row);
-  
+
   // for GD Library
   $row[] = "GD Library";
   if (function_exists('imageCreateTrueColor')) {
@@ -1698,9 +1680,10 @@ function _image_check_configuration() {
   return $output;
 }
 
-
-// Alternative function to GD 1.x imageCopyResized which produce better results
-// (found on www.php.net)
+/**
+ * Alternative function to GD 1.x imageCopyResized which produce better results.
+ * (found on www.php.net)
+ */
 function _imageCopyResampled ($dst, &$src, $x, $y) {
   /*
   Function derived from ImageCopyResampleBicubic()
@@ -1749,5 +1732,19 @@ function _image_form_max_picture_per_role() {
     unset($row);
   }
   return form_item('', table($header, $rows), t('Set how many pictures each role listed above is allowed. "Personal Gallery Picture Limit" will be the default value for new roles.'));
+}
+
+/**
+ * Generates an image id.
+ * Id could be either a random string or based on the image filename.
+ */
+function _image_id($filename = '') {
+  if (variable_get('image_default_filename', 'random') == 'random') {
+    srand ((double) microtime() * 1000000);
+    return md5(rand());
+  }
+  else {
+    return basename($filename, strrchr($filename, "."));
+  }
 }
 ?>
