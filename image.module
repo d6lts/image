@@ -332,7 +332,7 @@ function image_view($node, $main = 0) {
   $node->teaser = check_output($node->teaser);
   $node->body = check_output($node->body);
 
-  theme("node_image", $node, $rand, $main);
+  print theme("node_image", $node, $rand, $main);
 }
 
 /**
@@ -1137,18 +1137,18 @@ function image_page() {
 
       $galleryuser = user_load(array( "uid" => $uid));
 
-      theme("header");
-      theme("box", t("%u's Photo Gallery", array("%u" => $galleryuser->name)), theme("image_gallery_album", $null, $null, $images, $null, $galleryuser));
-      theme("footer");
+      print theme("header");
+      print theme("box", t("%u's Photo Gallery", array("%u" => $galleryuser->name)), theme("image_gallery_album", $null, $null, $images, $null, $galleryuser));
+      print theme("footer");
     }
     else if (!$tid) {
       // show albums
       $albums = taxonomy_get_children(0, variable_get("image_nav_vocabulary", ""));
       $albums = _image_album_properties($albums);
 
-      theme("header");
-      theme("box", t("Photo galleries"), theme("image_gallery_home", $albums));
-      theme("footer");
+      print theme("header");
+      print theme("box", t("Photo galleries"), theme("image_gallery_home", $albums));
+      print theme("footer");
     }
     else {
       // browse albums; show subalbums and thumbs
@@ -1181,15 +1181,15 @@ function image_page() {
         $n++;
       }
 
-      theme("header");
-      theme("box", t("Photo galleries"), theme("image_gallery_album", $parents, $subalbums, $images, $data));
-      theme("footer");
+      print theme("header");
+      print theme("box", t("Photo galleries"), theme("image_gallery_album", $parents, $subalbums, $images, $data));
+      print theme("footer");
     }
   }
   else {
-    theme("header");
-    theme("box", t("Access denied"), message_access());
-    theme("footer");
+    print theme("header");
+    print theme("box", t("Access denied"), message_access());
+    print theme("footer");
   }
 }
 
@@ -1284,7 +1284,7 @@ function theme_node_image($node, $rand, $main = 0) {
     }
   }
 
-  theme("node", $node, $main);
+  print theme("node", $node, $main);
 }
 
 function theme_image_gallery_home($albums) {
