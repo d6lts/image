@@ -1,3 +1,23 @@
+29 September 2004
+-----------------
+[Bruno Rocci, text from Bryan Kennedy]
+- Updated installation instructions
+
+19 September 2004
+-----------------
+[Gerhard Killesreiter]
+- Update for cached menu support.
+
+12 September 2004
+-----------------
+[Gordon Heydon]
+- Improved image transformation.
+
+01 September 2004
+-----------------
+[Gordon Heydon]
+- Added support forphp_imagick support.
+
 17 August 2004
 --------------
 [Eric Scouten]
