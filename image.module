@@ -7,6 +7,9 @@ function image_help($section = "admin/help#image") {
   $common = "<p>Admins may create many image nodes at once by uploading all images to a folder on the server. This upload happens outside of Drupal, usually using an FTP client.</p>";
 
   switch ($section) {
+    case 'admin/system/modules#description':
+      $output = 'Allows users to upload images.';
+      break;
     case 'admin/help#image':
       $output  = "<h4>Configuration</h4><h5>Image Library</h5>";
       $output .= "<p><a href=\"http://www.imagemagick.org/\">Imagemagick</a> and <a href=\"http://www.boutell.com/gd/\">GD</a> are supported image libraries. Imagemagick is required for full image manipulation features and is suggested for better thumbnail quality.</p>";
