@@ -150,11 +150,13 @@ TODO (+ = done):
 - change die() in trigger_error()?
 - disable convert: no convert -> file upload to upload thumb
 - do we really enforce kb, size and number of personal images limit? shouldn't these checks be at node save too?
-- support gd
++ support gd/netpbm
 - recheck personal limit
-- probably convert path should not be a variable, but more hardwired (security); besides, convert path is troublesome on win32
+- probably convert path should not be a variable, but more hardwired (security); besides, convert path is troublesome on win32; on the other hand this is less clean
 - index table
-- recheck in photo gallery the number of images reported, it seems wrong if you have images in subgalleries
++ recheck in photo gallery the number of images reported, it seems wrong if you have images in subgalleries
+- can users overwrite each other pics?
++ use theme_invoke
 
 ***
 Moshe:
@@ -241,6 +243,5 @@ warning text in the description for the temp path form field.
 - My new images are appearing in the queue AND in the gallery
 - when viewing an image, i see redundant link for 'edit this image' and
 'administer'. no big deal though
-
 
 

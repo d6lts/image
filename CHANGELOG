@@ -1,11 +1,23 @@
 11 June 2002
+------------------
+- partial support for GD: only thumbnails
+- applied patch to cron (infinite loop) by Stefano
+- applied patch to filter (more options) by Stefano, but params are now optional
+- applied patch to _gallery_inline_img (simpler html) by Stefano
+- used theme_invoke everywhere, and cleaned up some references
+- fixed two bugs in _image_album_properties (found by Simon): that function was completely wrong.
+
+
+11 June 2002
 -------------
 - added _system() hook
+
 
 3 June 2002
 ------------------
 - correct syntax (without &) in getimagesize 
 - misc cleanup and fixes
+
 
 26 May 2002 - "almost there"
 ------------------

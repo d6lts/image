@@ -6,6 +6,7 @@ function image_system($field) {
   return $system[$field];
 }
 
+
 function image_node($field) {
   $info["name"] = t("image");
   $info["description"] = t("An image you can insert into nodes, or see in photo galleries.");
@@ -39,6 +40,9 @@ function image_conf_options() {
   $output .= "<a name=\"image_temp_path\"></a>";
   $output .= form_textfield("Temporary image path", "image_temp_path", variable_get("image_temp_path", "./"), 30, 255, "Path for working directory; it must be writeable and visible from the web.");
   
+  if (function_exists("imageCreateTrueColor")) {
+    $output .= form_select("Image library", "image_lib", variable_get("image_lib", "imagemagick"), array("imagemagick" => "imagemagick", "gd" => "gd"), "Use Imagemagick if you can; GD produces worse thumbnails, does not support GIF and this module doesn't support image editing (rotate, crop etc) through it.");
+  }
   $output .= "<a name=\"image_convert\"></a>";
   $output .= form_textfield("Convert path", "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, "Path of ImageMagick convert.");
   $output .= "<a name=\"image_jhead\"></a>";
@@ -68,17 +72,17 @@ function image_cron() {
   // Clean up temp dir
   
   chdir(variable_get("image_temp_path", "./"));
-  $handle = opendir(".");
-  while (($file = readdir($handle))!==false) {
-    if ($file != "." && $file != ".." && strpos($file, "tmpimg") !== false) {
-      // delete older than 6 hours
-      echo $file;
-      if (time() - filemtime($file) > 60*60*6) {
-        unlink($file);
+  if ($handle = opendir(".")) {
+    while (($file = readdir($handle)) != false) {
+      if ($file != "." && $file != ".." && strpos($file, "tmpimg") !== false) {
+        // delete older than 6 hours
+        if (time() - filemtime($file) > 60*60*6) {
+          unlink($file);
+        }
       }
     }
+    closedir($handle);
   }
-  closedir($handle); 
 }
 
 
@@ -441,7 +445,7 @@ function image_delete(&$node) {
 
 
 function image_conf_filters() {
-  $output = form_select("Image filter", "image_filter_enabled", variable_get("image_filter_enabled", 0), array("Disabled", "Enabled"), "When enabled, image codes will be replaced by thumb linked to real node. Syntax: [image:node_id,(left|center|right)]");
+  $output = form_select("Image filter", "image_filter_enabled", variable_get("image_filter_enabled", 0), array("Disabled", "Enabled"), "When enabled, image codes will be replaced by thumb linked to real node. Syntax: [image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]; every param but node_id is optional.");
   return $output;
 }
 
@@ -450,17 +454,20 @@ function image_filter($text) {
   if (variable_get("image_filter_enabled", 0)) {
     // *** [image:NID,(left|center|right)] ***
     // first we find every tag
-    if (preg_match_all("/\[image:(\d+),(left|center|right)\]/i", $text, $match)) {
+    if (preg_match_all("/\[image:(\d+)(,(left|right|top|middle|bottom|absmiddle|texttop|baseline))?(,(\d+))?(,(\d+))?(,(\d+))?\]/i", $text, $match)) {
       // then we make the html
       $result = db_query("SELECT n.nid, teaser, thumb_path FROM image i, node n WHERE i.nid = n.nid AND n.nid IN ('".implode("','", array_map("check_query", $match[1]))."')");
       $n = 0;
       while ($img = db_fetch_object($result)) {
-        $img->align = $match[2][$n];
-        $match[3][] = method_exists($theme, "gallery_inline_img") ? $theme->gallery_inline_img($img) : _gallery_inline_img($img);
+        $img->align = $match[3][$n];
+        $img->hspace = $match[5][$n];
+        $img->vspace = $match[7][$n];
+        $img->border = $match[9][$n];
+        $match[10][] = theme_invoke("image_inline_img", $img);
         $n++;
       }
 
-      $text = str_replace($match[0], $match[3], $text);
+      $text = str_replace($match[0], $match[10], $text);
     }
   }
   return $text;
@@ -530,7 +537,7 @@ function _image_process($node) {
         if ($quality) {
           $trasform_string .= " -quality ".$quality;
         }
-        if ($trasform_string) {
+        if ($trasform_string && (variable_get("image_lib", "imagemagick") == "imagemagick")) {
           echo _image_convert(_image_tempname($node), _image_tempname($node), $trasform_string);    
         }
       }
@@ -712,7 +719,33 @@ function image_update($node) {
 
 
 function _image_make_thumbnail($node) {
-  echo _image_convert(_image_filename($node), _image_thumbname($node), "-resize ".variable_get("image_default_thumb_size", "100")." -filter QUADRATIC");     
+  $lib = variable_get("image_lib", "imagemagick");
+  if ($lib == "imagemagick") {
+    echo _image_convert(_image_filename($node), _image_thumbname($node), "-resize ".variable_get("image_default_thumb_size", "100")." -filter QUADRATIC");
+  } else if ($lib == "gd") {    
+    $size = GetImageSize(_image_filename($node));
+    if ($size[2] == "2") {
+      $type = "jpeg";
+    } else if($size[2] == "3") {
+      $type = "png";
+    }
+    $function = "imageCreateFrom".$type;
+    $im = $function(_image_filename($node));
+    
+    list($thx, $thy) = split("x", variable_get("image_default_thumb_size", "100"));
+    // X:x = Y:y
+    if (!$thy) {
+      $thy = round($size[1]*$thx/$size[0]);
+    } else if (!$thx){
+      $thx = round($size[0]*$thy/$size[1]);
+    }
+    $th = imageCreateTrueColor($thx, $thy);
+
+    imageCopyResampled($th, $im, 0, 0, 0, 0, $thx, $thy, $size[0], $size[1]);
+    
+    $function = "image".$type;
+    $function($th, _image_thumbname($node));
+  }
 }
 
 
@@ -800,6 +833,9 @@ function _image_personal_limit($image_file) {
 }
 
 function _images_transform_form($size, $bytes) {
+  if (variable_get("image_lib", "imagemagick") != "imagemagick") {
+    return "";
+  }
   return '
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <tr valign="top">
@@ -908,23 +944,26 @@ function image_page() {
       
       $null = array();
       $theme->header();
-      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_album") ? $theme->gallery_album($parents, $subalbums, $images) : _image_gallery_album($null, $null, $images, array()));
+      //$theme->box(t("Photo galleries"), method_exists($theme, "gallery_album") ? $theme->gallery_album($parents, $subalbums, $images) : _image_gallery_album($null, $null, $images, array()));
+      $theme->box(t("Photo galleries"), theme_invoke("image_gallery_album", $null, $null, $images, array()));
+      
       $theme->footer();    
     }
     else if (!$tid) {
       // show albums
       $albums = taxonomy_get_children(0, variable_get("image_nav_vocabulary", ""));
       
-      _image_album_properties($albums); 
+      $albums = _image_album_properties($albums); 
             
       $theme->header();
-      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_home") ? $theme->gallery_home($albums) : _image_gallery_home($albums));
+      //$theme->box(t("Photo galleries"), method_exists($theme, "gallery_home") ? $theme->gallery_home($albums) : _image_gallery_home($albums));
+      $theme->box(t("Photo galleries"), theme_invoke("image_gallery_home", $albums));
       $theme->footer();
     }
     else {
       // browse albums; show subalbums and thumbs
       $subalbums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
-      _image_album_properties($albums);
+      $subalbums = _image_album_properties($subalbums);
       
       $sql = "
         SELECT n.nid, title, teaser, body, thumb_path
@@ -962,7 +1001,8 @@ function image_page() {
       }
       
       $theme->header();
-      $theme->box(t("Photo galleries"), method_exists($theme, "gallery_album") ? $theme->gallery_album($parents, $subalbums, $images) : _image_gallery_album($parents, $subalbums, $images, $data));
+      //$theme->box(t("Photo galleries"), method_exists($theme, "gallery_album") ? $theme->gallery_album($parents, $subalbums, $images) : _image_gallery_album($parents, $subalbums, $images, $data));
+      $theme->box(t("Photo galleries"), theme_invoke("image_gallery_album", $parents, $subalbums, $images, $data));
       $theme->footer();
     }
   }
@@ -1010,87 +1050,106 @@ function _image_get_subalbums($tid, $recurse = 0) {
   return $subalbums;
 }
 
-function _image_album_properties(&$albums) {
+function _image_album_properties($albums) {
   // to every album add: how many images, last update, path of a thumbnail (, number of views, date of first image, something about comments)
-  // let's add how many images there are in it and its parents
-  $result = db_query("
-        SELECT t.tid, COUNT(*) AS c
-        FROM term_node t, node n, image i, term_data d
-        WHERE t.nid = n.nid
-        AND i.nid = n.nid
-        AND d.tid = t.tid
-        AND type = 'image'
-        AND vid = '".variable_get("image_nav_vocabulary", "")."'
-        AND personal = 0
-        GROUP BY tid
-    ");
-  while ($term = db_fetch_object($result)) {
-    $albums[$term->tid]->image_count = $term->c;
-  }
-  
+  taxonomy_get_tree(variable_get("image_nav_vocabulary", ""), &$tree); #, $parent = 0, $depth = -1
   foreach (array_keys($albums) as $term_id) {
-    $subalbums = _image_get_subalbums($term_id);
-    $albums[$term_id]->subalbums = $subalbums;
-
-    $thumb_choice = (variable_get("image_gallery_thumb", "last") == "random" ? "RAND()" : "created DESC");
-
+    $children = array(); $terms = array();
+    taxonomy_get_tree(variable_get("image_nav_vocabulary", ""), &$children, $term_id, 1);
+    $terms[] = $term_id;
+    foreach ($children as $term) {
+      $terms[] = $term->tid;
+    }
+    $result = db_query("
+          SELECT COUNT(*) AS c
+          FROM term_node t, node n, image i
+          WHERE t.nid = n.nid
+          AND i.nid = n.nid
+          AND tid IN (".implode(",", $terms).")
+          AND i.personal = 0
+      ");
+    while ($term = db_fetch_object($result)) {
+      $albums[$term_id]->image_count = $term->c;
+    }
+    
     $last_update = db_fetch_object(db_query("
         SELECT created, thumb_path
         FROM node n, image i
         LEFT JOIN term_node t ON n.nid = t.nid
         WHERE n.nid = i.nid
-        AND t.tid IN (".implode(",", array_merge($term_id, array_keys($subalbums))).")
+        AND t.tid IN (".implode(",", $terms).")
         AND type = 'image'
         AND personal = 0
-        ORDER BY $thumb_choice
+        ORDER BY created DESC
         LIMIT 1
-      "));
+      "));    
     $albums[$term_id]->last_updated = $last_update->created;
     $albums[$term_id]->thumb = $last_update->thumb_path;
+    
+    if (variable_get("image_gallery_thumb", "last") == "random") {    
+      $random = db_fetch_object(db_query("
+          SELECT thumb_path
+          FROM node n, image i
+          LEFT JOIN term_node t ON n.nid = t.nid
+          WHERE n.nid = i.nid
+          AND t.tid IN (".implode(",", $terms).")
+          AND type = 'image'
+          AND personal = 0
+          ORDER BY RAND()
+          LIMIT 1
+        "));   
+      $albums[$term_id]->thumb = $random->thumb_path;
+    }
   }
+  
+  return $albums;
 }
 
-function _image_gallery_home(&$albums) {
-  // passed as references merely for performance
-  $output .= "<table>";
-  
-  foreach ($albums as $tid => $album) {
-    $output .= "<tr><td align=\"center\">";
-    if ($album->thumb) {
-      $output .= lm("<img src=\"".$album->thumb."\" border=\"0\">", array("mod" => "image", "tid" => $album->tid));
+function image_gallery_home($albums) {
+  if ($albums) {
+    $output .= "<table>";
+
+    foreach ($albums as $tid => $album) {
+      $output .= "<tr><td align=\"center\">";
+      if ($album->thumb) {
+        $output .= lm("<img src=\"".$album->thumb."\" border=\"0\">", array("mod" => "image", "tid" => $album->tid));
+      }
+      $output .= "</td><td>";
+      $output .= lm($album->name, array("mod" => "image", "tid" => $album->tid))."<br>";
+      if ($album->description) {
+        $output .= check_output($album->description)."<br>";
+      }
+      if ($album->image_count) {
+        $output .= ($album->image_count) == 1 ? t("There is 1 image in this album.") : t("There are %a images in this album.", array("%a" => $album->image_count));
+      } else {
+        $output .= t("There are no images in this album.");
+      }
+      if ($album->last_updated) {
+        $output .= "<br>".t("Last updated: ").format_date($album->last_updated);
+      }
+      $output .= "</td></tr>";
     }
-    $output .= "</td><td>";
-    $output .= lm($album->name, array("mod" => "image", "tid" => $album->tid))."<br>";
-    $output .= check_output($album->description)."<br>";
-    if ($album->image_count) {
-      $output .= ($album->image_count) == 1 ? t("There is 1 image in this album.") : t("There are %a images in this album.", array("%a" => $album->image_count));
-    } else {
-      $output .= t("There are no images in this album.");
-    }
-    if ($album->last_updated) {
-      $output .= "<br>".t("Last updated: ").format_date($album->last_updated);
-    }
-    $output .= "</td></tr>";
+
+    $output .= "</table>";
   }
-  
-  $output .= "</table>";
   return $output;
 }
 
-function _image_gallery_album(&$parents, &$subalbums, &$images, $data) {
+function image_gallery_album($parents, $subalbums, $images, $data) {
+  $t[] = lm(t("galleries"), array("mod" => "image"));
   foreach (array_reverse(array_values($parents)) as $p) {
     $t[] = lm($p->name, array("mod" => "image", "tid" => $p->tid));;
   }
   if ($t) {
-    $output .= implode(":", $t);
+    $output .= "&nbsp;".implode(":", $t);
     $output .= "<hr>";
   }
 
-  $output .= method_exists($theme, "gallery_home") ? $theme->gallery_home($subalbums) : _image_gallery_home($subalbums);
-
-  if ($output) {
-    $output .= "<hr>";
+  $sub = theme_invoke("image_gallery_home", $subalbums);
+  if ($sub) {
+    $output .= $sub."<hr>";
   }
+
   $n = 0;
   $thumbs_cols = variable_get("image_gallery_thumb_cols", "5");
   if ($images) {
@@ -1110,31 +1169,19 @@ function _image_gallery_album(&$parents, &$subalbums, &$images, $data) {
     $output .= "</table>";
   }
   
-  $output .= _gallery_thumb_browser($data);
+  $output .= theme_invoke("image_thumb_browser", $data);
   
   return $output;
 }
 
-function _gallery_inline_img($img) {
-return '
-  <table border="0" cellspacing="0" cellpadding="5" align="'.$img->align.'">
-    <tr>
-      <td>
-        <div align="center">'.l("<img src=\"".$img->thumb_path."\" border=\"0\">", array("id" => $img->nid)).'</div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <div align="center"><i>'.check_output($img->teaser).'</i></div>
-      </td>
-    </tr>
-  </table>
-  ';
+function image_inline_img($img) {
+  return l("<img src=\"$img->thumb_path\" align=\"$img->align\" border=\"$img->border\" hspace=\"$img->hspace\" vspace=\"$img->vspace\" alt=\"$img->teaser\" />", array("id" => $img->nid));
 }
 
-function _gallery_thumb_browser($data) {
+function image_thumb_browser($data) {
   if ($data) {
     $output = '
+    <hr>
     <table width="100%" border="0" cellspacing="0" cellpadding="0">
       <tr> 
         <td colspan="5"><div align="center">'.t("%a images in this album on %b pages.", array("%a" => $data["total_images"], "%b" => $data["total_pages"])).' </div></td>
