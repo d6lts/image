@@ -319,8 +319,8 @@ function image_menu() {
  */
 function image_user($type, $ahem, &$user) {
 
-  if (user_access("access images") && _image_can_personal() && ($type == "view_public")) {
-    return form_item(t("Image gallery"), l(t("view user's image gallery"), "image/uid/$user->uid"));
+  if (user_access("access images") && _image_can_personal() && ($type == "view")) {
+    return array('Personal gallery' => form_item(t("Image gallery"), l(t("view user's image gallery"), "image/uid/$user->uid")));
   }
 }
 
