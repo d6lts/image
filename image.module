@@ -163,11 +163,11 @@ function image_link($type, $node) {
     }
 
     if ($prev) {
-      $links[] = l(t("previous image"), "node/$prev->nid", array("title" => $prev->title));
+      $links[] = l(t("previous image"), "node/view/$prev->nid", array("title" => $prev->title));
     }
 
     if ($next) {
-      $links[] = l(t("next image"), "node/$next->nid", array("title" => $next->title));
+      $links[] = l(t("next image"), "node/view/$next->nid", array("title" => $next->title));
     }
 
     if ($node->personal) {
@@ -912,6 +912,13 @@ function _images_transform_form($size, $bytes) {
 function image_page() {
   global $vid, $tid, $uid, $sortby, $image_per_page, $nf, $page;
 
+  if (arg(1) == "tid") {
+    $tid = arg(2);
+  }
+  if (arg(3) == "page") {
+    $page = arg(4);
+  }
+
   if (user_access("access images") && variable_get("image_nav_vocabulary", "")) {
     if ($uid) {
     // view user personal gallery
@@ -1125,40 +1132,41 @@ function image_render_node($node, $image_path, $main = 0) {
   */
 
   if(variable_get("image_random_suffix", "0")){
-    $node->body = "<p align='center'><img src=\"$image_path?".$rand."\"></p><p align='center'>". check_output($node->body) ."</p>";
+    $node->body = "\n<div id=\"image\">\n  <p align='center'><img src=\"$image_path?".$rand."\"></p>\n  <p align='center'>". check_output($node->body) ."</p>\n</div> <!-- end of IMAGE div -->";
   }
   else {
-    $node->body = "<p align='center'><img src=\"$image_path\"></p><p align='center'>". check_output($node->body) ."</p>";
+    $node->body = "\n<div id=\"image\">\n  <p align='center'><img src=\"$image_path\"></p>\n  <p align='center'>". check_output($node->body) ."</p>\n</div> <!-- end of IMAGE div -->";
   }
   theme("node", $node);
 }
 
 function image_gallery_home($albums) {
   if ($albums) {
-    $output .= "<table>";
+    $output .= "\n<div id=\"image\">\n<table>\n";
 
     foreach ($albums as $tid => $album) {
-      $output .= "<tr><td align=\"center\">";
+      $output .= "<tr>\n  <td align=\"center\">";
       if ($album->thumb) {
         $output .= l("<img src=\"".$album->thumb."\" border=\"0\">", "image/tid/$album->tid");
       }
-      $output .= "</td><td>";
-      $output .= l($album->name, "image/tid/$album->tid")."<br>";
+      $output .= "</td>\n  <td>";
+      $output .= "<p class=\"album-name\">".l($album->name, "image/tid/$album->tid")."</p>";
       if ($album->description) {
-        $output .= check_output($album->description)."<br>";
+        $output .= "<p class=\"album-description\">".check_output($album->description)."</p>";
       }
       if ($album->image_count) {
-        $output .= ($album->image_count) == 1 ? t("There is 1 image in this album.") : t("There are %a images in this album.", array("%a" => $album->image_count));
+        $output .= "<p class=\"album-count\">";
+        $output .= ($album->image_count) == 1 ? t("There is 1 image in this album.") : t("There are %a images in this album.", array("%a" => $album->image_count))."</p>";
       } else {
-        $output .= t("There are no images in this album.");
+        $output .= "<p class=\"album-count\">".t("There are no images in this album.")."</p>";
       }
       if ($album->last_updated) {
-        $output .= "<br>".t("Last updated: ").format_date($album->last_updated);
+        $output .= "<p class=\"album-updated\">".t("Last updated: ").format_date($album->last_updated)."</p>";
       }
-      $output .= "</td></tr>";
+      $output .= "</td></tr>\n";
     }
 
-    $output .= "</table>";
+    $output .= "</table>\n</div> <!-- end of IMAGE div -->\n";
   }
   return $output;
 }
@@ -1181,12 +1189,12 @@ function image_gallery_album($parents, $subalbums, $images, $data) {
   $n = 0;
   $thumbs_cols = variable_get("image_gallery_thumb_cols", "5");
   if ($images) {
-    $output .= "<table width=\"100%\" cellpadding=\"10\">";
+    $output .= "\n<div id=\"image\">\n<table width=\"100%\" cellpadding=\"10\">";
     foreach ($images as $image) {
       if ($n % $thumbs_cols == 0) {
         $output .= "<tr>";
       }
-      $output .= "<td valign=\"bottom\"><div align=\"center\">".l("<img src=\"".$image->thumb_path."\" border=\"0\">", "node/$image->nid")."<br><b>".$image->title."</b><br>".$image->teaser."</div></td>";
+      $output .= "<td valign=\"top\"><div align=\"center\">".l("<img src=\"".$image->thumb_path."\" border=\"0\">", "node/view/$image->nid")."</div><p class=\"title\">".$image->title."</p><p class=\"teaser\">".$image->teaser."</p></td>\n";
 
       if ($n % $thumbs_cols == $thumbs_cols - 1) {
         $output .= "</tr>";
@@ -1194,7 +1202,7 @@ function image_gallery_album($parents, $subalbums, $images, $data) {
 
       $n++;
     }
-    $output .= "</table>";
+    $output .= "</table>\n</div> <!-- end of IMAGE div -->";
   }
 
   $output .= theme("image_thumb_browser", $data);
@@ -1203,7 +1211,7 @@ function image_gallery_album($parents, $subalbums, $images, $data) {
 }
 
 function image_inline_img($img) {
-  return l("<img src=\"$img->thumb_path\" align=\"$img->align\" border=\"$img->border\" hspace=\"$img->hspace\" vspace=\"$img->vspace\" alt=\"$img->teaser\" />", "node/$img->nid");
+  return l("<img src=\"$img->thumb_path\" align=\"$img->align\" border=\"$img->border\" hspace=\"$img->hspace\" vspace=\"$img->vspace\" alt=\"$img->teaser\" />", "node/view/$img->nid");
 }
 
 function image_thumb_browser($data) {
@@ -1331,7 +1339,7 @@ function _image_dir_upload($edit, $type = "slow") {
             }
             $alreadyprinted = true;
           }
-          $output .= "--  image: ". l($node["title"], "node/$nid"). "<br />";
+          $output .= "--  image: ". l($node["title"], "node/view/$nid"). "<br />";
         }
 
       }
