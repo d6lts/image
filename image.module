@@ -1132,18 +1132,15 @@ function image_page() {
   if (arg(1) == "uid") {
     $uid = arg(2);
   }
-  if (arg(3) == "page") {
-    $page = arg(4);
-  }
 
   if (user_access("access images") && variable_get("image_nav_vocabulary", "")) {
     // view user personal gallery if personal gallery is enabled
     if ($uid && _image_can_personal()) {
-      $sql  = "SELECT n.nid, n.title, n.body, i.thumb_path FROM {node} n, {image} i, {users} u WHERE n.nid = i.nid AND i.personal = 1 AND n.uid = u.uid AND u.uid = '%s' AND n.moderate = 0 ORDER BY ";
-      $sql .= _image_get_thumb_order();
+      $thumb_num = variable_get("image_gallery_thumb_rows", "5") * variable_get("image_gallery_thumb_cols", "3");
 
-      $result = db_query($sql, $uid);
+      $sql  = "SELECT n.nid, n.title, n.body, i.thumb_path FROM {node} n, {image} i, {users} u WHERE n.nid = i.nid AND i.personal = 1 AND n.uid = u.uid AND u.uid = '". $uid . "' AND n.moderate = 0 ORDER BY ". _image_get_thumb_order();
 
+      $result = pager_query($sql, $thumb_num, 0);
       while ($image = db_fetch_object($result)) {
         $images[] = $image;
       }
@@ -1166,22 +1163,11 @@ function image_page() {
       // browse albums; show subalbums and thumbs
       $subalbums = taxonomy_get_children($tid, variable_get("image_nav_vocabulary", ""));
       $subalbums = _image_album_properties($subalbums);
-
-      $sql = "SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path FROM {node} n, {term_node} t, {image} i WHERE n.nid = t.nid AND n.nid = i.nid AND t.tid = '%s' AND i.personal = 0 AND n.moderate = 0";
-
-      $result = db_query($sql, $tid);
-      $data["total_images"] = db_num_rows($result);
-
-      $sql .= " ORDER BY "._image_get_thumb_order();
-
       $thumb_num = variable_get("image_gallery_thumb_rows", "5") * variable_get("image_gallery_thumb_cols", "3");
-      if (!$page) {$page = 1;}
-      $offset = ($page - 1) * $thumb_num;
-      $data["total_pages"] = ceil($data["total_images"] / $thumb_num);
-      $data["page"] = $page;
-      $data["tid"] = $tid;
 
-      $result = db_query_range($sql, $tid, $offset, $thumb_num);
+      $sql = "SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path FROM {node} n, {term_node} t, {image} i WHERE n.nid = t.nid AND n.nid = i.nid AND t.tid = '". $tid ."' AND i.personal = 0 AND n.moderate = 0 ORDER BY ". _image_get_thumb_order();
+
+      $result = pager_query($sql, $thumb_num, 0);
       while ($image = db_fetch_object($result)) {
         $images[] = $image;
       }
@@ -1193,7 +1179,7 @@ function image_page() {
         $n++;
       }
 
-      print theme("page", theme("image_gallery_album", $parents, $subalbums, $images, $data), t("Photo galleries"));
+      print theme("page", theme("image_gallery_album", $parents, $subalbums, $images), t("Photo galleries"));
     }
   }
   else {
@@ -1304,33 +1290,33 @@ function theme_image_gallery_home($albums, $gallery_description = '') {
 
   if ($albums) {
     if ($gallery_description) {
-      $output .="<div id=\"image-gallery-description\">". $gallery_description ."</div>";
+      $output .="<div id=\"image-gallery-description\">". check_output($gallery_description) ."</div>";
     }
     $output .= "\n<div id=\"image\">\n<table>\n";
 
     foreach ($albums as $tid => $album) {
-      $output .= "<tr>\n  <td align=\"center\">";
+      $output .= "<tr>\n<td align=\"center\">";
       if ($album->thumb) {
-        $output .= l("<img src=\"$base_url/".$album->thumb."\" border=\"0\">", "image/tid/$album->tid");
+        $output .= l("<img src=\"$base_url/". $album->thumb ."\" border=\"0\">", "image/tid/$album->tid");
       }
-      $output .= "</td>\n  <td>";
-      $output .= "<p class=\"album-name\">".l($album->name, "image/tid/$album->tid")."</p>";
+      $output .= "</td>\n<td>";
+      $output .= "<p class=\"album-name\">". l($album->name, "image/tid/$album->tid") ."</p>";
       if ($album->description) {
-        $output .= "<p class=\"album-description\">".check_output($album->description)."</p>";
+        $output .= "<p class=\"album-description\">". check_output($album->description) ."</p>";
       }
       if ($album->image_count) {
         $output .= "<p class=\"album-count\">";
         $output .= ($album->image_count) == 1 ? t("There is 1 image in this album.") : t("There are %a images in this album.", array("%a" => $album->image_count))."</p>";
       } else {
-        $output .= "<p class=\"album-count\">".t("There are no images in this album.")."</p>";
+        $output .= "<p class=\"album-count\">". t("There are no images in this album.") ."</p>";
       }
       if ($album->last_updated) {
-        $output .= "<p class=\"album-updated\">".t("Last updated: ").format_date($album->last_updated)."</p>";
+        $output .= "<p class=\"album-updated\">". t("Last updated: ").format_date($album->last_updated) ."</p>";
       }
       $output .= "</td></tr>\n";
     }
 
-    $output .= "</table>\n</div> <!-- end of IMAGE div -->\n";
+    $output .= "</table>\n</div>\n";
   }
   return $output;
 }
@@ -1338,7 +1324,7 @@ function theme_image_gallery_home($albums, $gallery_description = '') {
 /**
  * Theme function to render image gallery album.
  */
-function theme_image_gallery_album($parents, $subalbums, $images, $data, $galleryuser = null) {
+function theme_image_gallery_album($parents, $subalbums, $images, $galleryuser = null) {
   global $base_url;
 
   $output = '';
@@ -1360,7 +1346,8 @@ function theme_image_gallery_album($parents, $subalbums, $images, $data, $galler
   }
 
   $n = 0;
-  $thumbs_cols = variable_get("image_gallery_thumb_cols", "5");
+  $thumbs_cols = variable_get("image_gallery_thumb_cols", "3");
+  $thumbs_rows = variable_get("image_gallery_thumb_rows", "5");
   if ($images) {
     $output .= "\n<div id=\"image\">\n<table width=\"100%\" cellpadding=\"10\">";
     foreach ($images as $image) {
@@ -1375,62 +1362,35 @@ function theme_image_gallery_album($parents, $subalbums, $images, $data, $galler
 
       $n++;
     }
-    if ($n % $thumbs_cols != 0) $output .= "</tr>";
-    $output .= "</table>\n</div> <!-- end of IMAGE div -->";
+    if ($n % $thumbs_cols != 0) {
+      $output .= "</tr>";
+    }
+    $output .= "</table>\n</div>\n";
   }
 
-  $output .= theme("image_thumb_browser", $data);
+  // Use standard pager. To customize, define a theme_pager() function in your theme. See pager.inc.
+  if ($pager = theme("pager", NULL, $thumbs_rows * $thumbs_cols, 0)) {
+    $output .= $pager;
+  }
 
   return $output;
 }
 
+/**
+ * Theme function to render image in a node.
+ * Displays a thumbnail with a link to the image.
+ */
 function theme_image_inline_img($img) {
   global $base_url;
   return l("<img src=\"$base_url/$img->thumb_path\" align=\"$img->align\" border=\"$img->border\" hspace=\"$img->hspace\" vspace=\"$img->vspace\" alt=\"$img->teaser\" />", "node/view/$img->nid");
 }
 
-function theme_image_thumb_browser($data) {
-  if ($data) {
-    $output = '
-    <hr>
-    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-      <tr>
-        <td colspan="5"><div align="center">'.
-        format_plural($data["total_images"], "1 image", "%count images") .' '.
-        t("in this album on") .' '.
-        format_plural($data["total_pages"], "1 page", "%count pages") .'</div></td>
-      </tr>
-      <tr>
-        <td width="10%">'.(($data["page"] > 1) ? l("|&lt;", "image/tid/". $data["tid"] ."/page/1") : "").'</td>
-        <td width="10%">'.(($data["page"] > 1) ? l("&lt;&lt;", "image/tid/". $data["tid"] ."/page/". ($data["page"] - 1)) : "").'</td>
-        <td>
-          <div align="center">';
-
-    for ($n = 1; $n <= $data["total_pages"]; $n++) {
-      if ($n == $data["page"]) {
-        $p[] = "<b>&raquo;$n&laquo;</b>";
-      } else {
-        $p[] = l($n, "image/tid/". $data["tid"] ."/page/$n");
-      }
-    }
-    if ($p) {
-      $output .= implode("&nbsp;&#149;&nbsp;", $p);
-    }
-
-    $output .= '
-          </div>
-        </td>
-        <td width="10%">
-          <div align="right">'.(($data["page"] < $data["total_pages"]) ? l("&gt;&gt;", "image/tid/". $data["tid"] ."/page/". ($data["page"] + 1)) : "").'</div>
-        </td>
-        <td width="10%">
-          <div align="right">'.(($data["page"] < $data["total_pages"]) ? l("&gt;|", "image/tid/". $data["tid"] ."/page/". $data["total_pages"]) : "").'</div>
-        </td>
-      </tr>
-    </table>';
-  }
-
-  return $output;
+/**
+ * Alternate theme function to render image gallery pager.
+ */
+function theme_image_pager($tags = "", $limit = 10, $element = 0, $attributes = array()) {
+  $tags = array('|&lt;', '&lt;&lt;', '', '&gt;&gt;', '&gt;|');
+  return '<hr>' . theme("pager", $tags, $limit, $element, $attributes);
 }
 
 /****
