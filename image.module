@@ -156,7 +156,7 @@ function image_cron() {
   $dir = variable_get("image_temp_path", "./");
   if ($handle = opendir($dir)) {
     while (($file = readdir($handle)) !== false) {
-      if ($file != "." && $file != ".." && !is_dir($file) && (strpos($file, "tmp") !== false)) {
+      if ($file != "." && $file != ".." && !is_dir("$dir/$file") && (strpos($file, "tmp") !== false)) {
         // delete older than 6 hours
         if (time() - filemtime("$dir/$file") > 60*60*6) {
           @unlink("$dir/$file");
@@ -1444,7 +1444,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
     // Process files in upload directory
     $handle = opendir($dir);
     while (($file = readdir($handle)) !== false) {
-      if ($file != "." && $file != ".." && !is_dir($file)) {
+      if ($file != "." && $file != ".." && !is_dir("$dir/$file")) {
         $image_details = _get_image_details("$dir/$file");
         // Check to make sure that file is an image and has a type supported by image library
         if (_is_image_type_supported($image_details['type']) && _is_valid_image_ext($file)) {
@@ -1516,7 +1516,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
 
             //override defaults with any data specified in iptc header
             // Pull out iptc data and populate any node elements that are not already set.
-            if ($proposed = _image_iptc_map($image_details['ipct_info'])) {
+            if ($proposed = _image_iptc_map($image_details['iptc_info'])) {
               foreach ($proposed as $key => $value) {
                 $node->$key = $value;
               }
