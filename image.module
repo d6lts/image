@@ -1,19 +1,13 @@
 <?php
 // $Id$
 
-function image_help($section = "admin/image/help") {
+function image_help($section = "admin/help#image") {
   global $base_url;
-  $output = "";
+
   $common = "<p>Admins may create many image nodes at once by uploading all images to a folder on the server. This upload happens outside of Drupal, usually using an FTP client.</p>";
 
   switch ($section) {
-    case 'admin/help':
-      $output = "Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced.";
-      break;
-    case 'admin/image':
-      $output = "";
-      break;
-    case 'admin/image/help':
+    case 'admin/help#image':
       $output  = "<h4>Configuration</h4><h5>Image Library</h5>";
       $output .= "<p><a href=\"http://www.imagemagick.org/\">Imagemagick</a> and <a href=\"http://www.boutell.com/gd/\">GD</a> are supported image libraries. Imagemagick is required for full image manipulation features and is suggested for better thumbnail quality.</p>";
       $output .= "<p>Many ISPs already have Imagemagick installed and available for your use. If you are hosted on Linux and have shell access, type <i>which convert</i> at the command prompt This will tell you where the binary is, if it is in the path. The name of the binary on most unixoid systems is simply <i>convert</i>.</p>";
@@ -27,15 +21,18 @@ function image_help($section = "admin/image/help") {
       $output .= "<h5>Image Storage</h5>";
       $output .= "<p>All directories must be readable and writeable for the user id that the web server runs under.</p>";
       $output .= "<h5>Verifiying Configuration</h5>";
-      $output .= "<p>You can verify your directory and image library application configuration by visiting the <a href=\"". $base_url . "/?q=admin/image\">image management administration screen</a>.</p>";
+      $output .= "<p>You can verify your directory and image library application configuration by visiting the <a href=\"". $base_url . "/?q=admin/image\">images administration screen</a>.</p>";
       $output .= "<h4>Adding images into other nodes</h4>";
       $output .= "<p>Sometimes, you want to add an image to another node like a blog entry or a story. You may do this by creating an image node in Drupal for the target image, and then referencing that image in your story, blog, etc. To enable this feature and learn the proper syntax, visit the <a href=\"" . $base_url . "/?q=admin/system/filters\">filters configuration screen</a>.</p>";
+      break;
+    case 'admin/image':
+      $output = "Below is a status of image module's current configuration.";
       break;
     case 'admin/image/dir_upload/fast':
       $output  = $common . "<h4>Fast Mode</h4><ul>";
       $output .= "<li>Creates all image nodes at once without user interaction.</li>";
       $output .= "<li>Applies the same taxonomy term(s) to each node, thus creating a gallery.</li>";
-      $output .= "<li>If $l_iptc data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>";
+      $output .= "<li>If IPTC data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>";
       $output .= "<li>If the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li></ul>";
       break;
     case 'admin/image/dir_upload/slow':
@@ -43,18 +40,16 @@ function image_help($section = "admin/image/help") {
       $output .= "<li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>";
       $output .= "<li>Add custom titles, descriptions, etc.</li></ul>";
       break;
+    case 'admin/system/modules#description':
+      //$output = "Provides shared and personal photo galleries.";
+      $output = "Allow users to upload images and to display them in shared and personal photo galleries.";
+      break;
+    case 'admin/system/modules/image':
+      $output = "Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced.";
+      break;
   }
 
   return t($output);
-}
-
-/**
- * System description used in the master module admin screen.
- */
-function image_system($field) {
-  $system["description"] = t("Provides shared and personal photo galleries.");
-  $system["admin_help"] = image_help("admin/help");
-  return $system[$field];
 }
 
 /**
@@ -130,6 +125,11 @@ function image_settings() {
   $output .= form_select(t("Personal Photo Galleries"), "image_personal_gallery", variable_get("image_personal_gallery", "1"),   array("1" => "enabled", "0" => "disabled"), t("Activate/deactivate personal photo galleries site-wide.  When enabled you can use the \"has personal image gallery\" permission to control which roles have personal galleries."));
   if (variable_get("image_personal_gallery", "1") == "1") {
     $output .= form_textfield(t("Personal Gallery Picture Limit"), "image_personal_gallery_max_num", variable_get("image_personal_gallery_max_num", "50"), 5, 255, t("Set how many pictures users are allowed."));
+    $output .= form_select(t("Personal Gallery Picture Limit Per Role"), "image_personal_gallery_role", variable_get("image_personal_gallery_role", "0"), array("0" => "disabled", "1" => "enabled"), t("Enabling this will allow for setting a maximum number of pictures per role."));
+
+    if (variable_get("image_personal_gallery_role", "1") == "1") {
+      $output .= _image_form_max_picture_per_role();
+    }
     $output .= form_textfield(t("Personal Gallery Size Limit"), "image_gallery_max_kb", variable_get("image_gallery_max_kb", "1000"), 5, 255, t("Set a maximum number of kilobytes allowed per user."));
   }
 
@@ -181,12 +181,9 @@ function image_link($type, $node, $main = 0) {
 
   // Add admin items if the user has administer permission
   if ($type == "system" && user_access("administer images")) {
-    $l_iptc = l("IPTC", "admin/image/help#iptc");
-
-    menu("admin/image", "image management", "_image_check_configuration", NULL, 8);
-    menu("admin/image/dir_upload/slow", "directory upload: slow", "_image_dir_upload", image_help("admin/image/dir_upload/slow"), 2);
-    menu("admin/image/dir_upload/fast", "directory upload: fast", "_image_dir_upload_fast", image_help("admin/image/dir_upload/fast"), 4);
-    menu("admin/image/help", "help", "image_help", NULL, 12);
+    menu("admin/image", "images", "_image_check_configuration");
+    menu("admin/image/dir_upload/slow", "directory upload: slow", "_image_dir_upload");
+    menu("admin/image/dir_upload/fast", "directory upload: fast", "_image_dir_upload_fast");
   }
 
   // Add a create link for images if the user has create permission
@@ -1023,7 +1020,14 @@ function _check_filesize_limits($image_file) {
 
   $fsize = filesize($image_file);
 
-  $max_num = variable_get("image_personal_gallery_max_num", "50");
+  if (variable_get("image_personal_gallery_role", "1") == "1") {
+    $max_num_per_role = variable_get('image_personal_gallery_max_role', array());
+    $max_num = $max_num_per_role[$user->rid];
+  }
+  else {
+    $max_num = variable_get("image_personal_gallery_max_num", "50");
+  }
+
   if ($user_images->c >= $max_num) {
     $error = t("You can have at most %a images in your gallery.", array("%a" => $max_num));
   }
@@ -1605,6 +1609,7 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
 function _image_check_configuration() {
 
   $output = "";
+  $headers = array('Setting', 'Status');
 
   // since we have to deal with a different directories, we check for correct permissions
   $dirs = array(
@@ -1612,61 +1617,84 @@ function _image_check_configuration() {
     "Default thumb path" => array("image_default_thumb_path", "images/thumbs/"),
     "Temporary image path" => array("image_temp_path", "./")
     );
-
   foreach ($dirs as $description => $key) {
-    $output .= $description.":";
+    $row[] = $description;
     if (!file_exists(variable_get($key[0], $key[1]))) {
-      $output .= "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#$key[0]");
+      $row[] = "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#$key[0]") ."</div>";
     }
     else if (!is_writable(variable_get($key[0], $key[1]))) {
-      $output .= "<div class=\"error\">NOT WRITABLE - change permissions on server";
+      $row[] = "<div class=\"error\">NOT WRITABLE - change permissions on server</div>";
     }
     else if (substr(variable_get($key[0], $key[1]), -1) != "/") {
-      $output .= "<div class=\"error\">PATH DOES NOT END in SLASH (/) - fix in ". l("Site Configuration", "admin/system/modules/image#$key[0]");
+      $row[] = "<div class=\"error\">PATH DOES NOT END in SLASH (/) - fix in ". l("Site Configuration", "admin/system/modules/image#$key[0]") ."</div>";
     }
     else {
-      $output .= "<div class=\"ok\">OK";
+      $row[] = "<div class=\"ok\">OK</div>";
     }
-    $output .= "</div>";
+    $rows[] = $row;
+    unset($row);
   }
 
   // finally we also check for convert
-  $convert = variable_get("image_convert_path", "misc/image/convert.exe");
-  $output .= "ImageMagick convert:";
+  $convert = variable_get("image_convert_path", "");
+  $row[] = "ImageMagick convert";
   if ($convert) {
     if (!file_exists($convert)) {
-      $output .= "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#image_convert");
+      $row[] = "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#image_convert") ."</div>";
     }
     else {
-      $output .= "<div class=\"ok\">OK";
+      $row[] = "<div class=\"ok\">OK</div>";
     }
   }
   else {
-    $output .= "<div class=\"disabled\">disabled";
+    $row[] = "<div class=\"disabled\">disabled</div>";
   }
-  $output .= "</div>";
+  $rows[] = $row;
+  unset($row);
+  
+  // for GD Library
+  $row[] = "GD Library";
+  if (function_exists('imageCreateTrueColor')) {
+    $row[] = "<div class=\"ok\">available (version 2)</div>";
+  }
+  else if (function_exists('imageCreate')) {
+    $row[] = "<div class=\"ok\">available</div>";
+  }
+  else {
+    $row[] = "<div class=\"disabled\">unavailable</div>";
+  }
+  $rows[] = $row;
+  unset($row);
 
   // and jhead
   $jhead = variable_get("image_jhead_path", "");
-  $output .= "jhead:";
+  $row[] = "Jhead";
   if ($jhead) {
     if (!file_exists($jhead)) {
-      $output .= "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#image_jhead");
+      $row[] = "<div class=\"error\">DOES NOT EXIST - fix in ". l("Site Configuration", "admin/system/modules/image#image_jhead") ."</div>";
     }
     else {
-      $output .= "<div class=\"ok\">OK";
+      $row[] = "<div class=\"ok\">OK</div>";
     }
   }
   else {
-    $output .= "<div class=\"disabled\">disabled";
+    $row[] = "<div class=\"disabled\">disabled</div>";
   }
-  $output .= "</div>";
+  $rows[] = $row;
+  unset($row);
 
   // check if he assigned a vocabulary, for photo album navigation
+  $row[] = "Image vocabulary";
   if (!variable_get("image_nav_vocabulary", "")) {
-    $output .= "<div class=\"error\">Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ". l("Site Configuration", "admin/system/modules/image#image_nav_vocabulary"). "</div>";
+    $row[] = "<div class=\"error\">Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ". l("Site Configuration", "admin/system/modules/image#image_nav_vocabulary"). "</div>";
   }
-  
+  else {
+    $row[] = "<div class=\"ok\">assigned</div>";
+  }
+  $rows[] = $row;
+  unset($row);
+
+  $output .= table($headers, $rows);
   return $output;
 }
 
@@ -1703,5 +1731,23 @@ function _imageCopyResampled ($dst, &$src, $x, $y) {
       ImageSetPixel ($dst, $i, $j, ImageColorClosest ($dst, $r, $g, $b));
     }
   }
+}
+
+/**
+ * Display a form with a text input on each row to set the
+ * maximum number of pictures allowed per role.
+ */
+function _image_form_max_picture_per_role() {
+  $max_num_per_role = variable_get('image_personal_gallery_max_role', array());
+  $result = db_query('SELECT rid, name FROM {role} ORDER BY name');
+  $header = array(t('Role'), t('Limit'));
+  while ($role = db_fetch_object($result)) {
+    $row[] = t($role->name);
+    $max_num_per_role[$role->rid] = isset($max_num_per_role[$role->rid]) ? $max_num_per_role[$role->rid] : variable_get("image_personal_gallery_max_num", "50");
+    $row[] = "<input type=\"text\" maxlength=\"255\" class=\"form-text\" name=\"edit[image_personal_gallery_max_role][$role->rid]\" size=\"5\" value=\"". check_form($max_num_per_role[$role->rid]) ."\"". drupal_attributes($attributes) ." />";
+    $rows[] = $row;
+    unset($row);
+  }
+  return form_item('', table($header, $rows), t('Set how many pictures each role listed above is allowed. "Personal Gallery Picture Limit" will be the default value for new roles.'));
 }
 ?>
