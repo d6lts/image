@@ -1,7 +1,7 @@
 <?php
 // $Id$
 
-include_once(module_get_path('image') . '/image.inc');
+include_once(drupal_get_path('module', 'image') . '/image.inc');
 
 function image_help($section = 'admin/help#image') {
   global $base_url;
