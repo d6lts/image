@@ -138,47 +138,46 @@ function image_link($type, $node) {
     global $op;
     if (image_access("update", $node)) {
       $links[] = lm(t("edit this image"), array("mod" => "node", "op" => "edit", "id" => $node->nid), "", array("title" => t("Edit this image.")));
-      
-      // get previous and next image
-      $sql = "
-        SELECT n.nid, title, teaser, body, thumb_path
-        FROM node n, term_node t, image i
-        WHERE n.nid = t.nid
-        AND n.nid = i.nid
-        AND t.tid = '%s'
-        AND i.personal = 0
-      ";
-      $sql .= "ORDER BY "._image_get_thumb_order();
+    }
+    
+    // get previous and next image
+    $sql = "
+      SELECT n.nid, title, teaser, body, thumb_path
+      FROM node n, term_node t, image i
+      WHERE n.nid = t.nid
+      AND n.nid = i.nid
+      AND t.tid = '%s'
+      AND i.personal = 0
+    ";
+    $sql .= "ORDER BY "._image_get_thumb_order();
 
-      $terms = array_keys(taxonomy_node_get_terms_by_vocabulary($node->nid, variable_get("image_nav_vocabulary", "")));
-      $result = db_query($sql, $terms[0]);
-      
-      while ($image = db_fetch_object($result)) {
-        if ($stop == 1) {
-          $next->nid = $image->nid;
-          $next->title = $image->title;
-          break;
-        }
-        if ($image->nid == $node->nid) {
-          $stop = 1;
-        } else {
-          $prev->nid = $image->nid;
-          $prev->title = $image->title;
-        }
+    $terms = array_keys(taxonomy_node_get_terms_by_vocabulary($node->nid, variable_get("image_nav_vocabulary", "")));
+    $result = db_query($sql, $terms[0]);
+
+    while ($image = db_fetch_object($result)) {
+      if ($stop == 1) {
+        $next->nid = $image->nid;
+        $next->title = $image->title;
+        break;
       }
-      
-      if ($prev) {
-        $links[] = l(t("previous image"), array("id" => $prev->nid), "node", "", array("title" => $prev->title));
-      }
-      
-      if ($next) {
-        $links[] = l(t("next image"), array("id" => $next->nid), "node", "", array("title" => $next->title));
+      if ($image->nid == $node->nid) {
+        $stop = 1;
+      } else {
+        $prev->nid = $image->nid;
+        $prev->title = $image->title;
       }
     }
-    else {
-      if ($node->personal) {
-        $links[] = lm(t("%u's photo gallery", array("%u" => $node->name)), array("mod" => "image", "uid" => $node->uid), t("View %u's photo gallery.", array("%u" => $node->name)));
-      }
+
+    if ($prev) {
+      $links[] = l(t("previous image"), array("id" => $prev->nid), "node", "", array("title" => $prev->title));
+    }
+
+    if ($next) {
+      $links[] = l(t("next image"), array("id" => $next->nid), "node", "", array("title" => $next->title));
+    }
+
+    if ($node->personal) {
+      $links[] = lm(t("%u's photo gallery", array("%u" => $node->name)), array("mod" => "image", "uid" => $node->uid), t("View %u's photo gallery.", array("%u" => $node->name)));
     }
   }
 
