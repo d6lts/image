@@ -36,7 +36,7 @@ function image_settings() {
     $output .= form_select("Image library", "image_lib", variable_get("image_lib", "imagemagick"), array("imagemagick" => "imagemagick", "gd" => "gd"), "Use Imagemagick if you can; GD produces worse thumbnails, does not support GIF and this module doesn't support image editing (rotate, crop etc) through it.");
   }
   $output .= "<a name=\"image_convert\"></a>";
-  $output .= form_textfield("Convert path", "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, "Absolute path to ImageMagick convert.");
+  $output .= form_textfield("Convert path", "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, "Absolute path to ImageMagick convert file. Include the 'convert.exe' (or other filename) at the end.");
   $output .= "<a name=\"image_jhead\"></a>";
   $output .= form_textfield("jhead path", "image_jhead_path", variable_get("image_jhead_path", ""), 50, 255, "Absolute path of jhead, for EXIF parsing; blank to disable.");
 
@@ -1361,8 +1361,11 @@ function _image_dir_upload($type = "slow") {
 
           $nid = node_save(array2object($node));
 
-          // taxonomy_node_save($nid, $node["taxonomy"]);
-          if (!$alreadyprinted) {   // we only want to output this text once
+          if (function_exists("taxonomy_node_save")) {
+            taxonomy_node_save($nid, $node["taxonomy"]);
+          }
+          
+          if (!$alreadyprinted) {  // we only want to output this text once
             $output .= "\nYou may wish to view your new images: <p>\n";
             foreach ($node["taxonomy"] as $tid) {
               if ($term = taxonomy_get_term($tid)) {
@@ -1439,22 +1442,10 @@ function _image_check_configuration() {
 
   // check if he assigned a vocabulary, for photo album navigation
   if (!variable_get("image_nav_vocabulary", "")) {
-    echo "Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ". l("Site Configuration", "admin/system#image_nav_vocabulary");
+    echo "Warning: you must assign a vocabulary to navigate in photo gallery. Fix in ". l("Site Configuration", "admin/system/modules/image#image_nav_vocabulary");
   }
 }
 
-
-/*
-**    function _image_gallery_admin() {
-**      if (!variable_get("image_nav_vocabulary", "")) {
-**        $output = status("Error: you must assign a vocabulary to navigation before. Fix in ". l("Site Configuration", "admin/system/modules/image"));
-**      }
-**      else {
-**        // not sure what the intention is for this page
-**      }
-**      return $output;
-**    }
-*/
 
 function image_help() {
 
