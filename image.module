@@ -488,7 +488,7 @@ function image_validate(&$node) {
   } else if ($_FILES['edit']['tmp_name']['image']) {
     $upload_file = $_FILES['edit']['tmp_name']['image'];
     $upload_name = $_FILES['edit']['name']['image'];
-  } else if ($_POST['edit']['image_id']) {
+  } else if ($_POST['edit']['image_id'] && !$node->existing) {
     $node->image_path = variable_get("image_temp_path", "./") . "tmpimg_" . $_POST['edit']['image_id'] . $_POST['edit']['extension'];
   }
 
@@ -530,7 +530,7 @@ function image_validate(&$node) {
   }
 
   // If we get here, we know that we have a valid attempt to upload an image file
-  // or a valid re-use of an existing file. If an 0upload, move file to temp area.
+  // or a valid re-use of an existing file. If an upload, move file to temp area.
 
   $build_derivatives = false;
 
@@ -565,7 +565,14 @@ function image_validate(&$node) {
 
   } else {
 
-    //$build_derivatives = _image_validate_do_transform($node);
+    if (!$node->image_id) {
+      $node->image_id = _image_id($node->image_path, $node->nid);
+    }
+    if (!$node->extension) {
+      $node->extension = _get_ext($node->image_path);
+    }
+
+    $build_derivatives = _image_validate_do_transform($node);
 
     if (!$node->existing || $build_derivatives) {
 
@@ -767,25 +774,37 @@ function _image_validate_do_transform(&$node) {
     $cropy = $_POST['cropy'];
     $quality = $_POST['quality'];
 
-    if (($image = image_open($node->image_path)) != false) {
+    if ($cropx
+      || $cropy
+      || ($width && ($width != $node->width))
+      || ($height && ($height != $node->height))
+      || $rotate) {
 
-      if ($cropx || $cropy) {
-        image_crop($image, $cropx, $cropy, $width, $height);
-        $build_extra = true;
-      } else if (($width && ($width != $node->width)) || ($height && ($height != $node->height))) {
-        image_scale($image, $width, $height);
-        $build_extra = true;
+      if (!$node->image_id) {
+        $node->image_id = _image_id($upload_name);
       }
 
-      if ($rotate) {
-        image_rotate($image, $rotate);
-        $build_extra = true;
+      if (($image = image_open($node->image_path)) != false) {
+
+        if ($cropx || $cropy) {
+          image_crop($image, $cropx, $cropy, $width, $height);
+          $build_extra = true;
+        } else if (($width && ($width != $node->width)) || ($height && ($height != $node->height))) {
+          image_scale($image, $width, $height);
+          $build_extra = true;
+        }
+
+        if ($rotate) {
+          image_rotate($image, $rotate);
+          $build_extra = true;
+        }
+
+        image_close($image, _image_tempname($node), $quality);
+        $node->image_path = _image_tempname($node);
+
+        return true;
+
       }
-
-      image_close($image, _image_tempname($node), $quality);
-      $node->image_path = _image_tempname($node);
-
-      return true;
 
     }
 
@@ -1044,7 +1063,7 @@ function _image_make_static(&$node, $res) {
     $node->height = $details[1];
   }
   if (!$node->image_id) {
-    $node->image_id = _image_id($node->image_path);
+    $node->image_id = _image_id($node->image_path, $node->nid);
   }
   if (!$node->extension) {
     $node->extension = _get_ext($node->image_path);
@@ -1763,13 +1782,17 @@ function _image_form_max_picture_per_role() {
  * Generates an image id.
  * Id could be either a random string or based on the image filename.
  */
-function _image_id($filename = '') {
+function _image_id($filename = '', $nid = 0) {
   if (variable_get('image_default_filename', 'random') == 'random') {
     srand ((double) microtime() * 1000000);
     return md5(rand());
   }
   else {
-    return basename($filename, strrchr($filename, '.'));
+    $result = basename($filename, strrchr($filename, '.'));
+    if ($nid) {
+      $result = preg_replace("/-$nid\$/", "", $result);
+    }
+    return $result;
   }
 }
 
