@@ -32,8 +32,12 @@ function image_settings() {
   $output .= "<a name=\"image_temp_path\"></a>";
   $output .= form_textfield("Temporary image path", "image_temp_path", variable_get("image_temp_path", "./"), 30, 255, "Path for working directory relative to your drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end.");
 
+  // Check which version of the GD library is available
   if (function_exists("imageCreateTrueColor")) {
-    $output .= form_select("Image library", "image_lib", variable_get("image_lib", "imagemagick"), array("imagemagick" => "imagemagick", "gd" => "gd"), "Use Imagemagick if you can; GD produces worse thumbnails, does not support GIF and this module doesn't support image editing (rotate, crop etc) through it.");
+    $output .= form_select("Image library", "image_lib", variable_get("image_lib", "imagemagick"), array("imagemagick" => "imagemagick", "gd2" => "gd2"), "Use Imagemagick if you can; GD2 produces worse thumbnails, does not support GIF and this module doesn't support image editing (rotate, crop etc) through it.");
+  }
+  else if (function_exists("imageCreate")) {
+    $output .= form_select("Image library", "image_lib", variable_get("image_lib", "imagemagick"), array("imagemagick" => "imagemagick", "gd1" => "gd1"), "Use Imagemagick if you can; GD1 produces worse thumbnails, might not support GIF and this module doesn't support image editing (rotate, crop etc) through it.");
   }
   $output .= "<a name=\"image_convert\"></a>";
   $output .= form_textfield("Convert path", "image_convert_path", variable_get("image_convert_path", "misc/image/convert.exe"), 50, 255, "Absolute path to ImageMagick convert file. Include the 'convert.exe' (or other filename) at the end.");
@@ -68,7 +72,7 @@ function image_cron() {
   chdir(variable_get("image_temp_path", "./"));
   if ($handle = opendir(".")) {
     while (($file = readdir($handle)) != false) {
-      if ($file != "." && $file != ".." && strpos($file, "tmpimg") !== false) {
+      if ($file != "." && $file != ".." && strpos($file, "tmpimg") != false) {
         // delete older than 6 hours
         if (time() - filemtime($file) > 60*60*6) {
           unlink($file);
@@ -755,7 +759,10 @@ function _image_make_thumbnail($node) {
   $lib = variable_get("image_lib", "imagemagick");
   if ($lib == "imagemagick") {
     echo _image_convert(_image_filename($node), _image_thumbname($node), "-scale ".variable_get("image_default_thumb_size", "100")." -filter QUADRATIC");
-  } else if ($lib == "gd") {
+  
+  // Added support for version 1.xx and 2.xx of the GD library
+  } else if ($lib == "gd2") {
+    
     $size = GetImageSize(_image_filename($node));
     if ($size[2] == "2") {
       $type = "jpeg";
@@ -778,6 +785,35 @@ function _image_make_thumbnail($node) {
 
     $function = "image".$type;
     $function($th, _image_thumbname($node));
+
+  } else if ($lib == "gd1") {
+    
+    $size = @getimagesize(_image_filename($node));
+    if ($size[2] == "2") {
+      $type = "jpeg";
+    } else if($size[2] == "3") {
+      $type = "png";
+    }
+    $function = "imageCreateFrom".$type;
+    $im = $function(_image_filename($node));
+
+    list($thx, $thy) = split("x", variable_get("image_default_thumb_size", "100"));
+    // X:x = Y:y
+    if (!$thy) {
+      $thy = round($size[1]*$thx/$size[0]);
+    } else if (!$thx){
+      $thx = round($size[0]*$thy/$size[1]);
+    }
+
+    $th = imageCreate($thx, $thy);
+    // imageCopyResized doesn't produce very good results
+    // You may use _imageCopyResampled() below instead, but it's much slower...
+    imageCopyResized($th, $im, 0, 0, 0, 0, $thx, $thy, $size[0], $size[1]);
+    //_imageCopyResampled($th, $im, $thx, $thy);
+
+    $function = "image".$type;
+    $function($th, _image_thumbname($node));
+
   }
 }
 
@@ -1297,6 +1333,8 @@ function  _image_dir_upload_fast() {
 function _image_dir_upload($type = "slow") {
   global $HTTP_SERVER_VARS, $type, $user, $edit;
 
+  $links = array();
+
   if (!$edit["dir"]) {
     $output .= form_textfield("Directory to scan", "dir", variable_get("image_last_upload_dir", ""), 30, 255, "The path to the directory which holds the source image files. This path should be relative to Drupal root directory - don't forget the slash (/) at the end.");
     if ($type == "slow") {
@@ -1459,7 +1497,8 @@ If you are hosted on Linux and have shell access, type <i>which convert</i>
 at the command prompt This will tell you where the binary is, if it is in the path.
 The name of the binary on most unixoid systems is simply <i>convert</i>.</p>
 
-If you choose to use the GD library, you must install <a href="http://www.boutell.com/gd/">version 2.0 or higher</a>.
+If you choose to use the GD library, you should install <a href="http://www.boutell.com/gd/">version 2.0 or higher</a>.
+However, version 1.x of the GD library is supported, even if it produces lower quality images.
 
 <a name="iptc"><h4>IPTC</h4></a>
 JPEG images may be tagged with information about the image. This information talks about the
@@ -1482,5 +1521,38 @@ proper syntax, visit <b>admin -> site configuration -> content filters</b>
 <?php
 }
 
+// Alternative function to GD 1.x imageCopyResized which produce better results
+// (found on www.php.net)
+function _imageCopyResampled ($dst, &$src, $x, $y) {
+  /*
+  Function derived from ImageCopyResampleBicubic()
+  Original code in C, for the PHP GD Module by jernberg@fairytale.se
+  Port to PHP by John Jensen July 10 2001
+  Updated by tim@smoothdeity.com
+  Re-edited & optimized by TCK
+  */
+  $pals = ImageColorsTotal ($src);
+  ImagePaletteCopy ($dst,$src);
+  $scX =(imagesx ($src)-1)/$x;
+  $scY =(imagesy ($src)-1)/$y;
+  $scX2 =intval($scX/2);
+  $scY2 =intval($scY/2);
+  for ($j = 0; $j < ($y); $j++) {
+    $sY = intval($j * $scY);
+    $y13 = $sY + $scY2;
+    for ($i = 0; $i < ($x); $i++) {
+      $sX = intval($i * $scX);
+      $x34 = $sX + $scX2;
+      $c1 = ImageColorsForIndex ($src, ImageColorAt ($src, $sX, $y13));
+      $c2 = ImageColorsForIndex ($src, ImageColorAt ($src, $sX, $sY));
+      $c3 = ImageColorsForIndex ($src, ImageColorAt ($src, $x34, $y13));
+      $c4 = ImageColorsForIndex ($src, ImageColorAt ($src, $x34, $sY));
+      $r = ($c1['red']+$c2['red']+$c3['red']+$c4['red'])/4;
+      $g = ($c1['green']+$c2['green']+$c3['green']+$c4['green'])/4;
+      $b = ($c1['blue']+$c2['blue']+$c3['blue']+$c4['blue'])/4;
+      ImageSetPixel ($dst, $i, $j, ImageColorClosest ($dst, $r, $g, $b));
+    }
+  }
+}
 
 ?>
