@@ -341,10 +341,7 @@ function image_view($node, $main = 0, $page = 0) {
     $rand = rand();
   }
 
-  $node->teaser = check_output($node->teaser);
-  $node->body = check_output($node->body);
-
-  return theme("node_image", $node, $rand, $main, $page);
+  return theme("node_image", node_prepare($node), $rand, $main, $page);
 }
 
 /**
@@ -648,7 +645,7 @@ function image_conf_filters() {
 }
 
 /**
- * Actuall execute filter on given text.
+ * Actually execute filter on given text.
  */
 function image_filter($text) {
   if (variable_get("image_filter_enabled", 0)) {
@@ -1409,6 +1406,10 @@ function _image_dir_upload($type = "slow", $edit = NULL) {
 
   $links = array();
   $output = '';
+  
+  if ($type == "fast" && !ini_get("safe_mode")) {
+    set_time_limit(480);
+  }
 
   if (!$edit["dir"]) {
     $output .= form_textfield(t("Directory to scan"), "dir", variable_get("image_last_upload_dir", ""), 30, 255, t("The path to the directory which holds the source image files. This path should be relative to Drupal root directory - don't forget the slash (/) at the end."));
