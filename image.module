@@ -176,10 +176,7 @@ function image_link($type, $node, $main = 0) {
 
       $sql = "
         SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path
-        FROM {node} n, {image} i
-        WHERE n.nid = i.nid
-        AND i.personal = 1
-        AND n.uid = ";
+        FROM {node} n, {image} i WHERE n.nid = i.nid AND i.personal = 1 AND n.uid = ";
       $sql .= $node->uid;
       $sql .= " ORDER BY "._image_get_thumb_order();
 
@@ -212,10 +209,7 @@ function image_link($type, $node, $main = 0) {
         $sql = "
           SELECT n.nid, n.title, n.teaser, n.body, i.thumb_path
           FROM {node} n, {term_node} t, {image} i
-          WHERE n.nid = t.nid
-          AND n.nid = i.nid
-          AND i.personal = 0
-          AND t.tid = ";
+          WHERE n.nid = t.nid AND n.nid = i.nid AND i.personal = 0 AND t.tid = ";
         $sql .= $term->tid;
         $sql .= " ORDER BY "._image_get_thumb_order();
       }
@@ -1228,12 +1222,9 @@ function _image_album_properties($albums) {
       $terms[] = $term->tid;
     }
     $result = db_query("
-          SELECT COUNT(*) AS c
-          FROM {term_node} t, {node} n, {image} i
+          SELECT COUNT(*) AS c FROM {term_node} t, {node} n, {image} i
           WHERE t.nid = n.nid
-          AND i.nid = n.nid
-          AND t.tid IN (".implode(",", $terms).")
-          AND i.personal = 0
+          AND i.nid = n.nid AND t.tid IN (".implode(",", $terms).") AND i.personal = 0
       ");
     while ($term = db_fetch_object($result)) {
       $albums[$term_id]->image_count = $term->c;
@@ -1241,14 +1232,11 @@ function _image_album_properties($albums) {
 
     $last_update = db_fetch_object(db_query("
         SELECT n.created, i.thumb_path
-        FROM {node} n, {image} i
-        LEFT JOIN {term_node} t ON n.nid = t.nid
-        WHERE n.nid = i.nid
-        AND t.tid IN (".implode(",", $terms).")
-        AND n.type = 'image'
-        AND i.personal = 0
-        ORDER BY n.created DESC
-        LIMIT 1
+        FROM {node} n INNER JOIN {image} i
+        ON n.nid = i.nid INNER JOIN {term_node} t ON n.nid = t.nid
+        WHERE t.tid IN (".implode(",", $terms).")
+        AND n.type = 'image' AND i.personal = 0
+        ORDER BY n.created DESC LIMIT 1
       "));
     $albums[$term_id]->last_updated = $last_update->created;
     $albums[$term_id]->thumb = $last_update->thumb_path;
@@ -1256,14 +1244,10 @@ function _image_album_properties($albums) {
     if (variable_get("image_gallery_thumb", "last") == "random") {
       $random = db_fetch_object(db_query("
           SELECT i.thumb_path
-          FROM {node} n, {image} i
-          LEFT JOIN {term_node} t ON n.nid = t.nid
-          WHERE n.nid = i.nid
-          AND t.tid IN (".implode(",", $terms).")
-          AND n.type = 'image'
-          AND i.personal = 0
-          ORDER BY RAND()
-          LIMIT 1
+          FROM {node} n INNER JOIN {image} i ON  n.nid = i.nid
+          INNER JOIN {term_node} t ON n.nid = t.nid
+          WHERE t.tid IN (".implode(",", $terms).") AND n.type = 'image' AND i.personal = 0
+          ORDER BY RAND() LIMIT 1
         "));
       $albums[$term_id]->thumb = $random->thumb_path;
     }
