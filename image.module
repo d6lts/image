@@ -669,7 +669,10 @@ function image_filter($text) {
 }
 
 /**
- * I'm not exactly sure where this gets used.  I have not found where this displays in the UI.
+ * Explanation of image filter syntax, linked to from beneath the compose form
+ * when the compose_tips.module is enabled.
+ * 
+ * @see http://drupal.org/node/view/1516
  */
 function image_compose_tips() {
   if (variable_get("image_filter_enabled", 0)) {
