@@ -940,6 +940,9 @@ function image_page() {
   if (arg(1) == "tid") {
     $tid = arg(2);
   }
+  if (arg(1) == "uid") {
+    $uid = arg(2);
+  }
   if (arg(3) == "page") {
     $page = arg(4);
   }
