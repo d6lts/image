@@ -27,7 +27,7 @@ function image_get_info($image) {
 
   $details = array();
   $data = @getimagesize($image, $raw_iptc_info);
-  
+
   if (is_array($data)){
     $types = array('1' => 'GIF', '2' => 'JPEG', '3' => 'PNG', '4' => 'SWF', '5' => 'PSD', '6' => 'BMP', '7' => 'TIFF', '8' => 'TIFF', '9' => 'JPC', '10' => 'JP2', '11' => 'JPX', '12' => 'JB2', '13' => 'SWC', '14' => 'IFF', '15' => 'WBMP', '16' => 'XBM');
     $type = array_key_exists($data[2], $types) ? $types[$data[2]] : 'UNKNOWN';
@@ -92,7 +92,7 @@ function image_get_exif($file) {
   // From gallery 1.2.5 (also under GPL, see http://cvs.sourceforge.net/viewcvs.py/gallery/gallery/LICENSE.txt?rev=1.2&view=log).
 
   $_exif_path = variable_get('image_jhead_path', '');
-  
+
   if ($_exif_path) {
 
     $return = exec($_exif_path . ' ' . _image_escape_shell($file), $results);
@@ -231,7 +231,7 @@ function image_crop_and_scale(&$image, $width, $height, $topx, $topy) {
   $function = '_image_crop_and_scale_' . $imagelib;
 
   if (function_exists($function)) {
-    return $function(&$image, $width, $height, $topx, $topy);
+    return $function($image, $width, $height, $topx, $topy);
   } else if (function_exists('image_crop_' . $imagelib) && function_exists('image_scale_' . $imagelib)) {
     if (image_crop($image, $topx, $topy) && image_scale($image, $width, $height)) {
       return true;
@@ -373,12 +373,12 @@ function _image_rotate_libmagick(&$image, $degrees) {
       return false;
     }
   }
-  else { 
+  else {
     if (!imagick_rotate($image->imdata, $degrees)) {
       return false;
     }
   }
-  return true; 
+  return true;
 }
 
 function _image_crop_libmagick(&$image, $topx, $topym, $width, $height) {
@@ -511,10 +511,10 @@ function _image_supported_type_gd1(&$image) {
 function _image_open_gd2($filename) {
   if (file_exists($filename)) {
     $image->filename = $filename;
-    $image->image_details = _get_image_details($imagename);
-    $function = 'imageCreateFrom' . $image_details['type'];
+    $image->image_details = _get_image_details($image->filename);
+    $function = 'imageCreateFrom' . $image->image_details['type'];
     if (function_exists($function)) {
-      $image->imdata = $function($imagename);
+      $image->imdata = $function($image->filename);
     } else {
       return false;
     }
@@ -601,4 +601,41 @@ function _image_strip_name($filename) {
   return strtolower(preg_replace("/[^A-Za-z0-9\.\-\+\/_]/", '', $filename));
 }
 
+/**
+ * Returns the image types supported by the GD library.
+ */
+function _get_gd_image_types() {
+
+  $supported_types = array();
+
+  if (function_exists('imagetypes')) {
+    $types = imagetypes();
+    if ($types & IMG_GIF)  $supported_types[] = 'GIF';
+    if ($types & IMG_JPG)  $supported_types[] = 'JPEG';
+    if ($types & IMG_PNG)  $supported_types[] = 'PNG';
+    if ($types & IMG_WBMP) $supported_types[] = 'WBMP';
+  }
+  return $supported_types;
+}
+
+/**
+ * Returns image details (width, height, type and IPTC info if present)
+ */
+function _get_image_details($image) {
+  $details = array();
+  $data = @getimagesize($image, $raw_iptc_info);
+  if (is_array($data)){
+    $types = array('1' => 'GIF', '2' => 'JPEG', '3' => 'PNG', '4' => 'SWF', '5' => 'PSD', '6' => 'BMP', '7' => 'TIFF', '8' => 'TIFF', '9' => 'JPC', '10' => 'JP2', '11' => 'JPX', '12' => 'JB2', '13' => 'SWC', '14' => 'IFF', '15' => 'WBMP', '16' => 'XBM');
+    $type = array_key_exists($data[2], $types) ? $types[$data[2]] : 'UNKNOWN';
+    $iptc_info = _image_iptc($raw_iptc_info);
+    $details = array('width'     => $data[0],
+                     'height'    => $data[1],
+                     'type'      => $type,
+                     'mime_type' => $data[5],
+                     'iptc_info' => $iptc_info);
+  }
+  return $details;
+}
 ?>
+
+
