@@ -1252,7 +1252,7 @@ function image_thumb_browser($data) {
       </tr>
       <tr>
         <td width="10%">'.(($data["page"] > 1) ? l("|&lt;", "image/tid/". $data["tid"] ."/page/1") : "").'</td>
-        <td width="10%">'.(($data["page"] > 1) ? l("&lt;&lt;", "image/tid/". $data["tid"] ."/page/". $data["page"] - 1) : "").'</td>
+        <td width="10%">'.(($data["page"] > 1) ? l("&lt;&lt;", "image/tid/". $data["tid"] ."/page/". ($data["page"] - 1)) : "").'</td>
         <td>
           <div align="center">';
 
@@ -1271,7 +1271,7 @@ function image_thumb_browser($data) {
           </div>
         </td>
         <td width="10%">
-          <div align="right">'.(($data["page"] < $data["total_pages"]) ? l("&gt;&gt;", "image/tid/". $data["tid"] ."/page/". $data["page"] + 1) : "").'</div>
+          <div align="right">'.(($data["page"] < $data["total_pages"]) ? l("&gt;&gt;", "image/tid/". $data["tid"] ."/page/". ($data["page"] + 1)) : "").'</div>
         </td>
         <td width="10%">
           <div align="right">'.(($data["page"] < $data["total_pages"]) ? l("&gt;|", "image/tid/". $data["tid"] ."/page/". $data["total_pages"]) : "").'</div>
