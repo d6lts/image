@@ -11,7 +11,7 @@ function image_help($section) {
     case 'node/add#image':
       return t('An image (with thumbnail). This is ideal for publishing photographs or screenshots.');
     case 'admin/image':
-      return t('Image galleries can be used to organize and present groups of images. Gallery "albums" may be nested. To add a new gallery click the "add album" tab.');
+      return t('Image galleries can be used to organize and present groups of images. Galleries may be nested. To add a new gallery click the "add gallery" tab.');
   }
 }
 
@@ -99,13 +99,13 @@ function image_menu($may_cache) {
                      'access' => user_access('access content'),
                      'type' => MENU_CALLBACK,
                      'callback' => 'image_fetch');
-    $items[] = array('path' => 'admin/image', 'title' => t('image'),
+    $items[] = array('path' => 'admin/image', 'title' => t('image galleries'),
                      'access' => user_access('administer images'),
                      'callback' => 'image_admin');
     $items[] = array('path' => 'admin/image/list', 'title' => t('list'),
                      'access' => user_access('administer images'),
                      'type' => MENU_DEFAULT_LOCAL_TASK, 'weight' => -10);
-    $items[] = array('path' => 'admin/image/add', 'title' => t('add album'),
+    $items[] = array('path' => 'admin/image/add', 'title' => t('add gallery'),
                      'access' => user_access('administer images'),
                      'type' => MENU_LOCAL_TASK);
   }
@@ -366,18 +366,17 @@ function image_fetch($nid = 0, $size = 'preview') {
 }
 
 /**
- * Image album callback, displays an image album
+ * Image gallery callback, displays an image gallery
  */
 function image_page($type = NULL, $tid = 0) {
-  // ALBUMS
   drupal_set_html_head('<style type="text/css">@import url('.drupal_get_path('module','image').'/image.css);</style>');
-  $albums = taxonomy_get_tree(_image_get_vid(), $tid, -1, 1);
-  for ($i=0; $i < count($albums); $i++) {
-    $albums[$i]->count = taxonomy_term_count_nodes($albums[$i]->tid, 'image');
-    $tree = taxonomy_get_tree(_image_get_vid(), $albums[$i]->tid, -1);
-    $descendant_tids = array_merge(array($albums[$i]->tid), array_map('_taxonomy_get_tid_from_term', $tree));
+  $galleries = taxonomy_get_tree(_image_get_vid(), $tid, -1, 1);
+  for ($i=0; $i < count($galleries); $i++) {
+    $galleries[$i]->count = taxonomy_term_count_nodes($galleries[$i]->tid, 'image');
+    $tree = taxonomy_get_tree(_image_get_vid(), $galleries[$i]->tid, -1);
+    $descendant_tids = array_merge(array($galleries[$i]->tid), array_map('_taxonomy_get_tid_from_term', $tree));
     $last = db_fetch_object(db_query_range(db_rewrite_sql('SELECT n.nid FROM {node} n INNER JOIN {term_node} tn ON n.nid = tn.nid WHERE tn.tid IN (%s) AND n.status = 1 ORDER BY n.sticky DESC, n.created DESC'), implode(',', $descendant_tids), 0, 1));
-    $albums[$i]->latest = node_load(array('nid' => $last->nid));
+    $galleries[$i]->latest = node_load(array('nid' => $last->nid));
   }
 
   $images = array();
@@ -387,19 +386,19 @@ function image_page($type = NULL, $tid = 0) {
       $images[] = node_load(array('nid' => $node->nid));
     }
 
-    $album = taxonomy_get_term($tid);
+    $gallery = taxonomy_get_term($tid);
     $parents = taxonomy_get_parents($tid);
     foreach ($parents as $parent) {
       $breadcrumb[] = array('path' => 'image/tid/'.$parent->tid, 'title' => $parent->name);
     }
     $breadcrumb[] = array('path' => 'image', 'title' => t('Image galleries'));
     $breadcrumb = array_reverse($breadcrumb);
-    drupal_set_title($album->name);
+    drupal_set_title($gallery->name);
   }
   
   $breadcrumb[] = array('path' => $_GET['q']);
   menu_set_location($breadcrumb);
-  $content = theme('image_album', $albums, $images);
+  $content = theme('image_gallery', $galleries, $images);
   print theme('page', $content);
 }
 
@@ -428,7 +427,7 @@ function image_admin() {
         }
       }
       else {
-        $content = image_admin_album(object2array(taxonomy_get_term(arg(3))));
+        $content = image_admin_gallery(object2array(taxonomy_get_term(arg(3))));
       }
       break;
     default:
@@ -443,18 +442,18 @@ function image_admin_overview() {
   $tree = taxonomy_get_tree(_image_get_vid());
   if ($tree) {
     foreach ($tree as $term) {
-      $rows[] = array(_image_depth($term->depth) .' '. $term->name, l(t('edit album'), "admin/image/edit/$term->tid"));
+      $rows[] = array(_image_depth($term->depth) .' '. $term->name, l(t('edit gallery'), "admin/image/edit/$term->tid"));
     }
     return theme('table', $header, $rows);
   }
 }
 
-function image_admin_album($edit = array()) {
+function image_admin_gallery($edit = array()) {
   if (empty($edit)) {
     $edit['vid'] = _image_get_vid();
   }
 
-  $form = form_textfield(t('Album name'), 'name', $edit['name'], 50, 64, t('The name is used to identify the album.'), NULL, TRUE);
+  $form = form_textfield(t('Gallery name'), 'name', $edit['name'], 50, 64, t('The name is used to identify the gallery.'), NULL, TRUE);
   $form .= form_textarea(t('Description'), 'description', $edit['description'], 60, 5, t('The description can be used to provide more information about the forum, or further details about the topic.'));
 
   $exclude = array();
@@ -482,21 +481,21 @@ function image_admin_album($edit = array()) {
 /**
  * Theme a gallery page
  */
-function theme_image_album($albums, $images) {
+function theme_image_gallery($galleries, $images) {
   // We'll add height to keep thumbnails lined up.
   list($width, $height) = _image_get_dimensions('thumbnail');
 
   $content = '';
-  if (count($albums)) {
-    $content.= '<ul class="albums">';
-    foreach ($albums as $album) {
+  if (count($galleries)) {
+    $content.= '<ul class="galleries">';
+    foreach ($galleries as $gallery) {
       $content .= '<li style="height : '.$height .'px">';
-      $content.= l(image_display($album->latest, 'thumbnail'), 'image/tid/'.$album->tid, array(), NULL, NULL, FALSE, TRUE);
-      $content.= "<h3>".l($album->name, 'image/tid/'.$album->tid) . "</h3>\n";
-      $content.= '<div class="description">'. check_output($album->description) ."</div>\n";
-      $content.= '<p class="count">' . format_plural($album->count, 'There is %count image in this album', 'There are %count images in this album') . "</p>\n";
-      if ($album->latest->changed) {
-        $content.= '<p class="last">'. t('Last updated: %date', array('%date' => format_date($album->latest->changed))) . "</p>\n";
+      $content.= l(image_display($gallery->latest, 'thumbnail'), 'image/tid/'.$gallery->tid, array(), NULL, NULL, FALSE, TRUE);
+      $content.= "<h3>".l($gallery->name, 'image/tid/'.$gallery->tid) . "</h3>\n";
+      $content.= '<div class="description">'. check_output($gallery->description) ."</div>\n";
+      $content.= '<p class="count">' . format_plural($gallery->count, 'There is %count image in this gallery', 'There are %count images in this gallery') . "</p>\n";
+      if ($gallery->latest->changed) {
+        $content.= '<p class="last">'. t('Last updated: %date', array('%date' => format_date($gallery->latest->changed))) . "</p>\n";
       }
       $content.= "</li>\n";
     }
