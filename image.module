@@ -483,11 +483,14 @@ function image_admin_album($edit = array()) {
  * Theme a gallery page
  */
 function theme_image_album($albums, $images) {
+  // We'll add height to keep thumbnails lined up.
+  list($width, $height) = _image_get_dimensions('thumbnail');
+
   $content = '';
   if (count($albums)) {
     $content.= '<ul class="albums">';
     foreach ($albums as $album) {
-      $content.= "<li>";
+      $content .= '<li style="height : '.$height .'px">';
       $content.= l(image_display($album->latest, 'thumbnail'), 'image/tid/'.$album->tid, array(), NULL, NULL, FALSE, TRUE);
       $content.= "<h3>".l($album->name, 'image/tid/'.$album->tid) . "</h3>\n";
       $content.= '<div class="description">'. check_output($album->description) ."</div>\n";
@@ -501,12 +504,14 @@ function theme_image_album($albums, $images) {
   }
 
   if (count($images)) {
+    $height += 75;
     $content.= '<ul class="images">';
     foreach ($images as $image) {
       $content .= '<li';
       if ($image->sticky) {
         $content .= ' class="sticky"';
       }
+      $content .= ' style="height : '.$height .'px; width : '.$width.'px;"';
       $content .= ">\n";
       $content .= l(image_display($image, 'thumbnail'), 'node/'.$image->nid, array(), NULL, NULL, FALSE, TRUE);
       $content .= '<h3>'.l($image->title, 'node/'.$image->nid)."</h3>";
@@ -611,6 +616,15 @@ function _image_get_sizes() {
 
 function _image_required_sizes() {
   return array('thumbnail', 'preview', '_original');
+}
+
+function _image_get_dimensions($label) {
+  foreach (_image_get_sizes() as $size) {
+    if ($size['label'] == $label) {
+      return array($size['width'], $size['height']);
+    }
+  }
+  return array();
 }
 
 /**

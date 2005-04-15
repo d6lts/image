@@ -35,6 +35,4 @@ ul.images {
 ul.images li { 
   float : left;
   margin : 1em;
-  width : 30%;
-  height : 200px;
 }
