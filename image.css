@@ -1,27 +1,27 @@
-ul.albums { 
+ul.galleries { 
   list-style-type : none;
   margin : 0;
   padding : 0;
 }
 
-ul.albums li { 
+ul.galleries li { 
   background : #eeeeee;
   border : 1px #cccccc solid;
   margin : 1em 0;
   padding : 1em;
 }
 
-ul.albums li img { 
+ul.galleries li img { 
   float : left;
   padding-right : 4px;
   margin-right : 4px;
 }
 
-ul.albums li div.count { 
+ul.galleries li div.count { 
   clear : both;
 }
 
-ul.albums h3 { 
+ul.galleries h3 { 
   margin : 0;
   padding : 0;
 }
