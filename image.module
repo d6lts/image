@@ -209,17 +209,19 @@ function image_block($op, $delta = 0) {
 
       return $block;
     case 'view':
-      switch($delta) {
-        case 0:
-          $images = image_get_latest();
-          $block['subject'] = t('Latest image');
-          $block['content'] = l(image_display($images[0], 'thumbnail'), 'node/'.$images[0]->nid, array(), NULL, NULL, FALSE, TRUE);
-          break;
-        case 1:
-          $images = image_get_random();
-          $block['subject'] = t('Random image');
-          $block['content'] = l(image_display($images[0], 'thumbnail'), 'node/'.$images[0]->nid, array(), NULL, NULL, FALSE, TRUE);
-          break;
+      if (user_access('access content')) {
+        switch($delta) {
+          case 0:
+            $images = image_get_latest();
+            $block['subject'] = t('Latest image');
+            $block['content'] = l(image_display($images[0], 'thumbnail'), 'node/'.$images[0]->nid, array(), NULL, NULL, FALSE, TRUE);
+            break;
+          case 1:
+            $images = image_get_random();
+            $block['subject'] = t('Random image');
+            $block['content'] = l(image_display($images[0], 'thumbnail'), 'node/'.$images[0]->nid, array(), NULL, NULL, FALSE, TRUE);
+            break;
+        }
       }
       return $block;
   }
@@ -395,7 +397,7 @@ function image_page($type = NULL, $tid = 0) {
     $breadcrumb = array_reverse($breadcrumb);
     drupal_set_title($gallery->name);
   }
-  
+
   $breadcrumb[] = array('path' => $_GET['q']);
   menu_set_location($breadcrumb);
   $content = theme('image_gallery', $galleries, $images);
