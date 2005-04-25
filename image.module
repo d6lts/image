@@ -401,7 +401,7 @@ function image_page($type = NULL, $tid = 0) {
   $breadcrumb[] = array('path' => $_GET['q']);
   menu_set_location($breadcrumb);
   $content = theme('image_gallery', $galleries, $images);
-  print theme('page', $content);
+  return $content;
 }
 
 /**
@@ -435,7 +435,7 @@ function image_admin() {
     default:
       $content = image_admin_overview();
   }
-  print theme('page', $content);
+  return $content;
 }
 
 function image_admin_overview() {
