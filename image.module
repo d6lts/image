@@ -625,7 +625,7 @@ function _image_filename($filename, $type = NULL, $temp = FALSE) {
     $filename = substr($filename, 0, $pos) .'.'. $type . substr($filename, $pos);
   }
 
-  $output = variable_get('image_path', 'images') .'/';
+  $output = variable_get('image_default_path', 'images') .'/';
   if ($temp) {
     $output .= 'temp/';
   }
