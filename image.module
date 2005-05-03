@@ -54,6 +54,8 @@ function image_access($op, $node) {
 function image_settings() {
   _image_check_settings();
 
+  $output.= form_hidden('image_updated', time());
+  
   $paths .= form_textfield(t('Default image path'), 'image_default_path', variable_get('image_default_path', 'images'), 30, 255, t('Subdirectory in the directory "%dir" where pictures will be stored.', array('%dir' => '<em>'. variable_get('file_directory_path', 'files') .'/</em>')));
   $output.= form_group(t('File paths'), $paths);
 
@@ -144,8 +146,8 @@ function image_validate(&$node, $field_name) {
     else {
       return;
     }
-    $node->file = $file;
-    _image_build_derivatives($node);
+    $node->file = $node->images['_original'] = $file->filepath;
+    _image_build_derivatives($node, true);
   }
 }
 
@@ -176,6 +178,7 @@ function image_link($type, $node, $main = 0) {
     $sizes = array();
     foreach (_image_get_sizes() as $size) {
       if ($size['label'] && !in_array($size['label'], array('thumbnail', '_original'))) {
+
         $sizes[] = $size;
       }
     }
@@ -340,15 +343,19 @@ function image_delete($node) {
 /**
  * Create an <img> tag for an image.
  */
-function image_display($node, $size = 'preview', $attributes = array()) {
-  if (!empty($node->images[$size])) {
-    $info = image_get_info(file_create_path($node->images[$size]));
-    $attr = 'width="'.$info['width'].'" height="'.$info['height'].'" ' . drupal_attributes($attributes);
-    $output.= '<span class="image '.$size.'">';
-    $output.= theme('image', file_create_url($node->images[$size]), check_plain($node->title), check_plain($node->title), $attr, FALSE);
-    $output.= "</span>\n";
-    return $output;
+function image_display(&$node, $label = 'preview', $attributes = array()) {
+  // regenerate images?
+  if (!file_exists(file_create_path($node->images[$label])) ||
+      filemtime(file_create_path($node->images[$label])) < variable_get('image_updated', 0)) {
+    _image_build_derivatives($node);
   }
+
+  $info = image_get_info(file_create_path($node->images[$label]));
+  $attr = 'width="'.$info['width'].'" height="'.$info['height'].'" ' . drupal_attributes($attributes);
+  $output.= '<span class="image '.$label.'">';
+  $output.= theme('image', file_create_url($node->images[$label]), check_plain($node->title), check_plain($node->title), $attr, FALSE);
+  $output.= "</span>\n";
+  return $output;
 }
 
 /**
@@ -485,7 +492,9 @@ function image_admin_gallery($edit = array()) {
  */
 function theme_image_gallery($galleries, $images) {
   // We'll add height to keep thumbnails lined up.
-  list($width, $height) = _image_get_dimensions('thumbnail');
+  $size = _image_get_dimensions('thumbnail');
+  $width = $size['width'];
+  $height = $size['height'];
 
   $content = '';
   if (count($galleries)) {
@@ -569,24 +578,41 @@ function _image_check_settings() {
 /**
  * Generate image derivatives.
  */
-function _image_build_derivatives(&$node) {
-  $info = image_get_info($node->file->filepath);
+function _image_build_derivatives(&$node, $temp = FALSE) {
+  $info = image_get_info(file_create_path($node->images['_original']));
   $sizes = _image_get_sizes();
+  if (!$temp) {
+    _image_remove($node);
+  }
   foreach ($sizes as $size) {
-    $file = NULL;
     if ($size['label'] && $size['width'] && $size['height']) {
       if ($info['width'] > $size['width'] || $info['height'] > $size['height']) {
-        $filename = _image_filename($node->file->filename, $size['label'], TRUE);
-        if (!image_scale($node->file->filepath, file_create_path($filename), $size['width'], $size['height'])) {
+        $source = file_create_path($node->images['_original']);
+        $destination = _image_filename(basename($source), $size['label'], $temp);
+        if (!image_scale($source, file_create_path($destination), $size['width'], $size['height'])) {
           drupal_set_message(t('Unable to create %label image', array('%label' => $size['label'])), 'error');
         }
         else {
-          $node->images[$size['label']] = $filename;
+          $node->images[$size['label']] = $destination;
+          if (!$temp) {
+            _image_insert($node->nid, $size['label'], file_create_path($destination));
+          }
         }
+      }
+      else {
+        $node->images[$size['label']] = $node->images['_original'];
       }
     }
   }
-  $node->images['_original'] = $node->file->filepath;
+}
+
+function _image_remove($node) {
+  $result = db_query("SELECT * FROM {files} WHERE nid=%d AND filename!='_original'", $node->nid);
+  while ($file = db_fetch_object($result)) {
+    file_delete(file_create_path($file->filepath));
+  }
+  db_query("DELETE FROM {files} WHERE nid=%d AND filename!='_original'", $node->nid);
+
 }
 
 /**
@@ -622,7 +648,7 @@ function _image_required_sizes() {
 function _image_get_dimensions($label) {
   foreach (_image_get_sizes() as $size) {
     if ($size['label'] == $label) {
-      return array($size['width'], $size['height']);
+      return $size;
     }
   }
   return array();
