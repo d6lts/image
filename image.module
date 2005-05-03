@@ -378,7 +378,6 @@ function image_fetch($nid = 0, $size = 'preview') {
  * Image gallery callback, displays an image gallery
  */
 function image_page($type = NULL, $tid = 0) {
-  drupal_set_html_head('<style type="text/css">@import url('.drupal_get_path('module','image').'/image.css);</style>');
   $galleries = taxonomy_get_tree(_image_get_vid(), $tid, -1, 1);
   for ($i=0; $i < count($galleries); $i++) {
     $galleries[$i]->count = taxonomy_term_count_nodes($galleries[$i]->tid, 'image');
@@ -491,6 +490,8 @@ function image_admin_gallery($edit = array()) {
  * Theme a gallery page
  */
 function theme_image_gallery($galleries, $images) {
+  drupal_set_html_head('<style type="text/css">@import url('.drupal_get_path('module','image').'/image.css);</style>');
+
   // We'll add height to keep thumbnails lined up.
   $size = _image_get_dimensions('thumbnail');
   $width = $size['width'];
