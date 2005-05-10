@@ -119,7 +119,7 @@ function image_menu($may_cache) {
  * Implements hook_cron. (deletes old temp images)
  */
 function image_cron() {
-  $path = variable_get('image_default_path', 'image') . '/temp';
+  $path = variable_get('image_default_path', 'images') . '/temp';
   $files = file_scan_directory(file_create_path($path), '.*');
   foreach ($files as $file => $info) {
     if (time() - filemtime($file) > 60*60*6) {
