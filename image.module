@@ -532,8 +532,10 @@ function theme_image_gallery($galleries, $images) {
       $content .= ">\n";
       $content .= l(image_display($image, 'thumbnail'), 'node/'.$image->nid, array(), NULL, NULL, FALSE, TRUE);
       $content .= '<h3>'.l($image->title, 'node/'.$image->nid)."</h3>";
-      $content .= '<div class="author">'. t('Posted by: %name', array('%name' => format_name($image))) . "</div>\n";
-      $content .= '<div class="date">'.format_date($image->created)."</div>\n";
+      if (theme_get_setting('toggle_node_info_' . $image->type)) {
+        $content .= '<div class="author">'. t('Posted by: %name', array('%name' => format_name($image))) . "</div>\n";
+        $content .= '<div class="date">'.format_date($image->created)."</div>\n";
+      }
       $content .= "</li>\n";
     }
     $content.= "</ul>\n";
