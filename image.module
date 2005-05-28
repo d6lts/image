@@ -81,6 +81,9 @@ function image_settings() {
   $size_group .= form_checkbox(t('Allow users to view original image'), 'image_view_original', 1, variable_get('image_view_original', 0));
   $output.= form_group(t('Image sizes'), $size_group);
 
+  $gallery_group = form_textfield(t('Images per page'),'image_images_per_page', variable_get('image_images_per_page',6),3,3,t('Sets the number of images to be displayed in a gallery page.'));
+  $output .= form_group(t('Gallery settings'), $gallery_group);
+  
   return $output;
 }
 
@@ -389,7 +392,7 @@ function image_page($type = NULL, $tid = 0) {
 
   $images = array();
   if ($tid) {
-    $result = pager_query(db_rewrite_sql("SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid=n.nid WHERE n.status=1 AND n.type='image' AND t.tid=%d ORDER BY n.sticky DESC, n.created DESC"), 6, 0, NULL, $tid);
+    $result = pager_query(db_rewrite_sql("SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid=n.nid WHERE n.status=1 AND n.type='image' AND t.tid=%d ORDER BY n.sticky DESC, n.created DESC"), variable_get('image_images_per_page', 6), 0, NULL, $tid);
     while ($node = db_fetch_object($result)) {
       $images[] = node_load(array('nid' => $node->nid));
     }
@@ -453,6 +456,9 @@ function image_admin_overview() {
       $rows[] = array(_image_depth($term->depth) .' '. $term->name, l(t('edit gallery'), "admin/image/edit/$term->tid"));
     }
     return theme('table', $header, $rows);
+  }
+  else {
+    return t('No galleries available');
   }
 }
 
@@ -533,7 +539,7 @@ function theme_image_gallery($galleries, $images) {
     $content.= "</ul>\n";
   }
 
-  if ($pager = theme('pager', NULL, 6, 0)) {
+  if ($pager = theme('pager', NULL, variable_get('image_images_per_page', 6), 0)) {
     $content.= $pager;
   }
 
