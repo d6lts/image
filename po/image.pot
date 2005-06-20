@@ -17,6 +17,18 @@ msgstr "Project-Id-Version: PROJECT\n"
 msgid "<p>Admins may create many image nodes at once by uploading all images to a folder on the server. This upload happens outside of Drupal, usually using an FTP client.</p>"
 msgstr ""
 
+#: image.module:10
+msgid "Allows uploading of images and creating image galleries."
+msgstr ""
+
+#: image.module:12
+msgid "An image (with thumbnail). This is ideal for publishing photographs or screenshots."
+msgstr ""
+
+#: image.module:14
+msgid "Image galleries can be used to organize and present groups of images. Galleries may be nested. To add a new gallery click the \"add gallery\" tab."
+msgstr ""
+
 #: image.module:30
 msgid "Below is a status of image module's current configuration."
 msgstr ""
@@ -45,6 +57,18 @@ msgstr ""
 msgid "You may link to images on this site <a href=\"%explanation-url\">using a special syntax</a>"
 msgstr ""
 
+#: image.module:59
+msgid "Default image path"
+msgstr ""
+
+#: image.module:59
+msgid "Subdirectory in the directory \"%dir\" where pictures will be stored."
+msgstr ""
+
+#: image.module:60
+msgid "File paths"
+msgstr ""
+
 #: image.module:61
 msgid "<p>You may quickly link to image nodes using a special syntax. The image code(s) will be replaced by thumbnail linked to full size image node. Syntax: <code>[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]</code>. Every parameter except node_id is <em>optional</em>.</p>"
 msgstr ""
@@ -53,16 +77,48 @@ msgstr ""
 msgid "image"
 msgstr ""
 
+#: image.module:79
+msgid "Label"
+msgstr ""
+
+#: image.module:79
+msgid "Width"
+msgstr ""
+
+#: image.module:79
+msgid "Height"
+msgstr ""
+
+#: image.module:80
+msgid "Select various pixel dimensions, \"thumbnail\" and \"preview\" are required."
+msgstr ""
+
+#: image.module:81
+msgid "Allow users to view original image"
+msgstr ""
+
+#: image.module:82
+msgid "Image sizes"
+msgstr ""
+
+#: image.module:84
+msgid "Images per page"
+msgstr ""
+
+#: image.module:84
+msgid "Sets the number of images to be displayed in a gallery page."
+msgstr ""
+
+#: image.module:85
+msgid "Gallery settings"
+msgstr ""
+
 #: image.module:87
 msgid "Explanation or submission guidelines"
 msgstr ""
 
 #: image.module:87
 msgid "This text will be displayed at the top of the image submission form.  It is useful for helping or instructing your users."
-msgstr ""
-
-#: image.module:89
-msgid "Default image path"
 msgstr ""
 
 #: image.module:89
@@ -123,6 +179,14 @@ msgstr ""
 
 #: image.module:103
 msgid "Default size of thumbnails: format will be the same as original image. Use just one dimension, and put a \"x\" to specify height. Examples: \"100\" for width of 100; \"x200\" for height of 200."
+msgstr ""
+
+#: image.module:110
+msgid "list"
+msgstr ""
+
+#: image.module:113
+msgid "add gallery"
 msgstr ""
 
 #: image.module:116
@@ -214,6 +278,10 @@ msgid "Set how many pictures users are allowed."
 msgstr ""
 
 #: image.module:145
+msgid "Uploaded file is not a valid image"
+msgstr ""
+
+#: image.module:145
 msgid "Personal Gallery Picture Limit Per Role"
 msgstr ""
 
@@ -241,6 +309,10 @@ msgstr ""
 msgid "image galleries"
 msgstr ""
 
+#: image.module:198
+msgid "view original"
+msgstr ""
+
 #: image.module:200
 msgid "images"
 msgstr ""
@@ -257,6 +329,14 @@ msgstr ""
 msgid "my image gallery"
 msgstr ""
 
+#: image.module:213;222
+msgid "Latest image"
+msgstr ""
+
+#: image.module:214;227
+msgid "Random image"
+msgstr ""
+
 #: image.module:224
 msgid "edit this image"
 msgstr ""
@@ -271,6 +351,18 @@ msgstr ""
 
 #: image.module:229
 msgid "View %u's image gallery."
+msgstr ""
+
+#: image.module:254
+msgid "Thumbnail"
+msgstr ""
+
+#: image.module:258
+msgid "Image"
+msgstr ""
+
+#: image.module:259;471
+msgid "Description"
 msgstr ""
 
 #: image.module:259
@@ -293,14 +385,6 @@ msgstr ""
 msgid "Image gallery"
 msgstr ""
 
-#: image.module:307
-msgid "view user's image gallery"
-msgstr ""
-
-#: image.module:366;1427
-msgid "Thumbnail"
-msgstr ""
-
 #: image.module:370
 msgid "EXIF data"
 msgstr ""
@@ -311,10 +395,6 @@ msgstr ""
 
 #: image.module:382
 msgid "Click \"Browse...\" to select an image to upload."
-msgstr ""
-
-#: image.module:384
-msgid "Description"
 msgstr ""
 
 #: image.module:388
@@ -569,3 +649,46 @@ msgstr ""
 msgid "administer images"
 msgstr ""
 
+#: image.module:456
+msgid "edit gallery"
+msgstr ""
+
+#: image.module:461
+msgid "No galleries available"
+msgstr ""
+
+#: image.module:470
+msgid "Gallery name"
+msgstr ""
+
+#: image.module:470
+msgid "The name is used to identify the gallery."
+msgstr ""
+
+#: image.module:517
+msgid "Last updated: %date"
+msgstr ""
+
+#: image.module:537
+msgid "Posted by: %name"
+msgstr ""
+
+#: image.module:607
+msgid "Unable to create %label image"
+msgstr ""
+
+#: image.module:654
+msgid "thumbnail"
+msgstr ""
+
+#: image.module:655
+msgid "preview"
+msgstr ""
+
+#: image.module:712
+msgid "Image Galleries"
+msgstr ""
+
+#: image.module:515;550
+msgid "There is 1 image in this gallery"
+msgstr ""
