@@ -689,10 +689,6 @@ msgstr "Přístup zamítnut"
 msgid "There is 1 image in this album."
 msgstr "V této galerii je 1 obrázek."
 
-#: image.module:1327
-msgid "There are %a images in this album."
-msgstr "V této galerii je %a obrázků."
-
 #: image.module:1329
 msgid "There are no images in this album."
 msgstr "V této galerii nejsou žádné obrázky."
@@ -849,5 +845,8 @@ msgstr "Galerie"
 
 #: image.module:515 ;550
 msgid "There is 1 image in this gallery"
-msgstr "V této galerii je 1 obrázek"
+msgid_plural "There are %count images in this gallery"
+msgstr[0] "V této galerii je 1 obrázek"
+msgstr[1] "V této galerii jsou %count obrázky."
+msgstr[2] "V této galerii je %count obrázků."
 

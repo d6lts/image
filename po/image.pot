@@ -691,4 +691,5 @@ msgstr ""
 
 #: image.module:515;550
 msgid "There is 1 image in this gallery"
+msgid_plural "There are %count images in this gallery"
 msgstr ""
