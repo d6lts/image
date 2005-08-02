@@ -353,6 +353,10 @@ function image_display(&$node, $label = 'preview', $attributes = array()) {
     _image_build_derivatives($node);
   }
 
+  if(! $node->images[$label]) {
+    return '';
+  }
+
   $info = image_get_info(file_create_path($node->images[$label]));
   $attr = 'width="'.$info['width'].'" height="'.$info['height'].'" ' . drupal_attributes($attributes);
   $output.= '<span class="image '.$label.'">';
