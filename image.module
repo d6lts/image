@@ -358,7 +358,7 @@ function image_display(&$node, $label = 'preview', $attributes = array()) {
   }
 
   $info = image_get_info(file_create_path($node->images[$label]));
-  $attr = 'width="'.$info['width'].'" height="'.$info['height'].'" ' . drupal_attributes($attributes);
+  $attr = array('width' => $info['width'], 'height' => $info['height']) + $attributes;
   $output.= '<span class="image '.$label.'">';
   $output.= theme('image', file_create_url($node->images[$label]), check_plain($node->title), check_plain($node->title), $attr, FALSE);
   $output.= "</span>\n";
