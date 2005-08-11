@@ -149,7 +149,7 @@ function image_validate(&$node, $field_name) {
     else {
       return;
     }
-    $node->file = $node->images['_original'] = $file->filepath;
+    $node->images['_original'] = $file->filepath;
     _image_build_derivatives($node, true);
   }
 }
