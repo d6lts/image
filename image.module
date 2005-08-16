@@ -285,6 +285,7 @@ function image_view(&$node, $main = 0, $page = 0) {
     }
   }
   $request = ($_GET['size']) ? $_GET['size'] : 'preview';
+  $request = check_plain($request);
   $node = node_prepare($node, $main);
   $node->teaser = l(image_display($node, 'thumbnail'), 'node/'.$node->nid, array(), NULL, NULL, FALSE, TRUE) . $node->teaser;
   $node->body = image_display($node, $request) . $node->body;
