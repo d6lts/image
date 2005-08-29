@@ -16,10 +16,10 @@ function image_help($section) {
 }
 
 /**
- * Implementation of hook_node_name
+ * Implementation of hook_node_info
  */
-function image_node_name() {
-  return t('image');
+function image_node_info() {
+  return array('image' => array('name' => t('image'), 'base' => 'image'));
 }
 
 /**
