@@ -714,7 +714,8 @@ function _image_get_vid() {
     // Check to see if a forum vocabulary exists
     $vid = db_result(db_query("SELECT vid FROM {vocabulary} WHERE module='%s'", 'image'));
     if (!$vid) {
-      $vocabulary = taxonomy_save_vocabulary(array('name' => t('Image Galleries'), 'multiple' => '0', 'required' => '0', 'hierarchy' => '1', 'relations' => '0', 'module' => 'image', 'nodes' => array('image')));
+      $vocabulary = array('name' => t('Image Galleries'), 'multiple' => '0', 'required' => '0', 'hierarchy' => '1', 'relations' => '0', 'module' => 'image', 'nodes' => array('image'));
+      taxonomy_save_vocabulary($vocabulary);
       $vid = $vocabulary['vid'];
     }
     variable_set('image_nav_vocabulary', $vid);
