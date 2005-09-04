@@ -56,7 +56,7 @@ function image_settings() {
 
   $output.= form_hidden('image_updated', time());
   
-  $paths .= form_textfield(t('Default image path'), 'image_default_path', variable_get('image_default_path', 'images'), 30, 255, t('Subdirectory in the directory "%dir" where pictures will be stored.', array('%dir' => '<em>'. variable_get('file_directory_path', 'files') .'/</em>')));
+  $paths .= form_textfield(t('Default image path'), 'image_default_path', variable_get('image_default_path', 'images'), 30, 255, t('Subdirectory in the directory "%dir" where pictures will be stored. Do not include trailing slash.', array('%dir' => '<em>'. variable_get('file_directory_path', 'files') .'/</em>')));  // MSChange
   $output.= form_group(t('File paths'), $paths);
 
   // Size and restrictions
@@ -540,7 +540,9 @@ function theme_image_gallery($galleries, $images) {
       $content .= '<h3>'.l($image->title, 'node/'.$image->nid)."</h3>";
       if (theme_get_setting('toggle_node_info_' . $image->type)) {
         $content .= '<div class="author">'. t('Posted by: %name', array('%name' => theme('username', $image))) . "</div>\n";
-        $content .= '<div class="date">'.format_date($image->created)."</div>\n";
+        if ($image->created > 0) {
+          $content .= '<div class="date">'.format_date($image->created)."</div>\n";
+        }
       }
       $content .= "</li>\n";
     }
