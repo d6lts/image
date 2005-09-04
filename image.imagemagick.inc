@@ -73,7 +73,7 @@ function _image_imagemagick_convert($source, $dest, $filter) {
   $filter = preg_replace("/[^A-Za-z0-9\.\-\+\040]/", '', $filter);
   $source = _image_escape_shell($source);
   $dest = _image_escape_shell($dest);
-  $err = exec("$convert_path $filter $source $dest");
+  $err = _image_exec("$convert_path $filter $source $dest");
   if ($err) {
     return false;
   }
@@ -83,4 +83,18 @@ function _image_imagemagick_convert($source, $dest, $filter) {
   
   return true;
 }
+
+function _image_exec($cmd) {
+  if (substr(php_uname(), 0, 7) == "Windows"){
+    if ($h = popen("start \"bla\" $cmd", "r")) {
+      pclose($h);
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return exec($cmd);    
+  }
+} 
+
 ?>
