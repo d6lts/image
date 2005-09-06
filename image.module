@@ -590,16 +590,31 @@ function image_get_latest($count = 1, $tid = 0) {
 function _image_check_settings() {
   // File paths
   $image_path = file_create_path(variable_get('image_default_path', 'images'));
-  $temp_path = $image_path . '/temp';
+  $temp_path = rtrim($image_path, '/') . '/temp';
 
-  file_check_directory($image_path, FILE_CREATE_DIRECTORY, 'image_default_path');
-  file_check_directory($temp_path, FILE_CREATE_DIRECTORY, 'image_default_path');
+  if (!file_check_directory($image_path, FILE_CREATE_DIRECTORY, 'image_default_path')) {
+    return false;
+  }
+  if (!file_check_directory($temp_path, FILE_CREATE_DIRECTORY, 'image_default_path')) {
+    return false;
+  }
+
+  // Sanity check : make sure we've got a working toolkit
+  if (!image_get_toolkit()) {
+    drupal_set_message(t('Make sure you have a working image toolkit installed and enabled, for more information see: %settings', array('%settings' => l(t('the settings page'), 'admin/settings'))), 'error');
+    return false;
+  }
+  return true;
 }
 
 /**
  * Generate image derivatives.
  */
 function _image_build_derivatives(&$node, $temp = FALSE) {
+  // sanity check:
+  if (!_image_check_settings()) {
+    return false;
+  }
   $info = image_get_info(file_create_path($node->images['_original']));
   $sizes = _image_get_sizes();
   if (!$temp) {
