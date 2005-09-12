@@ -287,8 +287,8 @@ function image_view(&$node, $main = 0, $page = 0) {
   $request = ($_GET['size']) ? $_GET['size'] : 'preview';
   $request = check_plain($request);
   $node = node_prepare($node, $main);
-  $node->teaser = l(image_display($node, 'thumbnail'), 'node/'.$node->nid, array(), NULL, NULL, FALSE, TRUE) . $node->teaser;
-  $node->body = image_display($node, $request) . $node->body;
+  $node->teaser = theme('image_teaser', $node);
+  $node->body = theme('image_body', $node, $request);
 }
 
 
@@ -495,6 +495,20 @@ function image_admin_gallery($edit = array()) {
   }
 
   return form($form);
+}
+
+/**
+ * Theme a teaser
+ */
+function theme_image_teaser($node) {
+ return l(image_display($node, 'thumbnail'), 'node/'.$node->nid, array(), NULL, NULL, FALSE, TRUE) . $node->teaser;
+}
+
+/**
+ * Theme a body
+ */
+function theme_image_body($node, $size) {
+ return image_display($node, $size) . $node->body;
 }
 
 /**
