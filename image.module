@@ -237,6 +237,7 @@ function image_block($op, $delta = 0) {
  * Implementation of hook_form
  */
 function image_form(&$node, &$param) {
+  $output = form_textfield(t('Title'), 'title', $node->title, 60, 128, NULL, NULL, TRUE);
   _image_check_settings();
 
   $param['options'] = array("enctype" => "multipart/form-data",  "name" => "image_forms");
