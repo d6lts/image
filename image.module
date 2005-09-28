@@ -360,10 +360,9 @@ function image_display(&$node, $label = 'preview', $attributes = array()) {
   }
 
   $info = image_get_info(file_create_path($node->images[$label]));
+  $attributes['class'] = "image $label". (isset($attributes['class']) ? " ".$attributes['class'] : "");
   $attr = array('width' => $info['width'], 'height' => $info['height']) + $attributes;
-  $output.= '<span class="image '.$label.'">';
-  $output.= theme('image', file_create_url($node->images[$label]), check_plain($node->title), check_plain($node->title), $attr, FALSE);
-  $output.= "</span>\n";
+  $output.= theme('image', file_create_url($node->images[$label]), $node->title, $node->title, $attr, FALSE);
   return $output;
 }
 
@@ -474,7 +473,7 @@ function image_admin_gallery($edit = array()) {
   }
 
   $form = form_textfield(t('Gallery name'), 'name', $edit['name'], 50, 64, t('The name is used to identify the gallery.'), NULL, TRUE);
-  $form .= form_textarea(t('Description'), 'description', $edit['description'], 60, 5, t('The description can be used to provide more information about the forum, or further details about the topic.'));
+  $form .= form_textarea(t('Description'), 'description', $edit['description'], 60, 5, t('The description can be used to provide more information about the image gallery.'));
 
   $exclude = array();
   $parent = array_keys(taxonomy_get_parents($edit['tid']));
@@ -579,7 +578,12 @@ function theme_image_gallery($galleries, $images) {
  * Fetch a random N image(s) - optionally from a given term.
  */
 function image_get_random($count = 1, $tid = 0) {
-  $result = db_query_range(db_rewrite_sql("SELECT nid FROM {node} n WHERE n.type='image' AND n.status=1 ORDER BY RAND()"), 0, $count);
+  if ($tid != 0) {
+    $result = db_query_range(db_rewrite_sql("SELECT n.nid FROM {term_node} tn LEFT JOIN {node} n ON n.nid=tn.nid WHERE n.type='image' AND n.status=1 AND tn.tid=%d ORDER BY RAND()"), $tid, 0, $count);
+  }
+  else {
+    $result = db_query_range(db_rewrite_sql("SELECT n.nid FROM {node} n WHERE n.type='image' AND n.status=1 ORDER BY RAND()"), 0, $count);
+  }
   $output = array();
   while ($nid = db_fetch_object($result)) {
     $output[] = node_load(array('nid' => $nid->nid));
@@ -588,10 +592,15 @@ function image_get_random($count = 1, $tid = 0) {
 }
 
 /**
- * Fetch the latest N image(s).
+ * Fetch the latest N image(s) - optionally from a given term.
  */
 function image_get_latest($count = 1, $tid = 0) {
-  $result = db_query_range(db_rewrite_sql("SELECT nid FROM {node} n WHERE n.type='image' AND n.status=1 ORDER BY changed DESC"), 0, $count);
+  if ($tid != 0) {
+    $result = db_query_range(db_rewrite_sql("SELECT n.nid FROM {term_node} tn LEFT JOIN {node} n ON n.nid=tn.nid WHERE n.type='image' AND n.status=1 AND tn.tid=%d ORDER BY n.changed DESC"), $tid, 0, $count);
+  }
+  else {
+    $result = db_query_range(db_rewrite_sql("SELECT n.nid FROM {node} n WHERE n.type='image' AND n.status=1 ORDER BY changed DESC"), 0, $count);
+  }
   $output = array();
   while ($nid = db_fetch_object($result)) {
     $output[] = node_load(array('nid' => $nid->nid));
@@ -743,7 +752,7 @@ function _image_depth($depth, $graphic = '--') {
 function _image_get_vid() {
   $vid = variable_get('image_nav_vocabulary', '');
   if (empty($vid)) {
-    // Check to see if a forum vocabulary exists
+    // Check to see if an image gallery vocabulary exists
     $vid = db_result(db_query("SELECT vid FROM {vocabulary} WHERE module='%s'", 'image'));
     if (!$vid) {
       $vocabulary = array('name' => t('Image Galleries'), 'multiple' => '0', 'required' => '0', 'hierarchy' => '1', 'relations' => '0', 'module' => 'image', 'nodes' => array('image'));
