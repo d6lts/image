@@ -679,18 +679,27 @@ function _image_remove($node) {
  * Creates an image filename.
  */
 function _image_filename($filename, $type = NULL, $temp = FALSE) {
+  $path = variable_get('image_default_path', 'images') .'/';
+  if ($temp) {
+    $path .= 'temp/';
+  }
+  
   if ($type) {
     $pos = strrpos($filename, '.');
-    $filename = substr($filename, 0, $pos) .'.'. $type . substr($filename, $pos);
+    if ($pos === false) {
+      // The file had no extension - which happens in really old image.module
+      // versions, so figure out the extension.
+      $info = image_get_info(file_create_path($path . $filename));
+      $filename = $filename .'.'. $type .'.'. $info['extension'];
+    }
+    else {
+      $filename = substr($filename, 0, $pos) .'.'. $type . substr($filename, $pos);
+    }
   }
 
-  $output = variable_get('image_default_path', 'images') .'/';
-  if ($temp) {
-    $output .= 'temp/';
-  }
-  $output .= $filename;
+  //$output .= $filename;
 
-  return $output;
+  return $path . $filename;
 }
 
 /**
