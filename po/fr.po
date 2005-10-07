@@ -1,12 +1,14 @@
 # translation of fr.po to Français
-# LANGUAGE translation of PROJECT
-# Copyright YEAR NAME <EMAIL@ADDRESS>
+# translation of image.po to Français
+# French translation of Drupal (image.module)
+# Copyright 2005 Matthieu Duchemin <alkahan@free.fr>
+# Generated from file: image.module,v 1.146.2.4 2005/05/10 14:35:09 walkah
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
-"POT-Creation-Date: 2004-02-17 14:32+0100\n"
-"PO-Revision-Date: 2005-10-07 22:37+0200\n"
+"POT-Creation-Date: 2005-05-16 17:12-0300\n"
+"PO-Revision-Date: 2005-10-07 22:41+0200\n"
 "Last-Translator: Matthieu DUCHEMIN <alkahan@free.fr>\n"
 "Language-Team: Français <fr@li.org>\n"
 "MIME-Version: 1.0\n"
