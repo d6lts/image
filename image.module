@@ -54,37 +54,53 @@ function image_access($op, $node) {
 function image_settings() {
   _image_check_settings();
 
-  $output.= form_hidden('image_updated', time());
-  
-  $paths .= form_textfield(t('Default image path'), 'image_default_path', variable_get('image_default_path', 'images'), 30, 255, t('Subdirectory in the directory "%dir" where pictures will be stored. Do not include trailing slash.', array('%dir' => '<em>'. variable_get('file_directory_path', 'files') .'/</em>')));  // MSChange
-  $output.= form_group(t('File paths'), $paths);
+  $form['image_updated'] = array('#type' => 'hidden', '#value' => time());
 
-  // Size and restrictions
+  $form['paths'] = array('#type' => 'fieldset', '#title' => t('File paths'));
+  $form['paths']['image_default_path'] = array('#type' => 'textfield', '#title' => t('Default image path'), '#default_value' => variable_get('image_default_path', 'images'), '#description' => t('Subdirectory in the directory "%dir" where pictures will be stored. Do not include trailing slash.', array('%dir' => '<em>'. variable_get('file_directory_path', 'files') .'/</em>')));
+
+  $form['sizes'] = array('#type' => 'fieldset', '#title' => t('Image sizes'));
+  $form['sizes']['image_sizes'] = image_settings_sizes_form();
+
+  $form['gallery'] = array('#type' => 'fieldset', '#title' => t('Gallery settings'));
+  $form['gallery']['image_images_per_page'] = array('#type' => 'textfield', '#title' => t('Images per page'), '#default_value' => variable_get('image_images_per_page', 6), '#size' => 3, '#description' => t('Sets the number of images to be displayed in a gallery page.'));
+
+  return $form;
+}
+
+function image_settings_sizes_form() {
   $sizes = _image_get_sizes();
-  $rows = array();
+
+  $form['#type'] = 'item';
+  $form['#description'] = t('Select various pixel dimensions, "thumbnail" and "preview" are required.');
+  $form['#tree'] = TRUE;
+  $form['#theme'] = 'image_settings_sizes_form';
   for ($i = 0; $i < 5; $i++) {
-    $row = array();
+    $form[$i]['label'] = array('#type' => 'textfield', '#default_value' => $sizes[$i]['label'], '#size' => 25);
     if (in_array($sizes[$i]['label'], _image_required_sizes())) {
-      $row[] = form_hidden('image_sizes]['.$i.'][label', $sizes[$i]['label']) .
-        form_textfield(NULL, 'image_sizes]['. $i .'][label', $sizes[$i]['label'], 24, 255, NULL, array('disabled' => 'disabled'));
+      $form[$i]['label']['#attributes'] = array('disabled' => 'disabled');
+      $form[$i]['label']['#value'] = $sizes[$i]['label'];
     }
-    else {
-      $row[] = form_textfield(NULL, 'image_sizes]['. $i .'][label', $sizes[$i]['label'], 24, 255);
-    }
-    $row[] = form_textfield(NULL, 'image_sizes]['. $i .'][width', $sizes[$i]['width'], 5, 5);
-    $row[] = form_textfield(NULL, 'image_sizes]['. $i .'][height', $sizes[$i]['height'], 5, 5);
-
-    $rows[] = $row;
+    $form[$i]['width'] = array('#type' => 'textfield', '#default_value' => $sizes[$i]['width'], '#size' => 5, '#maxlength' => 5);
+    $form[$i]['height'] = array('#type' => 'textfield', '#default_value' => $sizes[$i]['height'], '#size' => 5, '#maxlength' => 5);
   }
-  $header = array(t('Label'), t('Width'), t('Height'));
-  $size_group .= form_item(NULL, theme('table', $header , $rows), t('Select various pixel dimensions, "thumbnail" and "preview" are required.'));
-  $size_group .= form_checkbox(t('Allow users to view original image'), 'image_view_original', 1, variable_get('image_view_original', 0));
-  $output.= form_group(t('Image sizes'), $size_group);
+  return $form;
+}
 
-  $gallery_group = form_textfield(t('Images per page'),'image_images_per_page', variable_get('image_images_per_page',6),3,3,t('Sets the number of images to be displayed in a gallery page.'));
-  $output .= form_group(t('Gallery settings'), $gallery_group);
-  
+function theme_image_settings_sizes_form(&$form) {
+  $header = array(t('Label'), t('Width'), t('Height'));
+  foreach (element_children($form) as $key) {
+    $row = array();
+    $row[] = form_render($form[$key]['label']);
+    $row[] = form_render($form[$key]['width']);
+    $row[] = form_render($form[$key]['height']);
+    $rows[] = $row;
+
+  }
+  $output = theme('table', $header, $rows);
+  $output .= form_render($form);
   return $output;
+
 }
 
 /**
@@ -237,36 +253,33 @@ function image_block($op, $delta = 0) {
  * Implementation of hook_form
  */
 function image_form(&$node, &$param) {
-  $output = form_textfield(t('Title'), 'title', $node->title, 60, 128, NULL, NULL, TRUE);
   _image_check_settings();
 
-  $param['options'] = array("enctype" => "multipart/form-data",  "name" => "image_forms");
-
+  $form['#attributes'] = array("enctype" => "multipart/form-data");
+  $form['title'] = array('#type' => 'textfield', '#title' => t('Title'), '#size' => 60, '#maxlength' => 128, '#required' => TRUE, '#default_value' => $node->title);
+  
   if (is_array($node->images)) {
     foreach ($node->images as $label => $image) {
-      $output .= form_hidden('images]['.$label, $image);
+      $form['images']['#tree'] = TRUE;
+      $form['images'][$label] = array('#type' => 'hidden', '#value' => $image);
+    }
+
+    if ($node->images['thumbnail']) {
+      $form['thumbnail'] = array('#type' => 'item', '#title' => t('Thumbnail'), '#value' => image_display($node, 'thumbnail'), '#weight' => -10);
     }
   }
 
-  // Taxonomy select form
-  $output .= implode('', taxonomy_node_form('image', $node));
+  $form['image'] = array('#type' => 'file', '#title' => t('Image'), '#description' => t('Click "Browse..." to select an image to upload.'), '#weight' => -9);
+  $form['body'] = array('#type' => 'textarea', '#title' => t('Body'), '#default_value' => $node->body);
+  $form = array_merge($form, filter_form($node->format));
 
-  if ($node->images['thumbnail']) {
-    $output.= form_item(t('Thumbnail'), image_display($node, 'thumbnail'));
-  }
-
-
-  $output .= form_file(t('Image'), 'image', 50, t('Click "Browse..." to select an image to upload.'), TRUE);
-  $output .= form_textarea(t('Description'), 'body', $node->body, 60, 5);
-  $output .= filter_form('format', $node->format);
-
-  return $output;
+  return $form;
 }
 
 /**
  * Implementation of hook_view
  */
-function image_view(&$node, $main = 0, $page = 0) {
+function image_view(&$node, $teaser = 0, $page = 0) {
   if ($page) {
     $terms = taxonomy_node_get_terms_by_vocabulary($node->nid, _image_get_vid());
     $term = array_pop($terms);
@@ -287,7 +300,7 @@ function image_view(&$node, $main = 0, $page = 0) {
   }
   $request = ($_GET['size']) ? $_GET['size'] : 'preview';
   $request = check_plain($request);
-  $node = node_prepare($node, $main);
+  $node = node_prepare($node, $teaser);
   $node->teaser = theme('image_teaser', $node);
   $node->body = theme('image_body', $node, $request);
 }
@@ -424,32 +437,52 @@ function image_page($type = NULL, $tid = 0) {
 function image_admin() {
   _image_check_settings();
 
-  switch (arg(2)) {
+  $op = $_POST['op'];
+  $edit = $_POST['edit'];
+  
+  if (empty($op)) {
+    $op = arg(2);
+  }
+
+  switch ($op) {
     case 'add':
+      $output = image_admin_gallery();
     case 'edit':
-      if ($_POST['edit']) {
-        if ($_POST['op'] == t('Delete')) {
-          if ($_POST['edit']['confirm']) {
-            taxonomy_del_term($_POST['edit']['tid']);
-            drupal_goto('admin/image');
-          }
-          else {
-            $content = _taxonomy_confirm_del_term($_POST['edit']['tid']);
-          }
-        }
-        else {
-          taxonomy_save_term($_POST['edit']);
-          drupal_goto('admin/image');
-        }
+      $output = image_admin_gallery(object2array(taxonomy_get_term(arg(3))));
+      break;
+    case t('Delete'):
+      if (!$edit['confirm']) {
+        $term = taxonomy_get_term($edit['tid']);
+
+        $form['tid'] = array('#type' => 'hidden', '#value' => $tid);
+
+        return confirm_form('image_confirm_delete', $form, t('Are you sure you want to delete the gallery %name?', array('%name' => theme('placeholder', $term->name))),
+                            'admin/image', t('Deleting a gallery will delete all sub-forums as well. However, the images will not be deleted. This action cannot be undone.'), t('Delete'), t('Cancel'));
+
+        break;
       }
       else {
-        $content = image_admin_gallery(object2array(taxonomy_get_term(arg(3))));
+        $name = $edit['name'];
+        $edit['name'] = 0;
       }
-      break;
+    case t('Submit'):
+      $status = taxonomy_save_term($edit);
+      switch ($status) {
+        case SAVED_NEW:
+          drupal_set_message(t('Created new gallery %term.', array('%term' => theme('placeholder', $edit['name']))));
+          break;
+        case SAVED_UPDATED:
+          drupal_set_message(t('The gallery %term has been updated.', array('%term' => theme('placeholder', $edit['name']))));
+          break;
+        case SAVED_DELETED:
+          drupal_set_message(t('The gallery %term has been deleted.', array('%term' => theme('placeholder', $name))));
+          break;
+      }
+      drupal_goto('admin/image');
     default:
-      $content = image_admin_overview();
+      $output = image_admin_overview();
   }
-  return $content;
+  return $output;
 }
 
 function image_admin_overview() {
@@ -472,29 +505,54 @@ function image_admin_gallery($edit = array()) {
     $edit['vid'] = _image_get_vid();
   }
 
-  $form = form_textfield(t('Gallery name'), 'name', $edit['name'], 50, 64, t('The name is used to identify the gallery.'), NULL, TRUE);
-  $form .= form_textarea(t('Description'), 'description', $edit['description'], 60, 5, t('The description can be used to provide more information about the image gallery.'));
+  $form['name'] = array('#type' => 'textfield', '#title' => t('Gallery name'), '#default_value' => $edit['name'], '#size' => 60, '#maxlength' =>  64, '#description' => t('The name is used to identify the gallery.'));
+  $form['description'] = array('#type' => 'textarea', '#title' => t('Description'), '#default_value' => $edit['description'], '#cols' => 60, '#rows' => 5, '#description' => ('The description can be used to provide more information about the image gallery.'));
+  $form['parent']['#tree'] = TRUE;
+  $form['parent'][0] = _image_parent_select($edit['tid'], t('Parent'), 'forum');
+  $form['weight'] = array('#type' => 'weight', '#title' => t('Weight'), '#default_value' => $edit['weight'], '#delta' => 10, '#description' => t('When listing galleries, those with with light (small) weights get listed before containers with heavier (larger) weights. Galleries with equal weights are sorted alphabetically.'));
+  
+  $form['vid'] = array('#type' => 'hidden', '#value' => _image_get_vid());
+  $form['submit' ] = array('#type' => 'submit', '#value' => t('Submit'));
+  if ($edit['tid']) {
+    $form['delete'] = array('#type' => 'submit', '#value' => t('Delete'));
+    $form['tid'] = array('#type' => 'hidden', '#value' => $edit['tid']);
+  }
 
-  $exclude = array();
-  $parent = array_keys(taxonomy_get_parents($edit['tid']));
-  $children = taxonomy_get_tree($edit['vid'], $edit['tid']);
+  return drupal_get_form('image_admin_gallery', $form);
+}
+
+
+function _image_parent_select($tid, $title) {
+  $parents = taxonomy_get_parents($tid);
+  if ($parents) {
+    $parent = array_shift($parents);
+    $parent = $parent->tid;
+  }
+  else {
+    $parent = 0;
+  }
+
+  $children = taxonomy_get_tree(_image_get_vid(), $tid);
+
   // A term can't be the child of itself, nor of its children.
   foreach ($children as $child) {
     $exclude[] = $child->tid;
   }
-  $exclude[] = $edit['tid'];
+  $exclude[] = $tid;
 
-  $form .= _taxonomy_term_select(t('Parent'), 'parent', $parent, $edit['vid'], NULL, 0, '<'. t('root') .'>', $exclude);
-  $form .= form_weight(t('Weight'), 'weight', $edit['weight'], 10, t('In listings, the heavier (with a higher weight value) terms will sink and the lighter terms will be positioned nearer the top.'));
-
-  $form .= form_hidden('vid', $edit['vid']);
-  $form .= form_submit(t('Submit'));
-  if ($edit['tid']) {
-    $form .= form_submit(t('Delete'));
-    $form .= form_hidden('tid', $edit['tid']);
+  $tree = taxonomy_get_tree(_image_get_vid());
+  $options[0] = '<'. t('root') .'>';
+  if ($tree) {
+    foreach ($tree as $term) {
+      if (!in_array($term->tid, $exclude)) {
+        $options[$term->tid] = _image_depth($term->depth) .' '. $term->name;
+      }
+    }
   }
 
-  return form($form);
+  $description = t('Image galleries may be nested below other galleries.');
+
+  return array('#type' => 'select', '#title' => $title, '#default_value' => $parent, '#options' => $options, '#description' => $description, '#required' => TRUE);
 }
 
 /**
