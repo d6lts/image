@@ -57,7 +57,7 @@ function image_settings() {
   $form['image_updated'] = array('#type' => 'hidden', '#value' => time());
 
   $form['paths'] = array('#type' => 'fieldset', '#title' => t('File paths'));
-  $form['paths']['image_default_path'] = array('#type' => 'textfield', '#title' => t('Default image path'), '#default_value' => variable_get('image_default_path', 'images'), '#description' => t('Subdirectory in the directory "%dir" where pictures will be stored. Do not include trailing slash.', array('%dir' => '<em>'. variable_get('file_directory_path', 'files') .'/</em>')));
+  $form['paths']['image_default_path'] = array('#type' => 'textfield', '#title' => t('Default image path'), '#default_value' => variable_get('image_default_path', 'images'), '#description' => t('Subdirectory in the directory "%dir" where pictures will be stored. Do not include trailing slash.', array('%dir' => theme('placeholder', variable_get('file_directory_path', 'files')))));
 
   $form['sizes'] = array('#type' => 'fieldset', '#title' => t('Image sizes'));
   $form['sizes']['image_sizes'] = image_settings_sizes_form();
@@ -84,6 +84,7 @@ function image_settings_sizes_form() {
     $form[$i]['width'] = array('#type' => 'textfield', '#default_value' => $sizes[$i]['width'], '#size' => 5, '#maxlength' => 5);
     $form[$i]['height'] = array('#type' => 'textfield', '#default_value' => $sizes[$i]['height'], '#size' => 5, '#maxlength' => 5);
   }
+
   return $form;
 }
 
@@ -99,8 +100,8 @@ function theme_image_settings_sizes_form(&$form) {
   }
   $output = theme('table', $header, $rows);
   $output .= form_render($form);
-  return $output;
 
+  return $output;
 }
 
 /**
@@ -206,12 +207,12 @@ function image_link($type, $node, $main = 0) {
       $request = ($_GET['size']) ? $_GET['size'] : 'preview';
       foreach ($sizes as $size) {
         if ($request != $size['label']) {
-          $links[] = l($size['label'], 'node/'. $node->nid, NULL, 'size='.urlencode($size['label']));
+          $links[] = l($size['label'], 'node/'. $node->nid, NULL, 'size='. urlencode($size['label']));
         }
       }
     }
     if (variable_get('image_view_original', 0)) {
-      $links[] = l(t('view original'), 'node/'.$node->nid, NULL, 'size=_original');
+      $links[] = l(t('view original'), 'node/'. $node->nid, NULL, 'size=_original');
     }
   }
 
@@ -305,7 +306,6 @@ function image_view(&$node, $teaser = 0, $page = 0) {
   $node->body = theme('image_body', $node, $request);
 }
 
-
 /**
  * Implementation of hook_load
  */
@@ -364,7 +364,7 @@ function image_delete($node) {
 function image_display(&$node, $label = 'preview', $attributes = array()) {
   // regenerate images?
   if (!file_exists(file_create_path($node->images[$label])) ||
-      filemtime(file_create_path($node->images[$label])) < variable_get('image_updated', 0)) {
+    filemtime(file_create_path($node->images[$label])) < variable_get('image_updated', 0)) {
     _image_build_derivatives($node);
   }
 
@@ -373,7 +373,7 @@ function image_display(&$node, $label = 'preview', $attributes = array()) {
   }
 
   $info = image_get_info(file_create_path($node->images[$label]));
-  $attributes['class'] = "image $label". (isset($attributes['class']) ? " ".$attributes['class'] : "");
+  $attributes['class'] = "image $label". (isset($attributes['class']) ? " ". $attributes['class'] : "");
   $attr = array('width' => $info['width'], 'height' => $info['height']) + $attributes;
   $output.= theme('image', file_create_url($node->images[$label]), $node->title, $node->title, $attr, FALSE);
   return $output;
@@ -418,7 +418,7 @@ function image_page($type = NULL, $tid = 0) {
     $gallery = taxonomy_get_term($tid);
     $parents = taxonomy_get_parents($tid);
     foreach ($parents as $parent) {
-      $breadcrumb[] = array('path' => 'image/tid/'.$parent->tid, 'title' => $parent->name);
+      $breadcrumb[] = array('path' => 'image/tid/'. $parent->tid, 'title' => $parent->name);
     }
     $breadcrumb[] = array('path' => 'image', 'title' => t('Image galleries'));
     $breadcrumb = array_reverse($breadcrumb);
@@ -559,7 +559,7 @@ function _image_parent_select($tid, $title) {
  * Theme a teaser
  */
 function theme_image_teaser($node) {
- return l(image_display($node, 'thumbnail'), 'node/'.$node->nid, array(), NULL, NULL, FALSE, TRUE) . $node->teaser;
+ return l(image_display($node, 'thumbnail'), 'node/'. $node->nid, array(), NULL, NULL, FALSE, TRUE) . $node->teaser;
 }
 
 /**
@@ -730,7 +730,6 @@ function _image_remove($node) {
     file_delete(file_create_path($file->filepath));
   }
   db_query("DELETE FROM {files} WHERE nid=%d AND filename!='_original'", $node->nid);
-
 }
 
 /**
@@ -754,8 +753,6 @@ function _image_filename($filename, $type = NULL, $temp = FALSE) {
       $filename = substr($filename, 0, $pos) .'.'. $type . substr($filename, $pos);
     }
   }
-
-  //$output .= $filename;
 
   return $path . $filename;
 }
@@ -811,7 +808,6 @@ function _image_depth($depth, $graphic = '--') {
   }
   return $result;
 }
-
 
 /**
  * Returns (and possibly creates) a new vocabulary for Image galleries.
