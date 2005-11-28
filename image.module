@@ -280,7 +280,7 @@ function image_form(&$node, &$param) {
     }
   }
 
-  $form['thumbnail']['#post_process'] = 'image_form_add_thumbnail';
+  $form['thumbnail']['#after_build'] = 'image_form_add_thumbnail';
   
   $form['image'] = array('#type' => 'file', '#title' => t('Image'), '#description' => t('Click "Browse..." to select an image to upload.'), '#weight' => -9);
   $form['body'] = array('#type' => 'textarea', '#title' => t('Body'), '#default_value' => $node->body);
