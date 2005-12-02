@@ -264,7 +264,7 @@ function image_block($op, $delta = 0) {
   }
 }
 
-function image_form_add_thumbnail($form_id, $form, $edit) {
+function image_form_add_thumbnail($form_id, $edit) {
   if ($edit['images']['thumbnail']) {
     $node = array2object($edit);
     $form = array('#type' => 'item', '#title' => t('Thumbnail'), '#value' => image_display($node, 'thumbnail'), '#weight' => -10);
