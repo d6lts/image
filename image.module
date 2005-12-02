@@ -162,7 +162,14 @@ function image_cron() {
 }
 
 /**
- * Implementation of hook_validate
+ * Implementation of hook_validate().
+ */
+function image_validate($node) {
+  node_validate_title($node);
+}
+
+/**
+ * Implementation of hook_prepare().
  */
 function image_prepare(&$node, $field_name) {
   if (is_null($field_name)) {
