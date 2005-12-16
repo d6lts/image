@@ -395,8 +395,9 @@ function image_delete($node) {
  */
 function image_display(&$node, $label = 'preview', $attributes = array()) {
   // regenerate images?
-  if (!file_exists(file_create_path($node->images[$label])) ||
-    filemtime(file_create_path($node->images[$label])) < variable_get('image_updated', 0)) {
+  if ($file->images[$label] != $files->images['_original'] &&
+      (!file_exists(file_create_path($node->images[$label])) ||
+       filemtime(file_create_path($node->images[$label])) < variable_get('image_updated', 0))) {
     _image_build_derivatives($node);
   }
 
@@ -759,7 +760,10 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
 function _image_remove($node) {
   $result = db_query("SELECT * FROM {files} WHERE nid=%d AND filename!='_original'", $node->nid);
   while ($file = db_fetch_object($result)) {
-    file_delete(file_create_path($file->filepath));
+    // Never delete the original!
+    if ($file->filepath != $node->images['_original']) {
+      file_delete(file_create_path($file->filepath));
+    }
   }
   db_query("DELETE FROM {files} WHERE nid=%d AND filename!='_original'", $node->nid);
 }
