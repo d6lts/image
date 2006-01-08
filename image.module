@@ -273,7 +273,7 @@ function image_block($op, $delta = 0) {
 
 function image_form_add_thumbnail($form_id, $edit) {
   if ($edit['images']['thumbnail']) {
-    $node = array2object($edit);
+    $node = (object)($edit);
     $form = array('#type' => 'item', '#title' => t('Thumbnail'), '#value' => image_display($node, 'thumbnail'), '#weight' => -10);
   }
   return $form;
@@ -481,7 +481,7 @@ function image_admin() {
     case 'add':
       $output = image_admin_gallery();
     case 'edit':
-      $output = image_admin_gallery(object2array(taxonomy_get_term(arg(3))));
+      $output = image_admin_gallery((array)(taxonomy_get_term(arg(3))));
       break;
     case t('Delete'):
       if (!$edit['confirm']) {
