@@ -797,8 +797,9 @@ function _image_filename($filename, $type = NULL, $temp = FALSE) {
  * Helper function to return the defined sizes (or proper defaults).
  */
 function _image_get_sizes() {
-  return variable_get('image_sizes', array(array('width' => 100, 'height' => 100, 'label' => t('thumbnail')),
+  $sizes = variable_get('image_sizes', array(array('width' => 100, 'height' => 100, 'label' => t('thumbnail')),
                                            array('width' => 640, 'height' => 640, 'label' => t('preview'))));
+  return array_filter($sizes, create_function('$size', 'return !empty($size["label"]);'));
 }
 
 function _image_required_sizes() {
