@@ -322,10 +322,10 @@ function image_view(&$node, $teaser = 0, $page = 0) {
       $breadcrumb = array();
       $breadcrumb[] = array('path' => 'image', 'title' => $vocabulary->name);
       if ($parents = taxonomy_get_parents_all($term->tid)) {
-      $parents = array_reverse($parents);
-      foreach ($parents as $p) {
-        $breadcrumb[] = array('path' => 'image/tid/'. $p->tid, 'title' => $p->name);
-      }
+        $parents = array_reverse($parents);
+        foreach ($parents as $p) {
+          $breadcrumb[] = array('path' => 'image/tid/'. $p->tid, 'title' => $p->name);
+        }
       }
       $breadcrumb[] = array('path' => 'node/'. $node->nid);
       menu_set_location($breadcrumb);
@@ -797,8 +797,8 @@ function _image_filename($filename, $type = NULL, $temp = FALSE) {
  * Helper function to return the defined sizes (or proper defaults).
  */
 function _image_get_sizes() {
-  $sizes = variable_get('image_sizes', array(array('width' => 100, 'height' => 100, 'label' => t('thumbnail')),
-                                           array('width' => 640, 'height' => 640, 'label' => t('preview'))));
+  $sizes = variable_get('image_sizes', array(array('width' => 100, 'height' => 100, 'label' => 'thumbnail'),
+                                             array('width' => 640, 'height' => 640, 'label' => 'preview')));
   return array_filter($sizes, create_function('$size', 'return !empty($size["label"]);'));
 }
 
