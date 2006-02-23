@@ -395,13 +395,13 @@ function image_delete($node) {
  */
 function image_display(&$node, $label = 'preview', $attributes = array()) {
   // regenerate images?
-  if ($file->images[$label] != $files->images['_original'] &&
+  if ($node->images[$label] != $node->images['_original'] &&
       (!file_exists(file_create_path($node->images[$label])) ||
        filemtime(file_create_path($node->images[$label])) < variable_get('image_updated', 0))) {
     _image_build_derivatives($node);
   }
 
-  if(! $node->images[$label]) {
+  if(!$node->images[$label]) {
     return '';
   }
 
