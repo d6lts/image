@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: de\n"
 "POT-Creation-Date: 2003-12-08 21:11+0100\n"
-"PO-Revision-Date: 2006-02-25 14:22+0100\n"
-"Last-Translator: Konstantin Käfer <kkaefer@gmail.com>\n"
+"PO-Revision-Date: 2006-02-27 20:56+0100\n"
+"Last-Translator: Peter Santo <drupalde.20.rzyom@recursor.net>\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -25,11 +25,11 @@ msgstr "Unten findet sich der Zustand der gegenwärtigen Konfiguration des Bilde
 
 #: image.module
 msgid "Allow users to upload images and to display them in shared and personal photo galleries."
-msgstr "Benutzern das Hochladen von Bildern und die Anzeige in privaten und öffentlichen Bildergallerien gestatten."
+msgstr "Benutzern das Hochladen von Bildern und die Anzeige in privaten und öffentlichen Bildergalerien gestatten."
 
 #: image.module
 msgid "Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced."
-msgstr "Bilder können entweder in private oder in öffentlichen Bildergallerien hochgeladen werden. Anschließend können sie bearbeitet werden. Das Bildersystem erzeugt für alle Bilder, die in anderen Knoten über Eingabeformate oder in einer Gallerie-Navigation verwendet werden, automatisch Vorschaubilder. Mit diesen Einstellungen kann festgelegt werden, wo die Bilder abgelegt werden, wie sie angezeigt werden und welche Einschränkungen gelten."
+msgstr "Bilder können entweder in private oder in öffentlichen Bildergalerien hochgeladen werden. Anschließend können sie bearbeitet werden. Das Bildersystem erzeugt für alle Bilder, die in anderen Knoten über Eingabeformate oder in einer Galerie-Navigation verwendet werden, automatisch Vorschaubilder. Mit diesen Einstellungen kann festgelegt werden, wo die Bilder abgelegt werden, wie sie angezeigt werden und welche Einschränkungen gelten."
 
 #: image.module, image.module, image.module
 msgid "image"
@@ -113,7 +113,7 @@ msgstr "Standardgröße der Vorschaubilder. Das Bildformat ist dasselbe des ursp
 
 #: image.module
 msgid "Image library"
-msgstr "Konvertierungsprogramm"
+msgstr "Bild-Library"
 
 #: image.module
 msgid "Select the image library to be used during thumbnail generation and image manipulation.  Use ImageMagick if you can; GD produces worse thumbnails, might not support GIF and this module doesn't support image editing (rotate, crop etc) with it."
@@ -181,31 +181,28 @@ msgid "Gallery Order"
 msgstr "Galerie-Anordnung"
 
 #: image.module
-#, fuzzy
 msgid "Order of thumbnails within a gallery. Lighter and heavier refer to weight property."
-msgstr "Die Reihenfolge der Vorschaubilder innerhalb einer Bildergallerie. „Leichter“ und „schwerer“ beziehen sich auf die „Wichtung“-Eigenschaft."
+msgstr "Die Reihenfolge der Vorschaubilder innerhalb einer Bildergalerie. „Leichter“ und „schwerer“ beziehen sich auf die Wichtung der Bilder."
 
 #: image.module
 msgid "Personal Photo Galleries"
-msgstr "Private Photo-Galerien"
+msgstr "Private Bildergalerien"
 
 #: image.module
-#, fuzzy
 msgid "Activate/deactivate personal photo galleries site-wide.  When enabled you can use the \"has personal image gallery\" permission to control which roles have personal galleries."
-msgstr "Private Bildergallerien für die Site aktivieren/deaktivieren. Wenn dies aktiviert ist kann mit der Berechtigung „besitzt private Bildergallerie“ festgelegt werden, welche Rollen private Bildergallerien besitzen."
+msgstr "Private Bildergalerien für die Site aktivieren/deaktivieren. Wenn dies aktiviert ist kann mit der Berechtigung „besitzt private Bildergalerie“ festgelegt werden, welche Rollen private Bildergalerien besitzen."
 
 #: image.module
 msgid "Personal Gallery Picture Limit"
-msgstr "Grenzwert für persönliche Bildergalerien."
+msgstr "Grenzwert für private Bildergalerien."
 
 #: image.module
 msgid "Set how many pictures users are allowed."
 msgstr "Einstellen wieviele Bilder Benutzer haben dürfen."
 
 #: image.module
-#, fuzzy
 msgid "Personal Gallery Picture Limit Per Role"
-msgstr "Bilderbeschränkung privater Bildergallerien pro Rolle."
+msgstr "Bilderbeschränkung privater Bildergalerien pro Rolle."
 
 #: image.module
 msgid "Enabling this will allow for setting a maximum number of pictures per role."
@@ -213,7 +210,7 @@ msgstr "Aktivieren dieser Einstellung ermöglicht es, eine Höchstzahl von Bilde
 
 #: image.module
 msgid "Personal Gallery Size Limit"
-msgstr "Größenlimit für persönliche Galerie"
+msgstr "Größenlimit für private Galerie"
 
 #: image.module
 msgid "Set a maximum number of kilobytes allowed per user."
@@ -229,7 +226,7 @@ msgstr "Aktivieren bewirkt, dass zufällige Parameter an Bilder-URIs angehängt 
 
 #: image.module, image.module
 msgid "photo galleries"
-msgstr "Photo-Galerien"
+msgstr "Bildergalerien"
 
 #: image.module
 msgid "images"
@@ -246,7 +243,7 @@ msgstr "Hochladen von Verzeichnissen: schnell"
 
 #: image.module
 msgid "my photo gallery"
-msgstr "Meine Photo-Galerie"
+msgstr "Meine Bildergalerie"
 
 #: image.module
 msgid "edit this image"
@@ -266,11 +263,11 @@ msgstr "%us Bildergalerie betrachten"
 
 #: image.module
 msgid "%t photo gallery"
-msgstr "%t Photo-Galerie"
+msgstr "%t Bildergalerie"
 
 #: image.module
 msgid "View %t photo gallery."
-msgstr "%t-Photo-Galerie betrachten."
+msgstr "%t-Bildergalerie betrachten."
 
 #: image.module
 msgid "previous image"
@@ -282,11 +279,11 @@ msgstr "nächstes Bild"
 
 #: image.module
 msgid "Photo gallery"
-msgstr "Photo-Galerie"
+msgstr "Bildergalerie"
 
 #: image.module
 msgid "view user's photo gallery"
-msgstr "Photo-Galerie des Benutzers betrachten"
+msgstr "Bildergalerie des Benutzers betrachten"
 
 #: image.module, image.module
 msgid "Thumbnail"
@@ -313,17 +310,16 @@ msgid "Weight"
 msgstr "Gewicht"
 
 #: image.module
-#, fuzzy
 msgid "Weight of image used to sort thumbnails.  Heavier thumbnails will fall to the bottom of the gallery."
-msgstr "Wichtung von Bildern, die zur Sortierung der Vorschaubilder verwendet wird. Schwerere Vorschaubilder sinken in der Bildergallerie nach unten."
+msgstr "Wichtung von Bildern, die zur Sortierung der Vorschaubilder verwendet wird. Schwerere Vorschaubilder sinken in der Bildergalerie nach unten."
 
 #: image.module
 msgid "Personal"
-msgstr "Persönlich"
+msgstr "Privat"
 
 #: image.module
 msgid "A personal image can only be seen in the user's photo gallery."
-msgstr "Ein persönliches Bild kann nur in der Galerie des Autors angesehen werden."
+msgstr "Ein privates Bild kann nur in der Galerie des Autors angesehen werden."
 
 #: image.module, image.module
 msgid "The image file you are trying to upload is too big."
@@ -388,7 +384,7 @@ msgstr "Das Vorschaubild kann nicht erzeugt werden. Die GD Library unterstützt 
 
 #: image.module
 msgid "Imagemagick: you have to set <code>convert</code> path."
-msgstr "Imagemagick: Du mußt den Pfad zu <code>convert</code> setzen."
+msgstr "ImageMagick: Der Pfad zu <code>convert</code> muss gesetzt werden."
 
 #: image.module
 msgid "You can have at most %a images in your gallery."
@@ -444,11 +440,11 @@ msgstr "Qualität (1-100)"
 
 #: image.module
 msgid "%u's Photo Gallery"
-msgstr "%us Photo-Galerie"
+msgstr "%us Bildergalerie"
 
 #: image.module, image.module
 msgid "Photo galleries"
-msgstr "Photo-Galerien"
+msgstr "Bildergalerien"
 
 #: image.module
 msgid "Access Denied"
@@ -505,9 +501,8 @@ msgid "Add new gallery"
 msgstr "Neue Galerie hinzufügen."
 
 #: image.module
-#, fuzzy
 msgid "If needed, create a new term for this gallery by clicking on one of these vocabularies"
-msgstr "Durch Klick auf eines dieser Vokabulare einen neuen Taxonomie-Begriff für diese Bildergallerie erstellen."
+msgstr "Durch Klick auf eines dieser Vokabulare einen neuen Taxonomie-Begriff für diese Bildergalerie erstellen."
 
 #: image.module
 msgid "Directory upload"
@@ -548,5 +543,5 @@ msgstr "Grenzwert"
 
 #: image.module
 msgid "Set how many pictures each role listed above is allowed. \"Personal Gallery Picture Limit\" will be the default value for new roles."
-msgstr "Festlegen, wieviele Bilder jede oben aufgeführte Rolle besitzen darf. „Bilderhöchstzahl für private Bildergallerien“ ist der Standardwert für neue Rollen."
+msgstr "Festlegen, wieviele Bilder jede oben aufgeführte Rolle besitzen darf. „Bilderhöchstzahl für private Bildergalerien“ ist der Standardwert für neue Rollen."
 
