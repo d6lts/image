@@ -599,7 +599,7 @@ function theme_image_body($node, $size) {
  * Theme a gallery page
  */
 function theme_image_gallery($galleries, $images) {
-  drupal_set_html_head('<style type="text/css">@import url('.drupal_get_path('module','image').'/image.css);</style>');
+  drupal_set_html_head(theme('stylesheet_import', base_path() . drupal_get_path('module', 'image') .'/image.css'));
 
   // We'll add height to keep thumbnails lined up.
   $size = _image_get_dimensions('thumbnail');
