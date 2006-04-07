@@ -283,7 +283,12 @@ function image_form(&$node, &$param) {
 
   $sizes = _image_get_sizes();
   $form['images']['#tree'] = TRUE;
-  $form['images']['_original'] = array('#type' => 'hidden', '#value' => $node->images['_original']);
+  if ($node->new_file) {
+    $form['images']['_original'] = array('#type' => 'hidden', '#value' => $node->images['_original']);
+  }
+  else {
+    $form['images']['_original'] = array('#type' => 'hidden', '#default_value' => $node->images['_original']);
+  }
   foreach ($sizes as $size) {
     if ($node->new_file) {
       $form['images'][$size['label']] = array('#type' => 'hidden', '#value' => $node->images[$size['label']]);
@@ -354,7 +359,7 @@ function image_load(&$node) {
  */
 function image_insert($node) {
   foreach ($node->images as $label => $image) {
-    _image_insert($node->nid, $label, file_create_path($image));
+    _image_insert($node, $label, file_create_path($image));
   }
 }
 
@@ -368,7 +373,7 @@ function image_update($node) {
     if ($old_path != $image) {
       file_delete(file_create_path($old_path));
       db_query("DELETE FROM {files} WHERE filename='%s' AND nid=%d", $label, $node->nid);
-      _image_insert($node->nid, $label, file_create_path($image));
+      _image_insert($node, $label, file_create_path($image));
     }
   }
 }
@@ -739,7 +744,7 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
         else {
           $node->images[$size['label']] = $destination;
           if (!$temp) {
-            _image_insert($node->nid, $size['label'], file_create_path($destination));
+            _image_insert($node, $size['label'], file_create_path($destination));
           }
         }
       }
@@ -812,7 +817,7 @@ function _image_get_dimensions($label) {
  * Moves temporary (working) images to the final directory and stores
  * relevant information in the files table
  */
-function _image_insert($nid, $label, $image) {
+function _image_insert($node, $label, $image) {
   $dest = _image_filename(basename($image));
   if (file_copy($image, $dest)) {
     $info = image_get_info(file_create_path($dest));
@@ -821,8 +826,10 @@ function _image_insert($nid, $label, $image) {
     $file->filemime = $info['mime_type'];
     $file->filesize = filesize(file_create_path($dest));
     $fid = db_next_id('{files}_fid');
-    db_query("INSERT INTO {files} (fid, nid, filename, filepath, filemime, filesize, list) VALUES (%d, %d, '%s', '%s', '%s', '%s', %d)",
-             $fid, $nid, $file->filename, $file->filepath, $file->filemime, $file->filesize, 0);
+    db_query("INSERT INTO {files} (fid, nid, filename, filepath, filemime, filesize) VALUES (%d, %d, '%s', '%s', '%s', '%s')",
+             $fid, $node->nid, $file->filename, $file->filepath, $file->filemime, $file->filesize);
+    db_query("INSERT INTO {file_revisions} (fid, vid, description, list) VALUES (%d, %d, '%s', %d)",
+             $fid, $node->vid, '', 0);
   }
 }
 
