@@ -817,6 +817,11 @@ function _image_get_dimensions($label) {
  * relevant information in the files table
  */
 function _image_insert($node, $label, $image) {
+  // Don't duplicate images when a derivative == _original
+  if (($label != '_original') && ($image == file_create_path($node->images['_original']))) {
+    return;
+  }
+  
   $dest = _image_filename(basename($image));
   if (file_copy($image, $dest)) {
     $info = image_get_info(file_create_path($dest));
