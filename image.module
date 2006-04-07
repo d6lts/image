@@ -233,6 +233,10 @@ function image_link($type, $node, $main = 0) {
   return $links;
 }
 
+function image_term_path($term) {
+  return 'image/tid/'. $term->tid;
+}
+
 /**
  * Implementation of hook_block.
  *
