@@ -6,4 +6,6 @@ image.module installation instructions
 
 3.) Configure the module settings at: administer -> settings -> image
 
-4.) Optionally, add image albums for the gallery at: administer -> image galleries
+4.) Configure cron if you didn't do so already to have your temporary upload directory cleaned up
+
+5.) Optionally, add image albums for the gallery at: administer -> image galleries
