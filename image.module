@@ -39,7 +39,7 @@ function image_node_info() {
  * Implementation of hook_perm
  */
 function image_perm() {
-  return array('administer images', 'create images');
+  return array('administer images', 'create images', 'view original images');
 }
 
 /**
@@ -209,24 +209,14 @@ function image_link($type, $node, $main = 0) {
   }
 
   if ($type == 'node' && $node->type == 'image' && !$main) {
-    $sizes = array();
+    $request = ($_GET['size']) ? $_GET['size'] : 'preview';
     foreach (_image_get_sizes() as $size) {
-      if ($size['label'] && !in_array($size['label'], array('thumbnail', '_original'))) {
-
-        $sizes[] = $size;
+      if ($node->images[$request] != $node->images[$size['label']]) {
+        $links[] = l($size['label'], 'node/' . $node->nid, NULL, 'size=' . urlencode($size['label']));
       }
     }
-
-    if (count($sizes) > 1) {
-      $request = ($_GET['size']) ? $_GET['size'] : 'preview';
-      foreach ($sizes as $size) {
-        if ($request != $size['label']) {
-          $links[] = l($size['label'], 'node/'. $node->nid, NULL, 'size='. urlencode($size['label']));
-        }
-      }
-    }
-    if (variable_get('image_view_original', 0)) {
-      $links[] = l(t('view original'), 'node/'. $node->nid, NULL, 'size=_original');
+    if (user_access('view original images') && ($node->images[$request] != $node->images['_original'])) {
+      $links[] = l(t('original'), 'node/' . $node->nid, NULL, 'size=_original');
     }
   }
 
