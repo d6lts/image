@@ -27,7 +27,7 @@ if (function_exists('_image_insert')) {
       }
       if ($old_file && $old_image->$old !='' &&
           db_num_rows(db_query("SELECT fid FROM {files} WHERE nid=%d and filename='%s'", $old_image->nid, $new)) == 0) {
-        _image_insert($old_image->nid, $new, $old_file);
+        _image_insert($old_image, $new, $old_file);
       }
     }
   }
