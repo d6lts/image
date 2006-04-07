@@ -474,16 +474,21 @@ function image_admin() {
   if (empty($op)) {
     $op = arg(2);
   }
+  
+  $tid = arg(3);
+  if (isset($edit['tid'])) {
+    $tid = $edit['tid'];
+  }
 
   switch ($op) {
     case 'add':
       $output = image_admin_gallery();
     case 'edit':
-      $output = image_admin_gallery((array)(taxonomy_get_term(arg(3))));
+      $output = image_admin_gallery((array)(taxonomy_get_term($tid)));
       break;
     case t('Delete'):
       if (!$edit['confirm']) {
-        $term = taxonomy_get_term($edit['tid']);
+        $term = taxonomy_get_term($tid);
 
         $form['tid'] = array('#type' => 'hidden', '#value' => $tid);
 
