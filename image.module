@@ -22,9 +22,9 @@ Image galleries are used to organize and display images in galleries.   The list
     case 'admin/modules#description':
       return t('Allows uploading of images and creating image galleries.');
     case 'node/add#image':
-      return t('An image (with thumbnail). This is ideal for publishing photographs or screenshots.');
+      return '<p>'. t('An image (with thumbnail). This is ideal for publishing photographs or screenshots.') .'</p>';
     case 'admin/image':
-      return t('Image galleries can be used to organize and present groups of images. Galleries may be nested. To add a new gallery click the "add gallery" tab.');
+      return '<p>'. t('Image galleries can be used to organize and present groups of images. Galleries may be nested. To add a new gallery click the "add gallery" tab.') .'</p>';
   }
 }
 
@@ -201,12 +201,6 @@ function image_file_download($file) {
  */
 function image_link($type, $node, $main = 0) {
   $links = array();
-
-  if ($type == "page" && user_access('access content')) {
-    if (_image_get_vid()) {
-      $links[] = l(t('image galleries'), 'image');
-    }
-  }
 
   if ($type == 'node' && $node->type == 'image' && !$main) {
     $request = ($_GET['size']) ? $_GET['size'] : 'preview';
@@ -521,7 +515,7 @@ function image_admin_overview() {
   $tree = taxonomy_get_tree(_image_get_vid());
   if ($tree) {
     foreach ($tree as $term) {
-      $rows[] = array(_image_depth($term->depth) .' '. $term->name, l(t('edit gallery'), "admin/image/edit/$term->tid"));
+      $rows[] = array(_image_depth($term->depth) .' '. l($term->name, "image/tid/$term->tid"), l(t('edit gallery'), "admin/image/edit/$term->tid"));
     }
     return theme('table', $header, $rows);
   }
@@ -868,5 +862,3 @@ function _image_get_vid() {
 
   return $vid;
 }
-
-?>
