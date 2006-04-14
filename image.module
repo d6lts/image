@@ -387,15 +387,16 @@ function image_display(&$node, $label = 'preview', $attributes = array()) {
     _image_build_derivatives($node);
   }
 
-  if(!$node->images[$label]) {
-    return '';
+  if (empty($node->images[$label])) {
+    return;
   }
 
   $info = image_get_info(file_create_path($node->images[$label]));
   $attributes['class'] = "image $label". (isset($attributes['class']) ? " ". $attributes['class'] : "");
-  $attr = array('width' => $info['width'], 'height' => $info['height']) + $attributes;
-  $output.= theme('image', file_create_url($node->images[$label]), $node->title, $node->title, $attr, FALSE);
-  return $output;
+  $attributes['width'] = $info['width'];
+  $attributes['height'] = $info['height'];
+
+  return theme('image_display', $node, $label, file_create_url($node->images[$label]), $attributes);
 }
 
 /**
@@ -591,6 +592,13 @@ function theme_image_teaser($node) {
  */
 function theme_image_body($node, $size) {
  return image_display($node, $size) . $node->body;
+}
+
+/**
+  * Theme an img tag for displaying the image.
+  */
+function theme_image_display($node, $label, $url, $attributes) {
+  return '<img src="'. check_url($url) .'" alt="'. check_plain($node->title) .'" title="'. check_plain($node->title) .'" '. drupal_attributes($attributes) .' />';
 }
 
 /**
