@@ -312,7 +312,7 @@ function _image_gallery_get_vid() {
     // Check to see if an image gallery vocabulary exists
     $vid = db_result(db_query("SELECT vid FROM {vocabulary} WHERE module='image_gallery'"));
     if (!$vid) {
-      $vocabulary = array('name' => t('Image Galleries'), 'multiple' => '0', 'required' => '0', 'hierarchy' => '1', 'relations' => '0', 'module' => 'image', 'nodes' => array('image_gallery' => 1));
+      $vocabulary = array('name' => t('Image Galleries'), 'multiple' => '0', 'required' => '0', 'hierarchy' => '1', 'relations' => '0', 'module' => 'image_gallery', 'nodes' => array('image' => 1));
       taxonomy_save_vocabulary($vocabulary);
       $vid = $vocabulary['vid'];
     }
