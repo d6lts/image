@@ -109,7 +109,7 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
      
     // Pass the body and teaser objects to the theme again to add the images
     case 'view':
-      if(function_exists('image_display')){
+      if($node->iid && function_exists('image_display')){
         $node->body = theme('image_attach_body', $node);
         if ($teaser){
           $node->teaser = theme('image_attach_teaser', $node);
