@@ -8,13 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "POT-Creation-Date: 2005-05-16 17:12-0300\n"
-"PO-Revision-Date: 2005-10-07 22:41+0200\n"
-"Last-Translator: Matthieu DUCHEMIN <alkahan@free.fr>\n"
+"PO-Revision-Date: 2006-06-11 12:39+0100\n"
+"Last-Translator: Jean-Louis Réthoré <jl.rethore@gmail.com>\n"
 "Language-Team: Français <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: KBabel 1.10.2\n"
 
 #: image.module:7
@@ -38,12 +38,31 @@ msgid "Below is a status of image module's current configuration."
 msgstr "Voici la configuration actuelle du module image."
 
 #: image.module:33
-msgid "\n      <h4>Fast Mode</h4><ul>\n      <li>Creates all image nodes at once without user interaction.</li>\n      <li>Applies the same taxonomy term(s) to each node, thus creating a gallery.</li>\n      <li>If IPTC data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>\n      <li>If the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li></ul>"
-msgstr "\n     <h4>Mode rapide</h4><ul>\n <li>À partir d'un répertoire contenant plusieurs images, cette fonction permet de créer tous les noeuds correspondants à la fois, sans intervention de l'usager.</li>\n<li>Le ou les mêmes termes de classification seront attribués à chaque noeud, ce qui créera une galerie instantanément.</li>\n<li>Si des données IPTC font partie de l'image d'origine, les champs d'en-tête et de légende serviront à remplir le titre et le corps du texte correspondants.</li><li>Si les dimensions de l'image dépassent la taille maximale permise, celle-ci sera réduite automatiquement.</li></ul>"
+msgid ""
+"\n"
+"      <h4>Fast Mode</h4><ul>\n"
+"      <li>Creates all image nodes at once without user interaction.</li>\n"
+"      <li>Applies the same taxonomy term(s) to each node, thus creating a gallery.</li>\n"
+"      <li>If IPTC data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>\n"
+"      <li>If the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li></ul>"
+msgstr ""
+"\n"
+"     <h4>Mode rapide</h4><ul>\n"
+" <li>À partir d'un répertoire contenant plusieurs images, cette fonction permet de créer tous les noeuds correspondants à la fois, sans intervention de l'usager.</li>\n"
+"<li>Le ou les mêmes termes de classification seront attribués à chaque noeud, ce qui créera une galerie instantanément.</li>\n"
+"<li>Si des données IPTC font partie de l'image d'origine, les champs d'en-tête et de légende serviront à remplir le titre et le corps du texte correspondants.</li><li>Si les dimensions de l'image dépassent la taille maximale permise, celle-ci sera réduite automatiquement.</li></ul>"
 
 #: image.module:41
-msgid "\n      <h4>Slow Mode</h4><ul>\n      <li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>\n      <li>Add custom titles, descriptions, etc.</li></ul>"
-msgstr "\n<h4>Mode lent</h4><ul>\n<li>Manipulez chaque image individuellement (recadrage, rotation, etc.).</li>\n<li>Ajoutez des titres personnalisés, des descriptions, etc.</li></ul>"
+msgid ""
+"\n"
+"      <h4>Slow Mode</h4><ul>\n"
+"      <li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>\n"
+"      <li>Add custom titles, descriptions, etc.</li></ul>"
+msgstr ""
+"\n"
+"<h4>Mode lent</h4><ul>\n"
+"<li>Manipulez chaque image individuellement (recadrage, rotation, etc.).</li>\n"
+"<li>Ajoutez des titres personnalisés, des descriptions, etc.</li></ul>"
 
 #: image.module:47
 msgid "Allow users to upload images and to display them in shared and personal image galleries."
@@ -75,9 +94,7 @@ msgstr "Chemin des fichiers"
 
 #: image.module:61
 msgid "<p>You may quickly link to image nodes using a special syntax. The image code(s) will be replaced by thumbnail linked to full size image node. Syntax: <code>[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]</code>. Every parameter except node_id is <em>optional</em>.</p>"
-msgstr ""
-"<p>Vous pouvez rapidement établir des liens vers les images en utilisant une syntaxe spéciale. Le code de l'image sera remplacé par une miniature avec un lien hypertexte vers l'image grand format. Syntaxe: <code>[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),"
-"hspace,vspace,border]</code>. Tous les paramètres sont <em>optionels</em> à l'exception de node_id.</p>"
+msgstr "<p>Vous pouvez rapidement établir des liens vers les images en utilisant une syntaxe spéciale. Le code de l'image sera remplacé par une miniature avec un lien hypertexte vers l'image grand format. Syntaxe: <code>[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]</code>. Tous les paramètres sont <em>optionels</em> à l'exception de node_id.</p>"
 
 #: image.module:72;207;1550;0
 msgid "image"
@@ -201,9 +218,7 @@ msgstr "Librairie graphique"
 
 #: image.module:116
 msgid "Select the image library to be used during thumbnail generation and image manipulation.  Use ImageMagick if you can; GD produces worse thumbnails, might not support GIF and this module doesn't support image editing (rotate, crop etc) with it."
-msgstr ""
-"Sélectionnez la librairie graphique à utiliser pour la génération des vignettes et la manipulation des images. Préférez ImageMagick si vous le pouvez; GD produit de moins belles vignettes, pourrait ne pas supporter le "
-"format GIF, et ce module ne supporte pas la modification des images (rotation, recadrage, etc ...) avec elle."
+msgstr "Sélectionnez la librairie graphique à utiliser pour la génération des vignettes et la manipulation des images. Préférez ImageMagick si vous le pouvez; GD produit de moins belles vignettes, pourrait ne pas supporter le format GIF, et ce module ne supporte pas la modification des images (rotation, recadrage, etc ...) avec elle."
 
 #: image.module:118
 msgid "Imagemagick Convert path"
@@ -459,9 +474,7 @@ msgstr "Codes d'image"
 
 #: image.module:665
 msgid "When enabled, image codes will be replaced by thumb linked to real node. Syntax: [image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]; every param but node_id is optional."
-msgstr ""
-"S'ils sont activés le code d'images sera remplacé par une miniature reliée au noeud réel. Syntaxe: "
-"[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]; Chaque paramètre (sauf node_id) est optionnel."
+msgstr "S'ils sont activés le code d'images sera remplacé par une miniature reliée au noeud réel. Syntaxe: [image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]; Chaque paramètre (sauf node_id) est optionnel."
 
 #: image.module:715;720;745;750
 msgid "Cannot save image."
@@ -637,7 +650,7 @@ msgstr "Limite"
 
 #: image.module:1713
 msgid "Set how many pictures each role listed above is allowed. \"Personal Gallery Picture Limit\" will be the default value for new roles."
-msgstr "Défini à combien d'images les rôles ci-dessus ont droit. La \"quantité maximale d'image par galerie personnelle\" sera la valeur par défaut pour les nouveaux rôles."
+msgstr "Définit à combien d'images les rôles ci-dessus ont droit. La \"limite d'images par galerie personnelle\" sera la valeur par défaut pour les nouveaux rôles."
 
 #: image.module:79
 msgid "has personal image gallery"
@@ -701,9 +714,7 @@ msgstr "Galeries d'images"
 
 #: image.module:515;550
 msgid "There is 1 image in this gallery"
-msgid_plural ""
-"There are %count images in this gallery"
-"msgstr ""
+msgid_plural "There are %count images in this galler"
 msgstr[0] "Il y a 1 image dans cette galerie"
 msgstr[1] "Il y a %count images dans cette galerie"
 
