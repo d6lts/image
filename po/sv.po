@@ -1,0 +1,735 @@
+# Swedish translation of image.module
+# Copyright (c) 2006 NAME <EMAIL@ADDRESS>
+# 
+msgid ""
+""
+msgstr "Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2004-02-17 14:32+0100\n"
+"PO-Revision-Date: 2006-03-24 13:21+0100\n"
+"Last-Translator: Hannes Lilljequist <webmaster@zoopeople.se>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#:image.module:7
+msgid "<p>Admins may create many image nodes at once by uploading all images to a folder on the server. This upload happens outside of Drupal, usually using an FTP client.</p>"
+msgstr "<p>Administratörer kan skapa flera bildnoder på en gång genom att ladda upp alla bilder till en katalog på servern. Denna uppladning sker utanför Drupal, vanligtvis via ett FTP-program.</p>"
+
+#:image.module:10
+msgid "Allows uploading of images and creating image galleries."
+msgstr "Gör det möjligt att ladda upp bilder och skapa bildgallerier."
+
+#:image.module:12
+msgid "An image (with thumbnail). This is ideal for publishing photographs or screenshots."
+msgstr "En bild (med miniatyr). Detta är lämpligt för publicering av fotografier eller skärmdumpar."
+
+#:image.module:14
+msgid "Image galleries can be used to organize and present groups of images. Galleries may be nested. To add a new gallery click the \"add gallery\" tab."
+msgstr "Bildgallerier kan användas för att organisera eller presentera grupper av bilder. Bildgallerier kan ha undergallerier. För att lägga till ett nytt bildgalleri, klicka på  \"lägg till bildgalleri\"."
+
+#:image.module:30
+msgid "Below is a status of image module's current configuration."
+msgstr "Nedan är statusen för bildmodulens nuvarande konfigurering."
+
+#:image.module:33
+msgid ""
+"\n"
+"      <h4>Fast Mode</h4><ul>\n"
+"      <li>Creates all image nodes at once without user interaction.</li>\n"
+"      <li>Applies the same taxonomy term(s) to each node, thus creating a gallery.</li>\n"
+"      <li>If IPTC data is present in the image, the headline and caption fields are used to populate the title and body respectively.</li>\n"
+"      <li>If the image dimensions are bigger than the maximum allowed, the image is automatically scaled down.</li></ul>"
+msgstr "\n"
+"      <h4>Snabbläge</h4><ul>\n"
+"      <li>Skapar alla bildnoder på en gång utan användarens inblandning.</li>\n"
+"      <li>Applicerar samma taxonomiterm(er) på varje nod, och skapar på så sätt ett galleri.</li>\n"
+"      <li>Om IPTC-information finns i bilden så används rubriken och bildtexten till nodens rubrik respektive bildtext.</li>\n"
+"      <li>Om bildstorleken är större än den maximalt tillåtna så skalas bilden automatiskt ner.</li></ul>"
+
+#:image.module:41
+msgid ""
+"\n"
+"      <h4>Slow Mode</h4><ul>\n"
+"      <li>Manipulate each image individually (i.e. crop, rotate, etc.).</li>\n"
+"      <li>Add custom titles, descriptions, etc.</li></ul>"
+msgstr "\n"
+"      <h4>Långsamt läge</h4><ul>\n"
+"      <li>Förändra varje bild individuellt (ex. beskär, rotera, etc.).</li>\n"
+"      <li>Lägg till egna rubriker, beksrivningar etc.</li></ul>"
+
+#:image.module:47
+msgid "Allow users to upload images and to display them in shared and personal image galleries."
+msgstr "Gör det möjligt för användare att ladda upp bilder och visa dem i delade och personliga bildgallerier."
+
+#:image.module:50
+msgid "Images can be uploaded into either shared or personal galleries. Once images are uploaded they can be manipulated.  The image system will auto-generate thumbnails for all images to be used in other nodes via filters and in gallery navigation.  These settings allow you to control where images are placed, how they are displayed, and any restrictions that should be enforced."
+msgstr "Bilder kan laddas upp till antingen delade eller personliga gallerier. När bilderna är uppladdade kan de färändras. Bildsystemet skapar automatiskt miniatyrer av alla bilder som kan användas i andra noder via fildter och via gallerinavigationen."
+
+#:image.module:53
+msgid "An image you can insert into nodes, or see in image galleries."
+msgstr "En bild som du kan infoga i noder eller visa i bildgallerier."
+
+#:image.module:57
+msgid "You may link to images on this site <a href=\"%explanation-url\">using a special syntax</a>"
+msgstr "Du kan länka till bilder på denna webbplats <a href=\"%explanation-url\">med ett speciellt syntax</a>"
+
+#:image.module:59
+msgid "Default image path"
+msgstr "Standardsökväg för bilder"
+
+#:image.module:59
+msgid "Subdirectory in the directory \"%dir\" where pictures will be stored."
+msgstr "Underkatalog till katalogen \"%dir\" där bilderna kommer att sparas."
+
+#:image.module:60
+msgid "File paths"
+msgstr "Sökväg"
+
+#:image.module:61
+msgid "<p>You may quickly link to image nodes using a special syntax. The image code(s) will be replaced by thumbnail linked to full size image node. Syntax: <code>[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]</code>. Every parameter except node_id is <em>optional</em>.</p>"
+msgstr "<p>Du kan snabbt länka till bildnoder med ett speciellt syntax. Bildkoderna kommer att ersättas med miniatyrbilder som länkas till originalbildens högupplösta bildnod. Syntax: <code>[image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]</code>. Varje parameter utom node_id är <em>frivillig</em>.</p>"
+
+# image.module:72,  ;207;1550;0
+#:image.module:72
+msgid "image"
+msgstr "bild"
+
+#:image.module:79
+msgid "Label"
+msgstr "Etikett"
+
+#:image.module:79
+msgid "Width"
+msgstr "Bredd"
+
+#:image.module:79
+msgid "Height"
+msgstr "Höjd"
+
+#:image.module:80
+msgid "Select various pixel dimensions, \"thumbnail\" and \"preview\" are required."
+msgstr "Ange olika pixeldimensioner, \"miniatyr\" och \"förhandsvisning\" är obligatoriska."
+
+#:image.module:81
+msgid "Allow users to view original image"
+msgstr "Tillåt användare att visa originalbild"
+
+#:image.module:82
+msgid "Image sizes"
+msgstr "Bildstorlekar"
+
+# /?q=admin/settings/image
+#:image.module:84
+msgid "Images per page"
+msgstr "Bilder per sida"
+
+# /?q=admin/settings/image
+#:image.module:84
+msgid "Sets the number of images to be displayed in a gallery page."
+msgstr "Anger antal bilder som ska visas på en bildgallerisida"
+
+# /?q=admin/settings/image
+#:image.module:85
+msgid "Gallery settings"
+msgstr "Galleriinställnignar"
+
+#:image.module:87
+msgid "Explanation or submission guidelines"
+msgstr "Förklaring eller riktlinjer för inlägg"
+
+#:image.module:87
+msgid "This text will be displayed at the top of the image submission form.  It is useful for helping or instructing your users."
+msgstr "Denna text visas högst upp på inmatningsformuläret för bilder. Texten kan användas för att hjälpa och instruera användare."
+
+#:image.module:89
+msgid "Default path for uploaded images relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."
+msgstr "Standardsökväg för upladdade bilder, relativt till din Drupal-installation. Katalogen måste vara skrivbar och åtkomlig från webben. Glöm inte snedstrecket (/) i slutet."
+
+#:image.module:92
+msgid "Default thumb path"
+msgstr "Standardsökväg för miniatyrer"
+
+#:image.module:92
+msgid "Default path for thumbnails relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."
+msgstr "Standardsökväg för miniatyrer relativt till din Drupal-installation. Katalogen måste vara skrivbar och åtkomlig från webben. Glöm inte snedstrecket (/) i slutet."
+
+#:image.module:95
+msgid "Temporary image path"
+msgstr "Sökväg för tillfälliga bilder"
+
+#:image.module:95
+msgid "Path for working directory relative to your Drupal installation; it must be writeable and visible from the web. Don't forget the slash (/) at the end."
+msgstr "Sökväg till arbetskatalog relativt till din Drupal-installation. Katalogen måste vara skrivbar och åtkomlig från webben. Glöm inte snedstrecket (/) i slutet."
+
+#:image.module:96
+msgid "Maximum temporary image directory size"
+msgstr "Maximal storlek på katalogen för tillfälliga bilder"
+
+#:image.module:96
+msgid "MBytes."
+msgstr "MByte."
+
+#:image.module:98
+# This text seems to be outdated.
+msgid "Stored images filenames"
+msgstr "Lagrade bilders filnamn"
+
+#:image.module:98
+# This text seems to be outdated.
+msgid "The filename of an image stored on the server could be based on an unique random string or include the original filename. In the later case, the node id will be appended to the filename."
+msgstr "Filnamnet på en bild som lagras på servern kan baseras på antingen en unik slumpmässig textsträng eller originalfilens namn. I det senare fallet läggs nodens id till i filnamnet."
+
+#:image.module:100
+msgid "Default max image size"
+msgstr "Förvald maxstorlek på bilder"
+
+#:image.module:100
+msgid "KBytes."
+msgstr "Kbyte."
+
+#:image.module:101
+msgid "Default max image resolution"
+msgstr "Förvald maxupplösning på bilder"
+
+#:image.module:101
+msgid "Example: 800x600."
+msgstr "Exempel: 800x600"
+
+#:image.module:103
+msgid "Default thumbnail resolution"
+msgstr "Förvald upplösning på miniatyrer"
+
+#:image.module:103
+msgid "Default size of thumbnails: format will be the same as original image. Use just one dimension, and put a \"x\" to specify height. Examples: \"100\" for width of 100; \"x200\" for height of 200."
+msgstr "Förvald miniatyrstorlek: formatet blir det samma som i originalbilden. Använd bara en dimension och använd \"x\" för att ange höjden. Exempel: \"100\" för bredden 100 och \"x200\" för höjden 200."
+
+#:image.module:110
+msgid "list"
+msgstr "lista"
+
+#:image.module:113
+msgid "add gallery"
+msgstr "lägg till bildgalleri"
+
+#:image.module:116
+msgid "Image library"
+msgstr ""
+
+#:image.module:116
+msgid "Select the image library to be used during thumbnail generation and image manipulation.  Use ImageMagick if you can; GD produces worse thumbnails, might not support GIF and this module doesn't support image editing (rotate, crop etc) with it."
+msgstr ""
+
+#:image.module:118
+msgid "Imagemagick Convert path"
+msgstr ""
+
+#:image.module:118
+msgid "Absolute path to ImageMagick convert file. Include the 'convert.exe' (or other filename) at the end. Leave it blank if you have selected GD library."
+msgstr ""
+
+#:image.module:121
+msgid "Background Color"
+msgstr "Bakgrundsfärg"
+
+#:image.module:121
+msgid "Color used to fill in background when rotating images."
+msgstr "Färg som används för att fylla i bakgrunden vid bildrotering."
+
+#:image.module:128
+msgid "jhead path"
+msgstr ""
+
+#:image.module:128
+msgid "Absolute path of jhead, for EXIF parsing; blank to disable."
+msgstr ""
+
+#:image.module:133
+msgid "<none>"
+msgstr "<inget>"
+
+#:image.module:135
+msgid "Gallery Navigation Vocabulary"
+msgstr "Vokabulär för bildgallerier"
+
+#:image.module:135
+msgid "One of the taxonomy vocabularies will be the navigation tree. Select it here. Make sure that a term from this vocabulary is required."
+msgstr "Ett taxonomi-vokabulär kommer att användas som galleriernas navigationsträd. Välj detta här. Se till att vokabuläret är obligatoriskt."
+
+# image.module:366,  ;1427
+#:image.module:137
+msgid "Gallery Thumbnails"
+msgstr "Galleriminiatyrer"
+
+#:image.module:137
+msgid "Set the thumbnail to be dislayed on the gallery page."
+msgstr "Ange vilken miniatyr som ska visas på gallerisidan."
+
+#:image.module:138
+msgid "Specify how many rows of thumbnails in each page of the gallery."
+msgstr "Ange hur många rader med miniatyrer som ska visas på varje gallerisida."
+
+#:image.module:139
+msgid "Gallery Columns"
+msgstr "Gallerikolumner"
+
+#:image.module:139
+msgid "Specify how many columns of thumbnails in each page of the gallery."
+msgstr "Ange hur många kolumner med miniatyrer som ska visas på varje gallerisida."
+
+#:image.module:140
+msgid "Gallery Order"
+msgstr "Galleriordning"
+
+#:image.module:140
+msgid "Order of thumbnails within a gallery. Lighter and heavier refer to weight property."
+msgstr "Ordning på miniatyrerna i ett galleri. Lätt och tung har att göra med egenskapen tyngd."
+
+#:image.module:142
+msgid "Personal Image Galleries"
+msgstr ""
+
+#:image.module:142
+msgid "Activate/deactivate personal image galleries site-wide.  When enabled you can use the \"has personal image gallery\" permission to control which roles have personal galleries."
+msgstr ""
+
+#:image.module:144
+msgid "Personal Gallery Picture Limit"
+msgstr ""
+
+#:image.module:144
+msgid "Set how many pictures users are allowed."
+msgstr ""
+
+#:image.module:145
+msgid "Uploaded file is not a valid image"
+msgstr "Den uppladdade filen är inte en giltig bild."
+
+#:image.module:145
+msgid "Personal Gallery Picture Limit Per Role"
+msgstr ""
+
+#:image.module:145
+msgid "Enabling this will allow for setting a maximum number of pictures per role."
+msgstr ""
+
+#:image.module:150
+msgid "Personal Gallery Size Limit"
+msgstr ""
+
+#:image.module:150
+msgid "Set a maximum number of kilobytes allowed per user."
+msgstr ""
+
+#:image.module:153
+msgid "Disable Image Caching"
+msgstr ""
+
+#:image.module:153
+msgid "Enabling this will add random parameters to image URIs which will prevent the browser from caching."
+msgstr ""
+
+# image.module:193,  ;216
+#:image.module:193
+msgid "image galleries"
+msgstr "bildgallerier"
+
+#:image.module:198
+msgid "view original"
+msgstr "visa original"
+
+# image.module:72,  ;207;1550;0
+#:image.module:200
+msgid "images"
+msgstr "bilder"
+
+#:image.module:201
+msgid "directory upload: slow"
+msgstr ""
+
+#:image.module:202
+msgid "directory upload: fast"
+msgstr ""
+
+# image.module:193,  ;216
+#:image.module:212
+msgid "my image gallery"
+msgstr ""
+
+# image.module:207;216
+#:image.module:213
+msgid "Latest image"
+msgstr "Senaste bild"
+
+# image.module:208;221
+#:image.module:214
+msgid "Random image"
+msgstr "Slumpmässigt vald bild"
+
+#:image.module:224
+msgid "edit this image"
+msgstr "redigera denna bild"
+
+#:image.module:224
+msgid "Edit this image."
+msgstr "Redigera denna bild."
+
+# image.module:193,  ;216
+#:image.module:229
+msgid "%u's image gallery"
+msgstr ""
+
+# image.module:193,  ;216
+#:image.module:229
+msgid "View %u's image gallery."
+msgstr ""
+
+# image.module:366,  ;1427
+#:image.module:254
+msgid "Thumbnail"
+msgstr "Miniatyr"
+
+#:image.module:258
+msgid "Image"
+msgstr "Bild"
+
+#:image.module:259
+msgid "Description"
+msgstr "Beskrivning"
+
+# image.module:193,  ;216
+#:image.module:259
+msgid "%t image gallery"
+msgstr "Bildgalleri %t"
+
+# image.module:193,  ;216
+#:image.module:259
+msgid "View %t image gallery."
+msgstr "Visa bildgalleri %t."
+
+#:image.module:288
+msgid "previous image"
+msgstr "föregående bild"
+
+#:image.module:292
+msgid "next image"
+msgstr "nästa bild"
+
+#:image.module:307
+msgid "Image gallery"
+msgstr "Bildgalleri"
+
+#:image.module:370
+msgid "EXIF data"
+msgstr ""
+
+#:image.module:374
+msgid "IPTC data"
+msgstr ""
+
+#:image.module:382
+msgid "Click \"Browse...\" to select an image to upload."
+msgstr "Klicka på  \"Bläddra...\" för att välja bilder för uppladdning."
+
+#:image.module:388
+msgid "Weight"
+msgstr "Vikt"
+
+#:image.module:388
+msgid "Weight of image used to sort thumbnails.  Heavier thumbnails will fall to the bottom of the gallery."
+msgstr ""
+
+#:image.module:392
+msgid "Personal"
+msgstr "Personlig"
+
+#:image.module:392
+msgid "A personal image can only be seen in the user's image gallery."
+msgstr ""
+
+# image.module:439;443
+#:image.module:439
+msgid "The image file you are trying to upload is too big."
+msgstr "Bildfilen du försöker ladda upp är för stor."
+
+#:image.module:447
+msgid "The image file was only partially uploaded. Please try again."
+msgstr "Bildfilen laddades bara upp delvis. Var god försök igen."
+
+#:image.module:451
+msgid "You must select an image for upload."
+msgstr "Du måste välja en bild som ska laddas upp."
+
+#:image.module:464
+msgid "Error processing image file."
+msgstr "Fel inträffade vid behandling av bildfil."
+
+#:image.module:486
+msgid "Uploaded file was not an image."
+msgstr "Den uppladdade filen var inte en bild."
+
+#:image.module:489
+msgid "image type '%type' is not supported."
+msgstr "Bildtypen '%type' stöds inte."
+
+#:image.module:496
+msgid "The uploaded image(%ax%b) is too large (max %cx%d)."
+msgstr "Dne uppladdade bilden(%ax%b) är för stor (max %cx%d)."
+
+#:image.module:651
+msgid "Image filter"
+msgstr "Bildfilter"
+
+#:image.module:665
+msgid "Image codes"
+msgstr "Bildkoder"
+
+#:image.module:665
+msgid "When enabled, image codes will be replaced by thumb linked to real node. Syntax: [image:node_id,(left|right|top|middle|bottom|absmiddle|texttop|baseline),hspace,vspace,border]; every param but node_id is optional."
+msgstr ""
+
+# image.module:715;720;745;750
+#:image.module:715
+msgid "Cannot save image."
+msgstr "Kan inte spara bilden."
+
+#:image.module:734
+msgid "Cannot delete old image."
+msgstr "Kan inte radera gammal bild."
+
+#:image.module:737
+msgid "Cannot delete old thumb."
+msgstr "Kan inte radera gammal miniatyr."
+
+#:image.module:934
+msgid "Cannot create thumbnail. Current GD library has no read support for '%type' image format."
+msgstr ""
+
+#:image.module:965
+msgid "Cannot create thumbnail. Current GD library has no support for '%type' format image creation."
+msgstr ""
+
+#:image.module:978
+msgid "Imagemagick: you have to set <code>convert</code> path."
+msgstr ""
+
+#:image.module:1032
+msgid "You can have at most %a images in your gallery."
+msgstr ""
+
+#:image.module:1038
+msgid "You have %a kb for your gallery."
+msgstr ""
+
+#:image.module:1045
+msgid "File is too big (max %a kbytes)"
+msgstr "Filen är för stor (max %a kbyte)"
+
+#:image.module:1053
+msgid "Upload directory is full."
+msgstr "Uppladdningskatalogen är full."
+
+#:image.module:1102
+msgid "Resize/Crop"
+msgstr "Skala om/beskär"
+
+#:image.module:1112
+msgid "keep prop"
+msgstr "behåll prop"
+
+# /admin/modules
+#:image.module:1116
+msgid "Rotate"
+msgstr "Rotera"
+
+#:image.module:1119
+msgid "clockwise"
+msgstr "medsols"
+
+#:image.module:1120
+msgid "background"
+msgstr "bakgrund"
+
+#:image.module:1120
+msgid "white"
+msgstr "vit"
+
+#:image.module:1120
+msgid "black"
+msgstr "svart"
+
+#:image.module:1124
+msgid "Convert"
+msgstr "Konvertera"
+
+#:image.module:1125
+msgid "Quality (1-100)"
+msgstr "Kvalitet (1-100)"
+
+#:image.module:1161
+msgid "Home"
+msgstr "Hem"
+
+#:image.module:1164
+msgid "%u's Image Gallery"
+msgstr ""
+
+#:image.module:1195
+msgid "Image galleries"
+msgstr "Bildgallerier"
+
+#:image.module:1204
+msgid "Access Denied"
+msgstr "Åtkomst nekad"
+
+#:image.module:1327
+msgid "There is 1 image in this album."
+msgstr "Det finns 1 bild i galleriet."
+
+#:image.module:1327
+msgid "There are %a images in this album."
+msgstr "Det finns %a bilder i galleriet."
+
+#:image.module:1329
+msgid "There are no images in this album."
+msgstr "Det finns inga bilder i galleriet."
+
+#:image.module:1332
+msgid "Last updated: "
+msgstr "Senast uppdaterad:"
+
+#:image.module:1425
+msgid "Directory to scan"
+msgstr "Katalog att söka igenom"
+
+#:image.module:1425
+msgid "The path to the directory which holds the source image files. This path should be relative to Drupal root directory - don't forget the slash (/) at the end."
+msgstr ""
+
+#:image.module:1427
+msgid "Show resized image. Use only if you have large bandwidth."
+msgstr ""
+
+# modules\privatemsg.module:187;508
+#:image.module:1430
+msgid "Delete images after insert"
+msgstr ""
+
+#:image.module:1430
+msgid "If instructed, Drupal will delete all files in the above directory after creating the image nodes."
+msgstr ""
+
+#:image.module:1434
+msgid "Add new gallery"
+msgstr "lägg till bildgalleri"
+
+#:image.module:1434
+msgid "If needed, create a new term for this gallery by clicking on one of these vocabularies"
+msgstr "Om det behövs, skapa en ny term för detta galleri genom att klicka på ett av dessa vokabulär."
+
+#:image.module:1437
+msgid "Directory upload"
+msgstr "Kataloguppladdning"
+
+#:image.module:1444
+msgid "is not a directory"
+msgstr "är inte en katalog"
+
+#:image.module:1452
+msgid "is not writable. Change permissions on server"
+msgstr ""
+
+#:image.module:1542
+msgid "You may wish to view your new images:"
+msgstr ""
+
+#:image.module:1545
+msgid "gallery"
+msgstr "galleri"
+
+#:image.module:1555
+msgid "is not an image."
+msgstr "är inte en bild."
+
+#:image.module:1558
+msgid "image type is not supported."
+msgstr "bildtypen stöds inte."
+
+#:image.module:1705
+msgid "Role"
+msgstr "Användarroll"
+
+#:image.module:1705
+msgid "Limit"
+msgstr "Begränsa"
+
+#:image.module:1713
+msgid "Set how many pictures each role listed above is allowed. \"Personal Gallery Picture Limit\" will be the default value for new roles."
+msgstr ""
+
+#:image.module:79
+msgid "has personal image gallery"
+msgstr ""
+
+#:image.module:79
+msgid "manipulate images"
+msgstr "manipulera bilder"
+
+#:image.module:79
+msgid "access images"
+msgstr "åtkomst till bilder"
+
+#:image.module:79
+msgid "create images"
+msgstr "skapa bilder"
+
+#:image.module:79
+msgid "administer images"
+msgstr "administrera bilder"
+
+#:image.module:456
+msgid "edit gallery"
+msgstr "redigera galleri"
+
+#:image.module:461
+msgid "No galleries available"
+msgstr "Inga gallerier tillgängliga."
+
+#:image.module:470
+msgid "Gallery name"
+msgstr "Gallerinamn"
+
+#:image.module:470
+msgid "The name is used to identify the gallery."
+msgstr "Namnet används för att identifiera galleriet."
+
+#:image.module:517
+msgid "Last updated: %date"
+msgstr "Senast uppdaterad: %date"
+
+#:image.module:537
+msgid "Posted by: %name"
+msgstr "Inlagd av: %name"
+
+#:image.module:607
+msgid "Unable to create %label image"
+msgstr "Kan inte skapa bilden %label"
+
+#:image.module:654
+msgid "thumbnail"
+msgstr "miniatyr"
+
+#:image.module:655
+msgid "preview"
+msgstr "exempel"
+
+#:image.module:712
+msgid "Image Galleries"
+msgstr "Bildgallerier"
+
+#: image.module:515;550
+msgid "There is 1 image in this gallery"
+msgid_plural "There are %count images in this gallery"
+msgstr[0] "Det finns en bild i detta galleri"
+msgstr[1] "Det finns %count bilder i detta galleri"
