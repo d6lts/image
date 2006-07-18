@@ -376,7 +376,7 @@ function image_fetch($nid = 0, $size = 'preview') {
  * Theme a teaser
  */
 function theme_image_teaser($node) {
- return l(image_display($node, 'thumbnail'), 'node/'. $node->nid, array(), NULL, NULL, FALSE, TRUE) . $node->teaser;
+ return l(image_display($node, 'thumbnail'), 'node/'. $node->nid, array(), NULL, NULL, TRUE, TRUE) . $node->teaser;
 }
 
 /**
