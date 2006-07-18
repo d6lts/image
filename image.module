@@ -57,9 +57,9 @@ function image_access($op, $node) {
 }
 
 /**
- * Implementation of hook_settings
+ * Admin settings callback.
  */
-function image_settings() {
+function image_admin_settings() {
   _image_check_settings();
 
   $form['image_updated'] = array('#type' => 'hidden', '#value' => time());
@@ -70,7 +70,7 @@ function image_settings() {
   $form['sizes'] = array('#type' => 'fieldset', '#title' => t('Image sizes'));
   $form['sizes']['image_sizes'] = image_settings_sizes_form();
 
-  return $form;
+ return system_settings_form('image_admin_settings', $form);
 }
 
 function image_settings_sizes_form() {
@@ -122,6 +122,13 @@ function image_menu($may_cache) {
                      'access' => user_access('access content'),
                      'type' => MENU_CALLBACK,
                      'callback' => 'image_fetch');
+    $items[] = array(
+                     'path' => 'admin/settings/image',
+                     'title' => ('image settings'),
+                     'callback' => 'image_admin_settings',
+                     'access' => user_access('administer site configuration'),
+                     'type' => MENU_NORMAL_ITEM,
+                     );
   }
 
   return $items;
