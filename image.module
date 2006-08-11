@@ -18,7 +18,7 @@ Image galleries are used to organize and display images in galleries.   The list
 ', array('%admin-settings' => url('admin/settings'), '%admin-image-galleries' => url('admin/image/galleries'), '%admin-settings-image' => url('admin/settings/image'), '%external-http-drupal-org-project-img_assist' => 'http://drupal.org/project/img_assist')) .'</ul>';
       $output .= '<p>'. t('For more information please read the configuration and customization handbook <a href="%image">Image page</a>.', array('%image' => 'http://www.drupal.org/handbook/modules/image/')) .'</p>';
       return $output;
-    case 'admin/modules#description':
+    case 'admin/settings/modules#description':
       return t('Allows uploading of images.');
     case 'node/add#image':
       return '<p>'. t('An image (with thumbnail). This is ideal for publishing photographs or screenshots.') .'</p>';

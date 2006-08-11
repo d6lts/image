@@ -3,7 +3,7 @@
 
 function image_gallery_help($section) {
   switch ($section) {
-    case 'admin/modules#description':
+    case 'admin/settings/modules#description':
       return t('Allows sorting and displaying of image galleries based on categories');
     case 'admin/image':
       return '<p>'. t('Image galleries can be used to organize and present groups of images. Galleries may be nested. To add a new gallery click the "add gallery" tab.') .'</p>';
