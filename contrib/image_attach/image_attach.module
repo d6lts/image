@@ -59,7 +59,7 @@ function image_attach_form_alter($form_id, &$form) {
         $value = ($node->new_image) ? '#value' : '#default_value';
         $form['image_attach']['iid'] = array('#type' => 'hidden' , $value => $node->iid);
         $form['image_attach']['image'] = array('#type' => 'file', '#title' => t('Image'));
-        $form['image_attach']['image_title'] = array('#type' => 'textfield', '#title' => t('Image title'), '#default_value' => '');
+        $form['image_attach']['image_title'] = array('#type' => 'textfield', '#title' => t('Image title'), '#default_value' => $image->title);
       }
       break;
   }
