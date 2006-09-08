@@ -18,10 +18,6 @@ Image galleries are used to organize and display images in galleries.   The list
 ', array('%admin-settings' => url('admin/settings'), '%admin-image-galleries' => url('admin/image/galleries'), '%admin-settings-image' => url('admin/settings/image'), '%external-http-drupal-org-project-img_assist' => 'http://drupal.org/project/img_assist')) .'</ul>';
       $output .= '<p>'. t('For more information please read the configuration and customization handbook <a href="%image">Image page</a>.', array('%image' => 'http://www.drupal.org/handbook/modules/image/')) .'</p>';
       return $output;
-    case 'admin/settings/modules#description':
-      return t('Allows uploading of images.');
-    case 'node/add#image':
-      return '<p>'. t('An image (with thumbnail). This is ideal for publishing photographs or screenshots.') .'</p>';
   }
 }
 
@@ -29,7 +25,13 @@ Image galleries are used to organize and display images in galleries.   The list
  * Implementation of hook_node_info
  */
 function image_node_info() {
-  return array('image' => array('name' => t('image'), 'base' => 'image'));
+  return array(
+    'image' => array(
+      'name' => t('image'),
+      'module' => 'image',
+      'description' => t('An image (with thumbnail). This is ideal for publishing photographs or screenshots.'),
+    )
+  );
 }
 
 /**
@@ -65,12 +67,12 @@ function image_admin_settings() {
   $form['image_updated'] = array('#type' => 'hidden', '#value' => time());
 
   $form['paths'] = array('#type' => 'fieldset', '#title' => t('File paths'));
-  $form['paths']['image_default_path'] = array('#type' => 'textfield', '#title' => t('Default image path'), '#default_value' => variable_get('image_default_path', 'images'), '#description' => t('Subdirectory in the directory "%dir" where pictures will be stored. Do not include trailing slash.', array('%dir' => theme('placeholder', variable_get('file_directory_path', 'files')))));
+  $form['paths']['image_default_path'] = array('#type' => 'textfield', '#title' => t('Default image path'), '#default_value' => variable_get('image_default_path', 'images'), '#description' => t('Subdirectory in the directory "%dir" where pictures will be stored. Do not include trailing slash.', array('%dir' => variable_get('file_directory_path', 'files'))));
 
   $form['sizes'] = array('#type' => 'fieldset', '#title' => t('Image sizes'));
   $form['sizes']['image_sizes'] = image_settings_sizes_form();
 
- return system_settings_form('image_admin_settings', $form);
+ return system_settings_form($form);
 }
 
 function image_settings_sizes_form() {
@@ -97,14 +99,14 @@ function theme_image_settings_sizes_form(&$form) {
   $header = array(t('Label'), t('Width'), t('Height'));
   foreach (element_children($form) as $key) {
     $row = array();
-    $row[] = form_render($form[$key]['label']);
-    $row[] = form_render($form[$key]['width']);
-    $row[] = form_render($form[$key]['height']);
+    $row[] = drupal_render($form[$key]['label']);
+    $row[] = drupal_render($form[$key]['width']);
+    $row[] = drupal_render($form[$key]['height']);
     $rows[] = $row;
 
   }
   $output = theme('table', $header, $rows);
-  $output .= form_render($form);
+  $output .= drupal_render($form);
 
   return $output;
 }
@@ -125,9 +127,11 @@ function image_menu($may_cache) {
     $items[] = array(
                      'path' => 'admin/settings/image',
                      'title' => ('image settings'),
-                     'callback' => 'image_admin_settings',
+                     'callback' => 'drupal_get_form',
+                     'callback arguments' => array('image_admin_settings'),
                      'access' => user_access('administer site configuration'),
                      'type' => MENU_NORMAL_ITEM,
+                     'description' => t('image module settings'),
                      );
   }
 
@@ -284,8 +288,11 @@ function image_view(&$node, $teaser = 0, $page = 0) {
   $request = ($_GET['size']) ? $_GET['size'] : 'preview';
   $request = check_plain($request);
   $node = node_prepare($node, $teaser);
-  $node->teaser = theme('image_teaser', $node);
-  $node->body = theme('image_body', $node, $request);
+  $node->content['image'] = array(
+    '#value' => theme('image_body', $node, $request),
+    '#weight' => 0,
+  );
+  return $node;
 }
 
 /**
@@ -415,7 +422,7 @@ function theme_image_teaser($node) {
  * Theme a body
  */
 function theme_image_body($node, $size) {
- return image_display($node, $size) . $node->body;
+ return image_display($node, $size);
 }
 
 /**
