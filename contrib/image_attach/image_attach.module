@@ -17,6 +17,23 @@ function image_attach_help($section) {
 }
 
 /**
+ * Implementation of hook_settings()
+ */
+function image_attach_settings() {
+  $form = array();
+  
+  $form['image_attach_existing'] = array(
+    '#type' => 'radios',
+    '#title' => t('Attach existing images.'),
+    '#default_value' => variable_get('image_attach_existing', 1),
+    '#options' => array(0 => 'Disabled', 1 => 'Enabled'),
+    '#description' => t('When enabled, will allow existing image nodes to be attached instead of uploading new images.')
+  );
+  
+  return $form;
+}
+
+/**
  * implementation of hook_form_alter()
  */
 function image_attach_form_alter($form_id, &$form) {
@@ -49,20 +66,74 @@ function image_attach_form_alter($form_id, &$form) {
       if ($enabled == 1 &&  function_exists('_image_check_settings')) {
         _image_check_settings();
         $node = $form['#node'];
+        $existing = variable_get('existingImageAttachDisabled', 1);
+        $value = ($node->new_image) ? '#value' : '#default_value';
         $form['#attributes'] = array("enctype" => "multipart/form-data");
 
-        $form['image_attach'] = array('#type' => 'fieldset', '#title' => t('Attached Images'), '#collapsible' => TRUE);
+        $form['image_attach'] = array(
+          '#type' => 'fieldset', 
+          '#title' => t('Attached Images'), 
+          '#collapsible' => TRUE, 
+          '#collapsed' => !$node->iid
+        );
         if ($node->iid) {
           $image = node_load($node->iid);
-          $form['image_attach']['image_thumbnail'] = array('#type' => 'item', '#title' => t('Thumbnail'), '#value' => image_display($image, 'thumbnail'));
+          $form['image_attach']['image_thumbnail'] = array(
+            '#type' => 'item', 
+            '#title' => t('Thumbnail'), 
+            '#value' => image_display($image, 'thumbnail')
+          );
         }
-        $value = ($node->new_image) ? '#value' : '#default_value';
-        $form['image_attach']['iid'] = array('#type' => 'hidden' , $value => $node->iid);
-        $form['image_attach']['image'] = array('#type' => 'file', '#title' => t('Image'));
-        $form['image_attach']['image_title'] = array('#type' => 'textfield', '#title' => t('Image title'), '#default_value' => $image->title);
+        if ($existing && user_access('access content')) {         
+          $form['image_attach']['iid'] = array(
+            '#type' => 'select', 
+            '#title' => t('Existing Image'), 
+            '#options' => _image_attach_get_image_nodes(),
+            $value => $node->iid,
+            '#description' => t('Choose an image already existing on the server if you do not upload a new one.')
+            );
+          $form['image_attach'][] = array(
+            '#type' => 'item',
+            '#value' => t('-or-'),
+            '#attributes' => array('class' => 'either-choice')
+	        );
+        }
+        else {
+          $form['image_attach']['iid'] = array(
+            '#type' => 'hidden',
+            '#value' => $node->iid
+            );
+        }
+        $form['image_attach']['image'] = array(
+          '#type' => 'file',
+          '#title' => t('Upload Image')
+          );
+        $form['image_attach']['image_title'] = array(
+          '#type' => 'textfield', 
+          '#title' => t('Image title'),
+          $value => '',
+          '#description' => t('The title the image will be shown with.')
+        );        
       }
       break;
   }
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function image_attach_menu($may_cache) {
+  $items = array();
+
+  if ($may_cache) {
+    $items[] = array('path' => 'image_attach',
+      'title' => t('Image Attachment View'),
+      'callback' => 'image_attach_view_image',
+      'access' => user_access('access content'),
+      'type' => MENU_CALLBACK,
+    );
+  }
+  return $items;
 }
 
 /**
@@ -89,7 +160,7 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
           $node->new_image = TRUE;
         }
       }
-      elseif ($_POST['edit']['iid']) {
+      elseif (variable_get('image_attach_existing', 1) && $_POST['edit']['iid']) {
         $node->iid = $_POST['edit']['iid'];
       }
       break;
@@ -116,6 +187,22 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
         }
       }
   }
+}
+
+/**
+ * Fetch an array of all candidate referenced nodes, for use in presenting the selection form to the user.
+ */
+function _image_attach_get_image_nodes() {
+  $rows = array(0 => '');
+  $result = db_query(db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE n.status=1 AND type='image' ORDER BY n.sticky DESC, n.title ASC"));
+  if (db_num_rows($result) == 0) {
+      return array();
+  }
+  
+  while ($node = db_fetch_object($result)) {
+      $rows[$node->nid] = $node->title;
+  }  
+  return $rows;
 }
 
 /**
