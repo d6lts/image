@@ -66,7 +66,7 @@ function image_attach_form_alter($form_id, &$form) {
       if ($enabled == 1 &&  function_exists('_image_check_settings')) {
         _image_check_settings();
         $node = $form['#node'];
-        $existing = variable_get('existingImageAttachDisabled', 1);
+        $existing = variable_get('image_attach_existing', 1);
         $value = ($node->new_image) ? '#value' : '#default_value';
         $form['#attributes'] = array("enctype" => "multipart/form-data");
 
