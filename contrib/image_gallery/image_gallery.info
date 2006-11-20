@@ -1,0 +1,5 @@
+; $Id$
+name = Image Gallery
+description = Allows sorting and displaying of image galleries based on categories.
+package = Image
+dependencies = image
