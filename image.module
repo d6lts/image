@@ -525,6 +525,10 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
     return false;
   }
   $info = image_get_info(file_create_path($node->images['_original']));
+  // If we can't find our original image, we can not proceed.
+  if (!$info) {
+    return;
+  }
   $sizes = _image_get_sizes();
   if (!$temp) {
     _image_remove($node);
