@@ -534,6 +534,15 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
     _image_remove($node);
   }
   foreach ($sizes as $size) {
+    if ((!$size['width'] || !$size['height']) && ($info = image_get_info(file_create_path($node->images['_original'])))) {
+      $aspect = $info['height'] / $info['width'];
+      if ($size['width'] && !$size['height']) {
+        $size['height'] = (int)round($size['width'] * $aspect);
+      }
+      elseif ($size['height'] && !$size['width']) {
+        $size['width'] = (int)round($size['height'] / $aspect);
+      }
+    }
     if ($size['label'] && $size['width'] && $size['height']) {
       if ($info['width'] > $size['width'] || $info['height'] > $size['height']) {
         $source = file_create_path($node->images['_original']);
