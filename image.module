@@ -211,7 +211,7 @@ function image_link($type, $node, $main = 0) {
  *
  * Offers 2 blocks: latest image and random image
  */
-function image_block($op, $delta = 0) {
+function image_block($op = 'list', $delta = 0) {
   switch ($op) {
     case 'list':
       $block[0]['info'] = t('Latest image');
