@@ -13,13 +13,23 @@ function image_imagemagick_info() {
  * Validate and return toolkit specific settings
  */
 function image_imagemagick_settings() {
-  $convert_file = variable_get('image_imagemagick_convert', '/usr/bin/convert');
+  $form['image_imagemagick_convert'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Location of the "convert" binary'),
+    '#default_value' => variable_get('image_imagemagick_convert', '/usr/bin/convert'),
+    '#size' => 64,
+    '#maxlength' => 64,
+    '#validate' => array('image_imagemagick_valid_file' => array('image_imagemagick_convert')),
+  );
+  return $form;
+}
 
-  if (!file_exists($convert_file)) {
-    form_set_error('image_imagemagick_convert', t('%file does not exist or is not executable.', array('%file' => "<em>$convert_file</em>")));
+function image_imagemagick_valid_file($formelement = NULL, $fieldname = NULL) {
+  $convert_file = $formelement['#value'];
+
+  if (!empty($convert_file) && !file_exists($convert_file)) {
+    form_set_error($fieldname, t('%file does not exist or is not executable.', array('%file' => $convert_file)));
   }
-  
-  return form_textfield(t('Location of the "convert" binary'), 'image_imagemagick_convert', $convert_file, 64, 64);
 }
 
 /**
@@ -97,4 +107,3 @@ function _image_exec($cmd) {
   }
 } 
 
-?>
