@@ -139,7 +139,7 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
   }
   switch ($op) {
     case 'prepare':
-      $image->title = $_POST['edit']['image_title'];
+      $image->title = $_POST['image_title'];
       $image->uid = $node->uid;
       $image->name = $node->name;
       $image->created = $node->created;
@@ -154,8 +154,8 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
           $node->new_image = TRUE;
         }
       }
-      elseif (variable_get('image_attach_existing', 1) && $_POST['edit']['iid']) {
-        $node->iid = $_POST['edit']['iid'];
+      elseif (variable_get('image_attach_existing', 1) && $_POST['iid']) {
+        $node->iid = $_POST['iid'];
       }
       break;
     case 'insert':
