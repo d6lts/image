@@ -64,7 +64,7 @@ function image_attach_form_alter($form_id, &$form) {
       $form['workflow']['image_attach'] = array(
         '#type' => 'radios',
         '#title' => t('Attach Images'),
-        '#default_value' => variable_get('image_attach_'. $form['identity']['type']['default_value'], 1),
+        '#default_value' => variable_get('image_attach_'. $form['#node_type']->type, 1),
         '#options' => array(0 => t('Disabled'), 1 => t('Enabled')),
         '#description' => t('Should this node allows users to upload an image?'),
         );
