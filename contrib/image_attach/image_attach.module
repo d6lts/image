@@ -146,6 +146,9 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
       $image->type = 'image';
       image_prepare($image, 'image');
       if ($image->images) {
+        if (empty($image->title)) {
+          $image->title = basename($image->images['_original']);
+        }
         node_validate($image);
         if (!form_get_errors()) {
           $image = node_submit($image);
