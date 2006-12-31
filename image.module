@@ -27,7 +27,7 @@ Image galleries are used to organize and display images in galleries.   The list
 function image_node_info() {
   return array(
     'image' => array(
-      'name' => t('image'),
+      'name' => t('Image'),
       'module' => 'image',
       'description' => t('An image (with thumbnail). This is ideal for publishing photographs or screenshots.'),
     )
