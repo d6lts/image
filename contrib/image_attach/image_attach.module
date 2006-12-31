@@ -146,6 +146,9 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
       $image->type = 'image';
       image_prepare($image, 'image');
       if ($image->images) {
+        if (empty($image->title)) {
+          $image->title = basename($image->images['_original']);
+        }
         node_validate($image);
         if (!form_get_errors()) {
           $image = node_submit($image);
@@ -203,6 +206,71 @@ function _image_attach_get_image_nodes() {
       $rows[$node->nid] = $node->title;
   }  
   return $rows;
+}
+
+/**
+ * Implementation of hook_views_tables().
+ */
+function image_attach_views_tables() {
+  $tables['image_attach'] = array(
+    'name' => 'image_attach',
+    'join' => array(
+      'left' => array(
+        'table' => 'node',
+        'field' => 'nid'
+      ),
+      'right' => array(
+        'field' => 'nid'
+      ),
+    ),
+    'fields' => array(
+      'iid' => array(
+        'name' => t('Image Attach: Display Image'),
+        'handler' => array(
+          'image_attach_views_handler_field_iid' => t('Image'),
+          'image_attach_views_handler_field_iid_link_node' => t('Image with link to attaching node'),
+          'image_attach_views_handler_field_iid_link_image' => t('Image with link to attached image'),
+        ),
+        'option' => array(
+          '#type' => 'select',
+          '#options' => 'image_views_handler_filter_image_size',
+        ),
+        'sortable' => FALSE,
+      ),
+    ),
+  );
+  
+  return $tables;
+}
+
+/**
+ * Views handler for displaying the image.
+ */
+function image_attach_views_handler_field_iid($field_info, $field_data, $value, $data) {
+  if ($value) {
+    $image = node_load($value);
+    return image_display($image, $field_data['options']);
+  }
+}
+
+/**
+ * Views handler for displaying the image in a link to the image node that attaches the image.
+ */
+function image_attach_views_handler_field_iid_link_node($field_info, $field_data, $value, $data) {
+  if ($value) {
+    $image = node_load($value);
+    return l(image_display($image, $field_data['options']), 'node/'. $data->nid, array(), NULL, NULL, FALSE, TRUE);
+  }
+}
+
+/**
+ * Views handler for displaying the image in a link to the attached image.
+ */
+function image_attach_views_handler_field_iid_link_image($field_info, $field_data, $value, $data) {
+  if ($value) {
+    $image = node_load($value);
+    return l(image_display($image, $field_data['options']), 'node/'. $value, array(), NULL, NULL, FALSE, TRUE);
+  }
 }
 
 /**
