@@ -18,7 +18,6 @@ function image_imagemagick_settings() {
     '#title' => t('Location of the "convert" binary'),
     '#default_value' => variable_get('image_imagemagick_convert', '/usr/bin/convert'),
     '#size' => 64,
-    '#maxlength' => 64,
     '#validate' => array('image_imagemagick_valid_file' => array('image_imagemagick_convert')),
   );
   return $form;
