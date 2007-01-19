@@ -195,7 +195,7 @@ function image_link($type, $node, $main = 0) {
     $request = ($_GET['size']) ? $_GET['size'] : 'preview';
     foreach (_image_get_sizes() as $size) {
       if ($node->images[$request] != $node->images[$size['label']]) {
-        $links["image_size_$size"] = array('title' => t($size['label']), 'href' => 'node/' . $node->nid, 'query' => 'size=' . urlencode($size['label']));
+        $links['image_size_'. $size['label']] = array('title' => t($size['label']), 'href' => 'node/' . $node->nid, 'query' => 'size=' . urlencode($size['label']));
       }
     }
     if (user_access('view original images') && ($node->images[$request] != $node->images['_original'])) {
