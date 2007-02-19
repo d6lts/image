@@ -169,8 +169,11 @@ function image_prepare(&$node, $field_name) {
       return;
     }
     $node->images['_original'] = $file->filepath;
-    _image_build_derivatives($node, true);
     $node->new_file = TRUE;
+
+    // Call hook to allow other modules to modify the original image.
+    module_invoke_all('image_alter', $node, $file->filepath, '_original');
+    _image_build_derivatives($node, TRUE);
   }
 }
 
@@ -245,6 +248,28 @@ function image_form_add_thumbnail($form_id, $edit) {
   return $form;
 }
 
+function image_form_image_alter($form, $form_values) {
+  if (!form_get_errors() && !isset($form_values['new_file'])) {
+    $node = (object)$form_values;
+    // Call hook_image_alter() since the original maybe being altered for a second or thrid time.
+    module_invoke_all('image_alter', $node, $file->filepath, '_original');
+
+    // We need to remove all the images and recreate the derivatives, so
+    // that hook_image_alter() will be called again.
+    _image_remove($node);
+    _image_build_derivatives($node, true);
+  }
+}
+
+/**
+ * Implementation of hook_form_alter
+ */
+function image_form_alter($form_id, &$form) {
+  if ($form_id == 'image_node_form') {
+    $form['#validate']['image_form_image_alter'] = array();
+  }
+}
+
 /**
  * Implementation of hook_form
  */
@@ -253,6 +278,10 @@ function image_form(&$node, &$param) {
 
   $form['#attributes'] = array("enctype" => "multipart/form-data");
   $form['title'] = array('#type' => 'textfield', '#title' => t('Title'), '#size' => 60, '#maxlength' => 128, '#required' => TRUE, '#default_value' => $node->title);
+
+  if ($node->new_file) {
+    $form['new_file'] = array('#type' => 'value', '#value' => TRUE);
+  }
 
   $sizes = _image_get_sizes();
   $form['images']['#tree'] = TRUE;
@@ -555,10 +584,29 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
           if (!$temp) {
             _image_insert($node, $size['label'], file_create_path($destination));
           }
+          module_invoke_all('image_alter', $node, file_create_path($destination), $size['label']);
         }
       }
       else {
-        $node->images[$size['label']] = $node->images['_original'];
+        /**
+         * If there is a module that implements hook_image_alter() then there
+         * possibility of modifying the derived images, then copy the 
+         * original to the devired and call hook_image_alter()
+         */
+        if (module_implements('image_alter')) {
+          $source = file_create_path($node->images['_original']);
+          $destination = _image_filename(basename($source), $size['label'], $temp);
+          file_copy($source, $destination);
+
+          $node->images[$size['label']] = $destination;
+          if (!$temp) {
+            _image_insert($node, $size['label'], file_create_path($destination));
+          }
+          module_invoke_all('image_alter', $node, file_create_path($destination), $size['label']);
+        }
+        else {
+          $node->images[$size['label']] = $node->images['_original'];
+        }
       }
     }
   }
