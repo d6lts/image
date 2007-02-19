@@ -11,14 +11,19 @@ function image_attach_install() {
   switch ($GLOBALS['db_type']) {
     case 'mysqli':
     case 'mysql':
-      db_query("
-CREATE TABLE {image_attach} (
-  nid int(10) unsigned NOT NULL default '0',
-  iid int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (nid)
-) TYPE=MyISAM
-/*!40100 DEFAULT CHARACTER SET utf8 */;");
+      db_query("CREATE TABLE {image_attach} (
+        nid int(10) unsigned NOT NULL default '0',
+        iid int(10) unsigned NOT NULL default '0',
+        PRIMARY KEY  (nid)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
       break;
+  case 'pgsql':
+    db_query("CREATE TABLE {image_attach} (
+      nid integer NOT NULL default '0',
+      iid integer NOT NULL default '0',
+      PRIMARY KEY (nid)
+    )");
+    break;
   }
   
 }
