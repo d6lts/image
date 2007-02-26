@@ -317,7 +317,7 @@ function image_view(&$node, $teaser = 0, $page = 0) {
   $request = check_plain($request);
   $node = node_prepare($node, $teaser);
   $node->content['image'] = array(
-    '#value' => theme('image_body', $node, $request),
+    '#value' => theme($teaser ? 'image_teaser' : 'image_body', $node, $request),
     '#weight' => 0,
   );
   return $node;
