@@ -125,7 +125,7 @@ function image_menu($may_cache) {
                      'type' => MENU_CALLBACK,
                      'callback' => 'image_fetch');
     $items[] = array('path' => 'admin/settings/image',
-                     'title' => ('Image'),
+                     'title' => t('Image'),
                      'callback' => 'drupal_get_form',
                      'callback arguments' => array('image_admin_settings'),
                      'access' => user_access('administer site configuration'),
