@@ -14,6 +14,10 @@ function image_import_help($section = '') {
   }
 }
 
+function image_import_perm() {
+  return array('import images');
+}
+
 function image_import_menu($may_cache) {
   $items = array();
   if ($may_cache) {
@@ -22,7 +26,7 @@ function image_import_menu($may_cache) {
       'title' => t('Image import'),
       'callback' => 'drupal_get_form',
       'callback arguments' => array('image_import_form'),
-      'access' => user_access('administer site configuration'),
+      'access' => user_access('import images'),
       'type' => MENU_NORMAL_ITEM,
       'description' => t('Import images from the filesystem.')
     );
