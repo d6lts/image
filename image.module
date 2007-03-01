@@ -540,7 +540,7 @@ function _image_check_settings() {
 
   // Sanity check : make sure we've got a working toolkit
   if (!image_get_toolkit()) {
-    drupal_set_message(t('Make sure you have a working image toolkit installed and enabled, for more information see: %settings', array('%settings' => l(t('the settings page'), 'admin/settings'))), 'error');
+    drupal_set_message(t('No image toolkit is currently enabled. Without one the image module will not be able to resize your images. You can select one from the <a href="!link">image toolkit settings page</a>.', array('!link' => url('admin/settings/image-toolkit'))), 'error');
     return false;
   }
   return true;
