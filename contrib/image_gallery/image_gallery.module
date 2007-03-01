@@ -157,7 +157,7 @@ function image_gallery_admin_form($edit = array()) {
   }
 
  $form['name'] = array('#type' => 'textfield', '#title' => t('Gallery name'), '#default_value' => $edit['name'], '#size' => 60, '#maxlength' =>  64, '#description' => t('The name is used to identify the gallery.'), '#required' => TRUE);
- $form['description'] = array('#type' => 'textarea', '#title' => t('Description'), '#default_value' => $edit['description'], '#cols' => 60, '#rows' => 5, '#description' => ('The description can be used to provide more information about the image gallery.'));
+ $form['description'] = array('#type' => 'textarea', '#title' => t('Description'), '#default_value' => $edit['description'], '#cols' => 60, '#rows' => 5, '#description' => t('The description can be used to provide more information about the image gallery.'));
  $form['parent']['#tree'] = TRUE;
  $form['parent'][0] = _image_gallery_parent_select($edit['tid'], t('Parent'), 'forum');
  $form['weight'] = array('#type' => 'weight', '#title' => t('Weight'), '#default_value' => $edit['weight'], '#delta' => 10, '#description' => t('When listing galleries, those with with light (small) weights get listed before containers with heavier (larger) weights. Galleries with equal weights are sorted alphabetically.'));
