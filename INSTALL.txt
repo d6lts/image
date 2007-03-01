@@ -9,8 +9,20 @@ Image module installation instructions
 4.) Configure cron if you didn't do so already to have your temporary upload
     directory cleaned up. See http://drupal.org/cron for detailed instructions.
 
-5.) Optionally, add enable the Image Gallery module and add albums
-    at: Administer > Content management > Image galleries
 
-6.) Optionally, if ImageMagick is installed, copy image.imagemagic.inc to the 
+Image Gallery module installation instructions
+
+1.) After installing the Image module, enable the Image Gallery module at:
+    Administer > Site building > Modules
+
+2.) Create albums at: Administer > Content management > Image galleries
+
+
+ImageMagick toolkit installation instructions
+
+1.) If ImageMagick is installed, copy image.imagemagic.inc to the
     Drupal's include/ directory
+
+2.) Enable and configure the toolkit at:
+    Administer > Site configuration > Image toolkit
+
