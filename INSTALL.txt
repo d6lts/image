@@ -11,3 +11,6 @@ Image module installation instructions
 
 5.) Optionally, add enable the Image Gallery module and add albums
     at: Administer > Content management > Image galleries
+
+6.) Optionally, if ImageMagick is installed, copy image.imagemagic.inc to the 
+    Drupal's include/ directory
