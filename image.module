@@ -252,7 +252,8 @@ function image_form_add_thumbnail($form_id, $edit) {
 function image_form_image_alter($form, $form_values) {
   if (!form_get_errors() && !isset($form_values['new_file'])) {
     $node = (object)$form_values;
-    // Call hook_image_alter() since the original maybe being altered for a second or thrid time.
+    // Call hook_image_alter() since the original maybe being altered for a 
+    // second or third time.
     module_invoke_all('image_alter', $node, $file->filepath, '_original');
 
     // We need to remove all the images and recreate the derivatives, so
@@ -444,7 +445,7 @@ function image_fetch($nid = 0, $size = 'preview') {
  * Theme a teaser
  */
 function theme_image_teaser($node) {
- return l(image_display($node, 'thumbnail'), 'node/'. $node->nid, array(), NULL, NULL, TRUE, TRUE) . $node->teaser;
+ return l(image_display($node, 'thumbnail'), 'node/'. $node->nid, array(), NULL, NULL, TRUE, TRUE);
 }
 
 /**
