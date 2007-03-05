@@ -158,15 +158,13 @@ function image_prepare(&$node, $field_name) {
     $field_name = 'image';
   }
   if ($file = file_check_upload($field_name)) {
-    $file = file_save_upload($field_name, _image_filename($file->filename, NULL, TRUE));
-    if ($file) {
-      $image_info = image_get_info($file->filepath);
-      if (!$image_info || !isset($image_info['extension'])) {
-        form_set_error($field_name, t('Uploaded file is not a valid image. Only JPG, PNG and GIF files are allowed.'));
-        return;
-      }
+    $image_info = image_get_info($file->filepath);
+    if (!$image_info || !isset($image_info['extension'])) {
+      form_set_error($field_name, t('Uploaded file is not a valid image. Only JPG, PNG and GIF files are allowed.'));
+      return;
     }
-    else {
+    $file = file_save_upload($field_name, _image_filename($file->filename, NULL, TRUE));
+    if (!$file) {
       return;
     }
     $node->images['_original'] = $file->filepath;
