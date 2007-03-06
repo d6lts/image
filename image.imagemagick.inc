@@ -6,7 +6,6 @@
  */
 function image_imagemagick_info() {
   return array('name' => 'imagemagick', 'title' => 'ImageMagick Toolkit.');
-  
 }
 
 /**
@@ -35,7 +34,7 @@ function image_imagemagick_valid_file($formelement = NULL, $fieldname = NULL) {
  * Resize an image to the given width and height
  */
 function image_imagemagick_resize($source, $dest, $width, $height) {
-  $filter = ' -scale '. $width . 'x' . $height . ' -filter QUADRATIC';
+  $filter = ' -scale '. $width .'x'. $height .'! -filter QUADRATIC';
   return _image_imagemagick_convert($source, $dest, $filter);
 }
 
@@ -43,7 +42,7 @@ function image_imagemagick_resize($source, $dest, $width, $height) {
  * Rotate an image
  */
 function image_imagemagick_rotate($source, $dest, $degrees) {
-  $filter = ' -rotate ' . escapeshellarg($degrees) . ' -background #000000';  
+  $filter = ' -rotate '. escapeshellarg($degrees) .' -background #000000';  
   return _image_imagemagick_convert($source, $dest, $filter);  
 }
 
@@ -51,7 +50,7 @@ function image_imagemagick_rotate($source, $dest, $degrees) {
  * Crop an image to the specified dimensions
  */
 function image_imagemagick_crop($source, $dest, $x, $y, $width, $height) {
-  $filter = ' -crop ' . $width . 'x' . $height . '+' . $x . '+' . $y;
+  $filter = ' -crop '. $width .'x'. $height .'+'. $x .'+'. $y;
   return _image_imagemagick_convert($source, $dest, $filter);  
 }
 
@@ -76,21 +75,21 @@ function _image_escape_shell($filename) {
 function _image_imagemagick_convert($source, $dest, $filter) {
   $convert_path = variable_get('image_imagemagick_convert', '/usr/bin/convert');
   if (!file_exists($convert_path)) {
-    return false;
+    return FALSE;
   }
   
-  $filter = preg_replace("/[^A-Za-z0-9\.\-\+\040]/", '', $filter);
+  $filter = preg_replace("/[^A-Za-z0-9\!\.\-\+\040]/", '', $filter);
   $source = _image_escape_shell($source);
   $dest = _image_escape_shell($dest);
   $err = _image_exec("$convert_path $filter $source $dest");
   if ($err) {
-    return false;
+    return FALSE;
   }
   if (!file_exists(trim($dest, "'"))) {
-    return false;
+    return FALSE;
   }
   
-  return true;
+  return TRUE;
 }
 
 function _image_exec($cmd) {
