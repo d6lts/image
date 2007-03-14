@@ -283,7 +283,6 @@ function image_form(&$node, &$param) {
     $form['new_file'] = array('#type' => 'value', '#value' => TRUE);
   }
 
-  $sizes = _image_get_sizes();
   $form['images']['#tree'] = TRUE;
   if ($node->new_file) {
     $form['images']['_original'] = array('#type' => 'hidden', '#value' => $node->images['_original']);
@@ -291,7 +290,7 @@ function image_form(&$node, &$param) {
   else {
     $form['images']['_original'] = array('#type' => 'hidden', '#default_value' => $node->images['_original']);
   }
-  foreach ($sizes as $size) {
+  foreach (_image_get_sizes() as $size) {
     if ($node->new_file) {
       $form['images'][$size['label']] = array('#type' => 'hidden', '#value' => $node->images[$size['label']]);
     }
@@ -355,11 +354,13 @@ function image_insert($node) {
  */
 function image_update($node) {
   foreach ($node->images as $label => $image) {
-    $old_path = db_result(db_query("SELECT filepath FROM {files} WHERE filename='%s' AND nid=%d", $label, $node->nid));
+    $old_file = db_fetch_object(db_query("SELECT fid, filepath FROM {files} WHERE filename='%s' AND nid=%d", $label, $node->nid));
+
     // This is a new image.
-    if ($old_path != $image) {
-      file_delete(file_create_path($old_path));
-      db_query("DELETE FROM {files} WHERE filename='%s' AND nid=%d", $label, $node->nid);
+    if ($old_file->filepath != $image) {
+      file_delete(file_create_path($old_file->filepath));
+      db_query("DELETE FROM {files} WHERE fid = %d", $old_file->fid);
+      db_query("DELETE FROM {file_revisions} WHERE fid = %d", $old_file->fid);
       _image_insert($node, $label, file_create_path($image));
     }
   }
@@ -369,10 +370,12 @@ function image_update($node) {
  * Implementation of hook_delete.
  */
 function image_delete($node) {
-  foreach ($node->images as $label => $image) {
-    file_delete(file_create_path($image));
-    db_query("DELETE FROM {files} WHERE filename='%s' AND nid=%d", $label, $node->nid);
+  $result = db_query('SELECT fid, filepath FROM {files} WHERE nid = %d', $node->nid);
+  while ($file = db_fetch_object($result)) {
+    file_delete(file_create_path($file->filepath));
+    db_query("DELETE FROM {file_revisions} WHERE fid = %d", $file->fid);
   }
+  db_query('DELETE FROM {files} WHERE nid = %d', $node->nid);
 }
 
 /**
@@ -558,11 +561,10 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
   if (!$info) {
     return;
   }
-  $sizes = _image_get_sizes();
   if (!$temp) {
     _image_remove($node);
   }
-  foreach ($sizes as $size) {
+  foreach (_image_get_sizes() as $size) {
     if ((!$size['width'] || !$size['height']) && ($info = image_get_info(file_create_path($node->images['_original'])))) {
       $aspect = $info['height'] / $info['width'];
       if ($size['width'] && !$size['height']) {
@@ -613,14 +615,16 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
 }
 
 function _image_remove($node) {
-  $result = db_query("SELECT * FROM {files} WHERE nid=%d AND filename!='_original'", $node->nid);
+  $result = db_query("SELECT * FROM {files} WHERE nid=%d AND filename <> '_original'", $node->nid);
   while ($file = db_fetch_object($result)) {
     // Never delete the original!
     if ($file->filepath != $node->images['_original']) {
       file_delete(file_create_path($file->filepath));
     }
   }
-  db_query("DELETE FROM {files} WHERE nid=%d AND filename!='_original'", $node->nid);
+  $original_fid = db_result(db_query("SELECT fid FROM {files} WHERE nid=%d AND filename = '_original'", $node->nid));
+  db_query("DELETE FROM {files} WHERE nid = %d AND filename <> '_original'", $node->nid);
+  db_query("DELETE FROM {file_revisions} WHERE vid = %d AND fid <> %d", $node->vid, $original_fid);
 }
 
 /**
