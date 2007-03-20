@@ -17,16 +17,17 @@ function image_imagemagick_settings() {
     '#title' => t('Location of the "convert" binary'),
     '#default_value' => variable_get('image_imagemagick_convert', '/usr/bin/convert'),
     '#size' => 64,
+    '#required' => TRUE,
     '#validate' => array('image_imagemagick_valid_file' => array('image_imagemagick_convert')),
   );
   return $form;
 }
 
 function image_imagemagick_valid_file($formelement = NULL, $fieldname = NULL) {
-  $convert_file = $formelement['#value'];
+  $convert_path = $formelement['#value'];
 
-  if (!empty($convert_file) && !file_exists($convert_file)) {
-    form_set_error($fieldname, t('%file does not exist or is not executable.', array('%file' => $convert_file)));
+  if (!is_file($convert_path)) {
+    form_set_error($fieldname, t('%file does not exist.', array('%file' => $convert_path)));
   }
 }
 
@@ -55,21 +56,6 @@ function image_imagemagick_crop($source, $dest, $x, $y, $width, $height) {
 }
 
 /**
- * Helper function: Escape filename for Unix or Windows shell.
- *
- * @param $filename filename to escape -- may contain spaces or other problematic characters
- *
- * @return escaped version of $filename which should pass through shell
- */
-function _image_escape_shell($filename) {
-  if (strstr($_SERVER['SERVER_SOFTWARE'], 'Win32') || strstr($_SERVER['SERVER_SOFTWARE'], 'IIS')) {
-    return '"' . addslashes($filename) . '"';
-  } else {
-    return escapeshellarg($filename);
-  }
-}
-
-/**
  * Calls the convert executable with the specified filter
  */
 function _image_imagemagick_convert($source, $dest, $filter) {
@@ -77,31 +63,50 @@ function _image_imagemagick_convert($source, $dest, $filter) {
   if (!file_exists($convert_path)) {
     return FALSE;
   }
-  
-  $filter = preg_replace("/[^A-Za-z0-9\!\.\-\+\040]/", '', $filter);
-  $source = _image_escape_shell($source);
-  $dest = _image_escape_shell($dest);
-  $err = _image_exec("$convert_path $filter $source $dest");
-  if ($err) {
+
+  if (strstr($_SERVER['SERVER_SOFTWARE'], 'Win32') || strstr($_SERVER['SERVER_SOFTWARE'], 'IIS')) {
+    // use window's start command to avoid the "black window" from showing up:
+    // http://us3.php.net/manual/en/function.exec.php#56599
+    // use /D to run the command from PHP's current working directory so the
+    // file paths don't have to be absolute.
+    $convert_path = 'start "window title" /D'. getcwd() .' /b '. escapeshellarg($convert_path);
+  }
+
+  $command = implode(' ', array(
+    $convert_path,
+    preg_replace("/[^A-Za-z0-9\!\.\-\+\040]/", '', $filter),
+    escapeshellarg($source),
+    escapeshellarg($dest),
+  ));
+
+
+  $status = _image_imagemagick_exec($command, $output, $error);
+  if ($error) {
+    drupal_set_message("ImageMagick reported an error: $error");
+    #drupal_set_message("ImageMagick command: $command");
+    #drupal_set_message("ImageMagick output: $output");
+  }
+
+  if ($status != 0) {
     return FALSE;
   }
-  if (!file_exists(trim($dest, "'"))) {
-    return FALSE;
-  }
-  
-  return TRUE;
+  return file_exists($dest);
 }
 
-function _image_exec($cmd) {
-  if (substr(php_uname(), 0, 7) == "Windows"){
-    if ($h = popen("start \"bla\" $cmd", "r")) {
-      pclose($h);
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    return exec($cmd);    
+function _image_imagemagick_exec($command, &$output, &$errors) {
+  $descriptors = array(
+    0 => array('pipe', 'r'), // stdin
+    1 => array('pipe', 'w'), // stdout
+    2 => array('pipe', 'w')  // stderr
+  );
+  if ($h = proc_open($command, $descriptors, $pipes)) {
+    $output = fgets($pipes[1]);
+    $errors = fgets($pipes[2]);
+    fclose($pipes[0]);
+    fclose($pipes[1]);
+    fclose($pipes[2]);
+    return proc_close($h);
   }
-} 
+  return FALSE;
+}
 
