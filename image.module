@@ -293,7 +293,7 @@ function image_submit(&$node) {
 /**
  * Implementation of hook_view
  */
-function image_view(&$node, $teaser = 0, $page = 0) {
+function image_view($node, $teaser = 0, $page = 0) {
   $request = ($_GET['size']) ? $_GET['size'] : 'preview';
   $request = check_plain($request);
   $node = node_prepare($node, $teaser);
@@ -599,7 +599,7 @@ function _image_filename($filename, $type = NULL, $temp = FALSE) {
   if ($temp) {
     $path .= 'temp/';
   }
-  
+
   if ($type) {
     $pos = strrpos($filename, '.');
     if ($pos === false) {
@@ -647,7 +647,7 @@ function _image_insert($node, $label, $image) {
   if (($label != '_original') && ($image == file_create_path($node->images['_original']))) {
     return;
   }
-  
+
   $dest = _image_filename(basename($image));
   if (file_move($image, $dest)) {
     $path = file_create_path($dest);
