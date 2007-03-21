@@ -1,11 +1,5 @@
 <?php
 // $Id$
-function image_attach_version($type) {
-  switch ($type) {
-    case SCHEMA:
-      return 1;
-  }
-}
 
 function image_attach_install() {
   switch ($GLOBALS['db_type']) {
@@ -25,5 +19,9 @@ function image_attach_install() {
     )");
     break;
   }
-  
+}
+
+function image_attach_uninstall() {
+  db_query('DROP TABLE {image_attach}');
+  variable_del('image_attach_existing');
 }
