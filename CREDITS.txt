@@ -7,6 +7,8 @@ Bruno Rocci
 Craig Courtney
 Gordon Heydon
 Eric Scouten
+James Walka
+Andrew Morton
 and of course Dries and Kjartan, and probably others I forgot.
 
 Thank you, guys!
