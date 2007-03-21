@@ -247,29 +247,6 @@ function image_form_add_thumbnail($form_id, $edit) {
   return $form;
 }
 
-function image_form_image_alter($form, $form_values) {
-  if (!form_get_errors() && !isset($form_values['new_file'])) {
-    $node = (object)$form_values;
-    // Call hook_image_alter() since the original maybe being altered for a 
-    // second or third time.
-    module_invoke_all('image_alter', $node, $file->filepath, '_original');
-
-    // We need to remove all the images and recreate the derivatives, so
-    // that hook_image_alter() will be called again.
-    _image_remove($node);
-    _image_build_derivatives($node, true);
-  }
-}
-
-/**
- * Implementation of hook_form_alter
- */
-function image_form_alter($form_id, &$form) {
-  if ($form_id == 'image_node_form') {
-    $form['#validate']['image_form_image_alter'] = array();
-  }
-}
-
 /**
  * Implementation of hook_form
  */
@@ -306,6 +283,11 @@ function image_form(&$node, &$param) {
   $form['format'] = filter_form($node->format);
 
   return $form;
+}
+
+function image_submit(&$node) {
+  _image_remove_derivatives($node);
+  _image_build_derivatives($node, FALSE);
 }
 
 /**
@@ -561,9 +543,6 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
   if (!$info) {
     return;
   }
-  if (!$temp) {
-    _image_remove($node);
-  }
   foreach (_image_get_sizes() as $size) {
     if ((!$size['width'] || !$size['height']) && ($info = image_get_info(file_create_path($node->images['_original'])))) {
       $aspect = $info['height'] / $info['width'];
@@ -575,46 +554,31 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
       }
     }
     if ($size['label'] && $size['width'] && $size['height']) {
+      $source = file_create_path($node->images['_original']);
+      $destination = _image_filename(basename($source), $size['label'], $temp);
+
       if ($info['width'] > $size['width'] || $info['height'] > $size['height']) {
-        $source = file_create_path($node->images['_original']);
-        $destination = _image_filename(basename($source), $size['label'], $temp);
         if (!image_scale($source, file_create_path($destination), $size['width'], $size['height'])) {
-          drupal_set_message(t('Unable to create %label image', array('%label' => $size['label'])), 'error');
-        }
-        else {
-          $node->images[$size['label']] = $destination;
-          if (!$temp) {
-            _image_insert($node, $size['label'], file_create_path($destination));
-          }
-          module_invoke_all('image_alter', $node, file_create_path($destination), $size['label']);
+          drupal_set_message(t('Unable to create scaled %label image', array('%label' => $size['label'])), 'error');
+          return FALSE;
         }
       }
       else {
-        /**
-         * If there is a module that implements hook_image_alter() then there
-         * possibility of modifying the derived images, then copy the 
-         * original to the devired and call hook_image_alter()
-         */
-        if (module_implements('image_alter')) {
-          $source = file_create_path($node->images['_original']);
-          $destination = _image_filename(basename($source), $size['label'], $temp);
-          file_copy($source, $destination);
-
-          $node->images[$size['label']] = $destination;
-          if (!$temp) {
-            _image_insert($node, $size['label'], file_create_path($destination));
-          }
-          module_invoke_all('image_alter', $node, file_create_path($destination), $size['label']);
-        }
-        else {
-          $node->images[$size['label']] = $node->images['_original'];
+        // Assume that a module that implements hook_image_alter() and there's
+        // a possibility of modifying the derived images, so copy the original
+        // to the devired and call hook_image_alter()
+        if (!file_copy($source, $destination)) {
+          drupal_set_message(t('Unable to create %label image', array('%label' => $size['label'])), 'error');
+          return FALSE;
         }
       }
+      $node->images[$size['label']] = $destination;
+      module_invoke_all('image_alter', $node, file_create_path($destination), $size['label']);
     }
   }
 }
 
-function _image_remove($node) {
+function _image_remove_derivatives($node) {
   $result = db_query("SELECT * FROM {files} WHERE nid=%d AND filename <> '_original'", $node->nid);
   while ($file = db_fetch_object($result)) {
     // Never delete the original!
@@ -685,12 +649,14 @@ function _image_insert($node, $label, $image) {
   }
   
   $dest = _image_filename(basename($image));
-  if (file_copy($image, $dest)) {
-    $info = image_get_info(file_create_path($dest));
+  if (file_move($image, $dest)) {
+    $path = file_create_path($dest);
+    $info = image_get_info($path);
+    $file = new stdClass();
     $file->filename = $label;
     $file->filepath = _image_filename(basename($image));
     $file->filemime = $info['mime_type'];
-    $file->filesize = filesize(file_create_path($dest));
+    $file->filesize = filesize($path);
     $fid = db_next_id('{files}_fid');
     db_query("INSERT INTO {files} (fid, nid, filename, filepath, filemime, filesize) VALUES (%d, %d, '%s', '%s', '%s', '%s')",
              $fid, $node->nid, $file->filename, $file->filepath, $file->filemime, $file->filesize);
