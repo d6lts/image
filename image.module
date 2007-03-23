@@ -69,6 +69,8 @@ function image_admin_settings() {
   $form['paths'] = array('#type' => 'fieldset', '#title' => t('File paths'));
   $form['paths']['image_default_path'] = array('#type' => 'textfield', '#title' => t('Default image path'), '#default_value' => variable_get('image_default_path', 'images'), '#description' => t('Subdirectory in the directory "%dir" where pictures will be stored. Do not include trailing slash.', array('%dir' => variable_get('file_directory_path', 'files'))));
 
+  $form['image_max_upload_size'] = array('#type' => 'textfield', '#title' => t('Maximum upload size'), '#default_value' => variable_get('image_max_upload_size', 800), '#size' => 12, '#description' => t('Maximum size of uploads per file, in kilobytes'));
+
   $form['sizes'] = array('#type' => 'fieldset', '#title' => t('Image sizes'));
   $form['sizes']['image_sizes'] = image_settings_sizes_form();
 
@@ -165,6 +167,11 @@ function image_prepare(&$node, $field_name) {
     }
     $file = file_save_upload($field_name, _image_filename($file->filename, NULL, TRUE));
     if (!$file) {
+      return;
+    }
+    if ($file->filesize > variable_get('image_max_upload_size', 800) * 1024) {
+      form_set_error($field_name, t('The image you uploaded was too big. You are only allowed upload files less than %max_size but your file was %file_size.', array('%max_size' => format_size(variable_get('image_max_upload_size', 800) * 1024), '%file_size' => format_size($file->filesize))));
+      file_delete($file->filepath);
       return;
     }
     $node->images['_original'] = $file->filepath;
