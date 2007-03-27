@@ -130,7 +130,15 @@ function image_attach_form_alter($form_id, &$form) {
  * Implementation of hook_nodeapi().
  */
 function image_attach_nodeapi(&$node, $op, $teaser, $page) {
-  if (variable_get('image_attach_'. $node->type, 0) == 0){
+  // Make sure that if an image is deleted it is detached from any nodes.
+  if ($node->type == 'image') {
+    switch ($op) {
+      case 'delete':
+        db_query("DELETE FROM {image_attach} WHERE iid=%d", $node->nid);
+    }
+    return;
+  }
+  else if (variable_get('image_attach_'. $node->type, 0) == 0) {
     return;
   }
   switch ($op) {
