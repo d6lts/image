@@ -42,7 +42,7 @@ function image_attach_menu($may_cache) {
 
 function image_attach_admin_settings() {
   $form = array();
-  
+
   $form['image_attach_existing'] = array(
     '#type' => 'radios',
     '#title' => t('Attach existing images'),
@@ -50,7 +50,7 @@ function image_attach_admin_settings() {
     '#options' => array(0 => 'Disabled', 1 => 'Enabled'),
     '#description' => t('When enabled, will allow existing image nodes to be attached instead of uploading new images.')
   );
-  
+
   return system_settings_form($form);
 }
 
@@ -77,25 +77,25 @@ function image_attach_form_alter($form_id, &$form) {
       $existing = variable_get('image_attach_existing', 1);
       $value = ($node->new_image) ? '#value' : '#default_value';
       $form['#attributes'] = array("enctype" => "multipart/form-data");
-      
+
       $form['image_attach'] = array(
-        '#type' => 'fieldset', 
-        '#title' => t('Attached Images'), 
-        '#collapsible' => TRUE, 
+        '#type' => 'fieldset',
+        '#title' => t('Attached Images'),
+        '#collapsible' => TRUE,
         '#collapsed' => !$node->iid
         );
       if ($node->iid) {
         $image = node_load($node->iid);
         $form['image_attach']['image_thumbnail'] = array(
-          '#type' => 'item', 
-          '#title' => t('Thumbnail'), 
+          '#type' => 'item',
+          '#title' => t('Thumbnail'),
           '#value' => image_display($image, 'thumbnail')
           );
       }
-      if ($existing && user_access('access content')) {         
+      if ($existing && user_access('access content')) {
         $form['image_attach']['iid'] = array(
-          '#type' => 'select', 
-          '#title' => t('Existing Image'), 
+          '#type' => 'select',
+          '#title' => t('Existing Image'),
           '#options' => _image_attach_get_image_nodes(),
           $value => $node->iid,
           '#description' => t('Choose an image already existing on the server if you do not upload a new one.')
@@ -117,11 +117,11 @@ function image_attach_form_alter($form_id, &$form) {
         '#title' => t('Upload Image')
         );
       $form['image_attach']['image_title'] = array(
-        '#type' => 'textfield', 
+        '#type' => 'textfield',
         '#title' => t('Image title'),
         $value => '',
         '#description' => t('The title the image will be shown with.')
-        );        
+        );
     }
   }
 }
@@ -130,8 +130,8 @@ function image_attach_form_alter($form_id, &$form) {
  * Implementation of hook_nodeapi().
  */
 function image_attach_nodeapi(&$node, $op, $teaser, $page) {
-  if(variable_get('image_attach_'. $node->type, 0) == 0){
-      return;
+  if (variable_get('image_attach_'. $node->type, 0) == 0){
+    return;
   }
   switch ($op) {
     case 'prepare':
@@ -157,6 +157,7 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
         $node->iid = $_POST['iid'];
       }
       break;
+
     case 'insert':
     case 'update':
       if ($node->iid) {
@@ -164,27 +165,23 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
         db_query("INSERT INTO {image_attach} (nid, iid) VALUES (%d, %d)", $node->nid, $node->iid);
       }
       break;
+
     case 'delete':
       db_query("DELETE FROM {image_attach} WHERE nid=%d", $node->nid);
       break;
+
     case 'load':
       $iid = db_result(db_query("SELECT iid FROM {image_attach} WHERE nid=%d", $node->nid));
       return array('iid' => $iid);
-     
+
     // Pass the body and teaser objects to the theme again to add the images
     case 'view':
-      if($node->iid && function_exists('image_display')){
-        if ($teaser) {
-          $node->content['image_attach'] = array(
-            '#value' => theme('image_attach_teaser', $node)
-            );
-        }
-        else {
-          $node->content['image_attach'] = array(
-            '#value' => theme('image_attach_body', $node)
-            );
-        }
+      if ($node->iid && function_exists('image_display')) {
+        $node->content['image_attach'] = array(
+          '#value' => theme($teaser ? 'image_attach_teaser' : 'image_attach_body', $node)
+        );
       }
+      break;
   }
 }
 
@@ -195,12 +192,12 @@ function _image_attach_get_image_nodes() {
   $rows = array(0 => '');
   $result = db_query(db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE n.status=1 AND type='image' ORDER BY n.sticky DESC, n.title ASC"));
   if (db_num_rows($result) == 0) {
-      return array();
+    return array();
   }
-  
+
   while ($node = db_fetch_object($result)) {
-      $rows[$node->nid] = $node->title;
-  }  
+    $rows[$node->nid] = $node->title;
+  }
   return $rows;
 }
 
@@ -245,7 +242,7 @@ function image_attach_views_tables() {
       ),
     ),
   );
-  
+
   return $tables;
 }
 
@@ -292,6 +289,7 @@ function image_attach_views_handler_filter_iid_exist($op, $filter, $filterdata, 
       else {
         $query->add_where('ISNULL(image_attach.iid)');
       }
+      break;
   }
 }
 
@@ -305,10 +303,9 @@ function theme_image_attach_teaser($node){
   drupal_add_css(drupal_get_path('module', 'image_attach') .'/image_attach.css');
 
   $image = node_load($node->iid);
-
   $info = image_get_info(file_create_path($image->images['thumbnail']));
-  $output = '';
-  $output .= '<div style="width: '. $info['width'] .'px" class="image-attach-teaser">';
+  
+  $output = '<div style="width: '. $info['width'] .'px" class="image-attach-teaser">';
   $output .= l(image_display($image, 'thumbnail'), "node/$node->nid", array(), NULL, NULL, FALSE, TRUE);
   $output .= '</div>'."\n";
   return $output;
@@ -321,10 +318,9 @@ function theme_image_attach_body($node){
   drupal_add_css(drupal_get_path('module', 'image_attach') .'/image_attach.css');
 
   $image = node_load($node->iid);
-  
   $info = image_get_info(file_create_path($image->images['thumbnail']));
-  $output = '';
-  $output .= '<div style="width: '. $info['width'] .'px" class="image-attach-body">';
+
+  $output = '<div style="width: '. $info['width'] .'px" class="image-attach-body">';
   $output .= l(image_display($image, 'thumbnail'), "node/$node->nid", array(), NULL, NULL, FALSE, TRUE);
   $output .= '</div>'."\n";
   return $output;
