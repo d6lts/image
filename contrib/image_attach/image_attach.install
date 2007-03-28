@@ -29,6 +29,9 @@ function image_attach_uninstall() {
   variable_del('image_attach_existing');
 }
 
+/**
+ * Add an index to the image id field.
+ */
 function image_attach_update_1() {
   $ret = array();
   switch ($GLOBALS['db_type']) {
@@ -41,5 +44,14 @@ function image_attach_update_1() {
       $ret[] = update_sql("CREATE INDEX {image_attach}_iid_idx ON {image_attach}(iid)");
       break;
   }
+  return $ret;
+}
+
+/**
+ * Remove attach records that point to a missing image.
+ */
+function image_attach_update_2() {
+  $ret = array();
+  $ret[] = update_sql("DELETE FROM {image_attach} WHERE NOT EXISTS (SELECT * FROM {node} n WHERE n.nid = {image_attach}.iid AND n.type = 'image')");
   return $ret;
 }
