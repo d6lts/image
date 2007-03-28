@@ -153,6 +153,32 @@ function image_cron() {
 }
 
 /**
+ * Implementation of hook_node_operations().
+ */
+function image_node_operations() {
+  $operations = array(
+    'rebuild_thumbs' => array(
+      'label' => t('Rebuild image thumbnails'),
+      'callback' => 'image_operations_rebuild',
+    ),
+  );
+  return $operations;
+}
+
+function image_operations_rebuild($nids) {
+  foreach ($nids as $nid) {
+    if ($node = node_load($nid)) {
+      if ($node->type == 'image') {
+        drupal_set_message(t("Rebuilding %node-title's resized images.", array('%node-title' => $node->title)));
+        _image_remove_derivatives($node);
+        _image_build_derivatives($node, FALSE);
+        node_save($node);
+      }
+    }
+  }
+}
+
+/**
  * Implementation of hook_prepare().
  */
 function image_prepare(&$node, $field_name) {
