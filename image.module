@@ -319,8 +319,10 @@ function image_form(&$node, &$param) {
 }
 
 function image_submit(&$node) {
-  _image_remove_derivatives($node);
-  _image_build_derivatives($node, FALSE);
+  if ($node->new_file) {
+    _image_remove_derivatives($node);
+    _image_build_derivatives($node, FALSE);
+  }
 }
 
 /**
