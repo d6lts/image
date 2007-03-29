@@ -20,8 +20,8 @@ Image Gallery module installation instructions
 
 ImageMagick toolkit installation instructions
 
-1.) If ImageMagick is installed, copy image.imagemagic.inc to the
-    Drupal's include/ directory
+1.) If ImageMagick is installed, copy image.imagemagic.inc to
+    Drupal's includes/ directory
 
 2.) Enable and configure the toolkit at:
     Administer > Site configuration > Image toolkit
