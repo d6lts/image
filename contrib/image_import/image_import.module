@@ -5,7 +5,7 @@ function image_import_help($section = '') {
   switch ($section) {
     case 'admin/content/image_import':
       $output = '<p>'. t("Import multiple image files and save them as image nodes. The files will be moved from their location into the image module's files directory. ")
-        . t("Searching for files ending with %extensions in %dirpath directory.", array('%dirpath' => realpath(variable_get('image_import_path', '')), '%extensions' => variable_get('image_import_extensions', 'jpg JPG'))) .'</p>';
+        . t("Searching for image files in %dirpath.", array('%dirpath' => realpath(variable_get('image_import_path', '')))) .'</p>';
       return $output;
     case 'admin/settings/image_import':
       return t("Configure the image import module's settings.");
@@ -53,11 +53,7 @@ function image_import_form() {
     return $form;
   }
 
-  // convert the extensions setting into a regex for file scanning
-  $extensions = variable_get('image_import_extensions', 'jpg JPG');
-  $filemask = '.*\.('. ereg_replace('[ ,]+', '|', preg_quote($extensions)) .')$';
-
-  $files = file_scan_directory($dirpath, $filemask);
+  $files = file_scan_directory($dirpath, '.*');
   ksort($files);
 
   if ($files) {
@@ -75,25 +71,44 @@ function image_import_form() {
     // additional information like dimensions and filesizes. Make sure that
     // there's no 0th element, because a checkbox with a zero value is seen as
     // unchecked and won't be imported.
+    $fields = array('filesize', 'dimensions', 'title', 'body');
+    foreach ($fields as $field) {
+      $form['files'][$field][0] = NULL;
+    }
     $filelist = array(0 => NULL);
-    $form['files']['filesize'][0] = $form['files']['dimensions'][0] = NULL;
+
     foreach ($files as $file) {
-      $filelist[] = substr($file->filename, strlen($dirpath) + 1);
-      $sizes = getimagesize($file->filename);
-      $form['files']['filesize'][] = array(
-        '#type' => 'item',
-        '#value' => format_size(filesize($file->filename)),
-      );
-      $form['files']['dimensions'][] = array(
-        '#type' => 'item',
-        '#value' => $sizes[0] .'x'. $sizes[1],
-      );
+      $info = image_get_info($file->filename);
+      if ($info && isset($info['extension'])) {
+        $filelist[] = substr($file->filename, strlen($dirpath) + 1);
+        $form['files']['filesize'][] = array(
+          '#type' => 'item',
+          '#value' => format_size(filesize($file->filename)),
+        );
+        $form['files']['dimensions'][] = array(
+          '#type' => 'item',
+          '#value' => $info['width'] .'x'. $info['height'],
+        );
+        $form['files']['title'][] = array(
+          '#type' => 'textfield',
+          '#size' => 20,
+          '#default_value' => basename($file->name),
+        );
+        $form['files']['body'][] = array(
+          '#type' => 'textfield',
+          '#size' => 20,
+        );
+      }
     }
     // Remove our 0 elements.
     unset($filelist[0]);
-    unset($form['files']['filesize'][0]);
-    unset($form['files']['dimensions'][0]);
+    foreach ($fields as $field) {
+      $form['files'][$field][0] = NULL;
+    }
 
+    // Put the titles into an array.
+    $form['files']['title']['#tree'] = TRUE;
+    $form['files']['body']['#tree'] = TRUE;
 
     // Store a copy of the list into a form value so we can compare it to what
     // they submit and not have to worry about files being added or removed from
@@ -102,7 +117,7 @@ function image_import_form() {
       '#type' => 'value',
       '#value' => $filelist,
     );
-    $form['import_files'] = array(
+    $form['import_file'] = array(
       '#type' => 'checkboxes',
       '#options' => $filelist,
     );
@@ -113,7 +128,7 @@ function image_import_form() {
     );
   }
   else {
-    $form['audio_import_files'] = array(
+    $form['audio_import_file'] = array(
       '#type' => 'item',
       '#value' => t('No files were found'),
     );
@@ -124,17 +139,19 @@ function image_import_form() {
 
 function theme_image_import_form($form) {
   $output = '';
-  if (isset($form['import_files']) && $form['import_files']['#type'] == 'checkboxes') {
-    $header = array(theme('table_select_header_cell'), t('Name'), t('Size'), t('Dimensions'));
+  if (isset($form['import_file']) && $form['import_file']['#type'] == 'checkboxes') {
+    $header = array(theme('table_select_header_cell'), t('Name'), t('Size'), t('Dimensions'), t('Title'), t('Body'));
     $rows = array();
-    foreach (element_children($form['import_files']) as $key) {
-      $filename = $form['import_files'][$key]['#title'];
-      unset($form['import_files'][$key]['#title']);
+    foreach (element_children($form['import_file']) as $key) {
+      $filename = $form['import_file'][$key]['#title'];
+      unset($form['import_file'][$key]['#title']);
       $rows[] = array(
-        drupal_render($form['import_files'][$key]),
+        drupal_render($form['import_file'][$key]),
         $filename,
         drupal_render($form['files']['filesize'][$key]),
         drupal_render($form['files']['dimensions'][$key]),
+        drupal_render($form['files']['title'][$key]),
+        drupal_render($form['files']['body'][$key]),
       );
     }
     $output .= theme('table', $header, $rows);
@@ -149,17 +166,22 @@ function image_import_form_submit($form_id, $form_values) {
     if (file_check_directory($dirpath)) {
       $nodes = array();
       $files = array();
-      foreach (array_filter($form_values['import_files']) as $index) {
+      foreach (array_filter($form_values['import_file']) as $index) {
         // try to avoid php's script timeout with a bunch of large files or
         // a slow machine
         if (!ini_get('safe_mode')){
           set_time_limit(0);
         }
-
         $origname = $form_values['file_list'][$index];
         $filename = file_check_location($dirpath .'/'. $origname, $dirpath);
         if ($filename) {
-          $node = _image_import_file($filename, $form_values['taxonomy']);
+          $node = _image_import_file(
+            $filename,
+            $form_values['taxonomy'],
+            $form_values['title'][$index],
+            $form_values['body'][$index]
+          );
+
           if ($node) {
             $nodes[] = t('%filename as <a href="!node-link">@node-title</a> <a href="!edit-link">[edit]</a>', array(
               '%filename' => $origname,
@@ -196,18 +218,10 @@ function image_import_admin_settings() {
     '#required' => TRUE,
   );
 
-  $form['image_import_extensions'] = array(
-    '#type' => 'textfield',
-    '#title' => t('File extensions'),
-    '#default_value' => variable_get('image_import_extensions', 'jpg JPG'),
-    '#description' => t('A comma or space separated list of file extensions to list on the import page. <strong>Note:</strong> the extensions are case sensitive, i.e. <code>JPG</code> and <code>jpg</code> are not the same.'),
-    '#required' => TRUE,
-  );
-
   return system_settings_form($form);
 }
 
-function _image_import_file($filepath, $taxonomy) {
+function _image_import_file($filepath, $taxonomy, $title = '', $body = '') {
   global $user;
 
   //check for user permission...
@@ -237,8 +251,9 @@ function _image_import_file($filepath, $taxonomy) {
     $node->taxonomy = $taxonomy;
   }
 
-  // start filling in the image info...
-  $node->title = $file->filename;
+  // Fill in the node content
+  $node->title = $title ? $title : $file->filename;
+  $node->body = $body;
 
   // copy the file so if there's a problem it can be re-imported.
   if (file_copy($file, _image_filename($file->filename, NULL, TRUE), FILE_EXISTS_RENAME)) {
