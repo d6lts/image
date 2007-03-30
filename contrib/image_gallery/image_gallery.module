@@ -61,6 +61,19 @@ function image_gallery_admin_settings() {
   return system_settings_form($form);
 }
 
+/**
+ * Implementation of hook_taxonomy. If our vocabulary gets deleted, delete our
+ * variable pointing to it.
+ */
+function image_gallery_taxonomy($op, $type, $array) {
+  if ($op == 'delete' && $type == 'vocabulary') {
+    $vid = variable_get('image_gallery_nav_vocabulary', '');
+    if ($vid == $array['vid']) {
+      variable_set('image_gallery_nav_vocabulary', '');
+    }
+  }
+}
+
 function image_gallery_term_path($term) {
   return 'image/tid/'. $term->tid;
 }
@@ -69,10 +82,11 @@ function image_gallery_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
   switch ($op) {
     case 'view':
       if ($page && $node->type == 'image') {
-        $terms = taxonomy_node_get_terms_by_vocabulary($node->nid, _image_gallery_get_vid());
+        $vid = _image_gallery_get_vid();
+        $terms = taxonomy_node_get_terms_by_vocabulary($node->nid, $vid);
         $term = array_pop($terms);
         if ($term) {
-          $vocabulary = taxonomy_get_vocabulary(_image_gallery_get_vid());
+          $vocabulary = taxonomy_get_vocabulary($vid);
           // Breadcrumb navigation
           $breadcrumb = array();
           $breadcrumb[] = array('path' => 'image', 'title' => $vocabulary->name);
@@ -307,7 +321,7 @@ function theme_image_gallery($galleries, $images) {
  */
 function _image_gallery_get_vid() {
   $vid = variable_get('image_gallery_nav_vocabulary', '');
-  if (empty($vid)) {
+  if (empty($vid) || !taxonomy_get_vocabulary($vid)) {
     // Check to see if an image gallery vocabulary exists
     $vid = db_result(db_query("SELECT vid FROM {vocabulary} WHERE module='image_gallery'"));
     if (!$vid) {
@@ -320,4 +334,3 @@ function _image_gallery_get_vid() {
 
   return $vid;
 }
-
