@@ -312,7 +312,7 @@ function theme_image_attach_teaser($node){
 
   $image = node_load($node->iid);
   $info = image_get_info(file_create_path($image->images['thumbnail']));
-  
+
   $output = '<div style="width: '. $info['width'] .'px" class="image-attach-teaser">';
   $output .= l(image_display($image, 'thumbnail'), "node/$node->nid", array(), NULL, NULL, FALSE, TRUE);
   $output .= '</div>'."\n";
@@ -329,7 +329,7 @@ function theme_image_attach_body($node){
   $info = image_get_info(file_create_path($image->images['thumbnail']));
 
   $output = '<div style="width: '. $info['width'] .'px" class="image-attach-body">';
-  $output .= l(image_display($image, 'thumbnail'), "node/$node->nid", array(), NULL, NULL, FALSE, TRUE);
+  $output .= l(image_display($image, 'thumbnail'), "node/$node->iid", array(), NULL, NULL, FALSE, TRUE);
   $output .= '</div>'."\n";
   return $output;
 }
