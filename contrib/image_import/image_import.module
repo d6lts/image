@@ -258,7 +258,7 @@ function _image_import_file($filepath, $taxonomy, $title = '', $body = '') {
   // copy the file so if there's a problem it can be re-imported.
   if (file_copy($file, _image_filename($file->filename, NULL, TRUE), FILE_EXISTS_RENAME)) {
     if ($image = image_get_info($file->filepath)) {
-      $node->images['_original'] = $file->filepath;
+      $node->images[IMAGE_ORIGINAL] = $file->filepath;
       _image_build_derivatives($node, TRUE);
       $node->new_file = TRUE;
 
