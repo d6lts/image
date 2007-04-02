@@ -1,6 +1,8 @@
 <?php
 // $Id$
 
+define('IMAGE_ORIGINAL', '_original');
+
 /**
  * Implementation of hook_help
  */
@@ -191,7 +193,7 @@ function image_prepare(&$node, $field_name) {
       form_set_error($field_name, t('Uploaded file is not a valid image. Only JPG, PNG and GIF files are allowed.'));
       return;
     }
-    $file = file_save_upload($field_name, _image_filename($file->filename, NULL, TRUE));
+    $file = file_save_upload($field_name, _image_filename($file->filename, IMAGE_ORIGINAL, TRUE));
     if (!$file) {
       return;
     }
@@ -200,11 +202,11 @@ function image_prepare(&$node, $field_name) {
       file_delete($file->filepath);
       return;
     }
-    $node->images['_original'] = $file->filepath;
+    $node->images[IMAGE_ORIGINAL] = $file->filepath;
     $node->new_file = TRUE;
 
     // Call hook to allow other modules to modify the original image.
-    module_invoke_all('image_alter', $node, $file->filepath, '_original');
+    module_invoke_all('image_alter', $node, $file->filepath, IMAGE_ORIGINAL);
     _image_build_derivatives($node, TRUE);
   }
 }
@@ -233,7 +235,7 @@ function image_link($type, $node, $main = 0) {
         $links['image_size_'. $size['label']] = array('title' => t($size['label']), 'href' => 'node/' . $node->nid, 'query' => 'size=' . urlencode($size['label']));
       }
     }
-    if (user_access('view original images') && ($node->images[$request] != $node->images['_original'])) {
+    if (user_access('view original images') && ($node->images[$request] != $node->images[IMAGE_ORIGINAL])) {
       $links['image_size_original'] = array('title' => t('original'), 'href' => 'node/' . $node->nid, 'query' => 'size=_original');
     }
   }
@@ -295,10 +297,10 @@ function image_form(&$node, &$param) {
 
   $form['images']['#tree'] = TRUE;
   if ($node->new_file) {
-    $form['images']['_original'] = array('#type' => 'hidden', '#value' => $node->images['_original']);
+    $form['images'][IMAGE_ORIGINAL] = array('#type' => 'hidden', '#value' => $node->images[IMAGE_ORIGINAL]);
   }
   else {
-    $form['images']['_original'] = array('#type' => 'hidden', '#default_value' => $node->images['_original']);
+    $form['images'][IMAGE_ORIGINAL] = array('#type' => 'hidden', '#default_value' => $node->images[IMAGE_ORIGINAL]);
   }
   foreach (_image_get_sizes() as $size) {
     if ($node->new_file) {
@@ -350,10 +352,10 @@ function image_load(&$node) {
   }
   // special images
   if (empty($node->images['thumbnail'])) {
-    $node->images['thumbnail'] = $node->images['_original'];
+    $node->images['thumbnail'] = $node->images[IMAGE_ORIGINAL];
   }
   if (empty($node->images['preview'])) {
-    $node->images['preview'] = $node->images['_original'];
+    $node->images['preview'] = $node->images[IMAGE_ORIGINAL];
   }
 }
 
@@ -362,7 +364,7 @@ function image_load(&$node) {
  */
 function image_insert($node) {
   foreach ($node->images as $label => $image) {
-    _image_insert($node, $label, file_create_path($image));
+    _image_insert($node, $label, $image);
   }
 }
 
@@ -378,7 +380,7 @@ function image_update($node) {
       file_delete(file_create_path($old_file->filepath));
       db_query("DELETE FROM {files} WHERE fid = %d", $old_file->fid);
       db_query("DELETE FROM {file_revisions} WHERE fid = %d", $old_file->fid);
-      _image_insert($node, $label, file_create_path($image));
+      _image_insert($node, $label, $image);
     }
   }
 }
@@ -425,7 +427,7 @@ function image_views_tables() {
  */
 function image_display(&$node, $label = 'preview', $attributes = array()) {
   // regenerate images?
-  if ($node->images[$label] != $node->images['_original'] &&
+  if ($node->images[$label] != $node->images[IMAGE_ORIGINAL] &&
       (!file_exists(file_create_path($node->images[$label])) ||
        filemtime(file_create_path($node->images[$label])) < variable_get('image_updated', 0))) {
     _image_build_derivatives($node);
@@ -538,7 +540,7 @@ function image_views_handler_filter_image_size($op) {
   foreach (_image_get_sizes() as $size) {
     $a[$size['label']] = $size['label'];
   }
-  $a['_original'] = 'original';
+  $a[IMAGE_ORIGINAL] = 'original';
   return $a;
 }
 
@@ -573,13 +575,15 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
   if (!_image_check_settings()) {
     return false;
   }
-  $info = image_get_info(file_create_path($node->images['_original']));
+  $original = file_create_path($node->images[IMAGE_ORIGINAL]);
+  $info = image_get_info($original);
   // If we can't find our original image, we can not proceed.
   if (!$info) {
-    return;
+    return FALSE;
   }
   foreach (_image_get_sizes() as $size) {
-    if ((!$size['width'] || !$size['height']) && ($info = image_get_info(file_create_path($node->images['_original'])))) {
+    $info = image_get_info($original);
+    if ((!$size['width'] || !$size['height']) && $info) {
       $aspect = $info['height'] / $info['width'];
       if ($size['width'] && !$size['height']) {
         $size['height'] = (int)round($size['width'] * $aspect);
@@ -589,11 +593,10 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
       }
     }
     if ($size['label'] && $size['width'] && $size['height']) {
-      $source = file_create_path($node->images['_original']);
-      $destination = _image_filename(basename($source), $size['label'], $temp);
+      $destination = _image_filename($original, $size['label'], $temp);
 
       if ($info['width'] > $size['width'] || $info['height'] > $size['height']) {
-        if (!image_scale($source, file_create_path($destination), $size['width'], $size['height'])) {
+        if (!image_scale($original, $destination, $size['width'], $size['height'])) {
           drupal_set_message(t('Unable to create scaled %label image', array('%label' => $size['label'])), 'error');
           return FALSE;
         }
@@ -602,7 +605,7 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
         // Assume that a module that implements hook_image_alter() and there's
         // a possibility of modifying the derived images, so copy the original
         // to the devired and call hook_image_alter()
-        if (!file_copy($source, $destination)) {
+        if (!file_copy($original, $destination, $temp ? FILE_EXISTS_REPLACE : FILE_EXISTS_RENAME)) {
           drupal_set_message(t('Unable to create %label image', array('%label' => $size['label'])), 'error');
           return FALSE;
         }
@@ -614,41 +617,44 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
 }
 
 function _image_remove_derivatives($node) {
-  $result = db_query("SELECT * FROM {files} WHERE nid=%d AND filename <> '_original'", $node->nid);
+  $result = db_query("SELECT * FROM {files} WHERE nid=%d AND filename <> '%s'", $node->nid, IMAGE_ORIGINAL);
   while ($file = db_fetch_object($result)) {
     // Never delete the original!
-    if ($file->filepath != $node->images['_original']) {
+    if ($file->filepath != $node->images[IMAGE_ORIGINAL]) {
       file_delete(file_create_path($file->filepath));
     }
   }
-  $original_fid = db_result(db_query("SELECT fid FROM {files} WHERE nid=%d AND filename = '_original'", $node->nid));
-  db_query("DELETE FROM {files} WHERE nid = %d AND filename <> '_original'", $node->nid);
+  $original_fid = db_result(db_query("SELECT fid FROM {files} WHERE nid=%d AND filename = '%s'", $node->nid, IMAGE_ORIGINAL));
+  db_query("DELETE FROM {files} WHERE nid = %d AND filename <> '%s'", $node->nid, IMAGE_ORIGINAL);
   db_query("DELETE FROM {file_revisions} WHERE vid = %d AND fid <> %d", $node->vid, $original_fid);
 }
 
 /**
  * Creates an image filename.
  */
-function _image_filename($filename, $type = NULL, $temp = FALSE) {
+function _image_filename($filename, $label = IMAGE_ORIGINAL, $temp = FALSE) {
   $path = variable_get('image_default_path', 'images') .'/';
   if ($temp) {
     $path .= 'temp/';
   }
 
-  if ($type) {
+  $filename = basename($filename);
+
+  // Insert the resized name in non-original images
+  if ($label && ($label != IMAGE_ORIGINAL)) {
     $pos = strrpos($filename, '.');
     if ($pos === false) {
       // The file had no extension - which happens in really old image.module
       // versions, so figure out the extension.
       $info = image_get_info(file_create_path($path . $filename));
-      $filename = $filename .'.'. $type .'.'. $info['extension'];
+      $filename = $filename .'.'. $label .'.'. $info['extension'];
     }
     else {
-      $filename = substr($filename, 0, $pos) .'.'. $type . substr($filename, $pos);
+      $filename = substr($filename, 0, $pos) .'.'. $label . substr($filename, $pos);
     }
   }
 
-  return $path . $filename;
+  return file_create_path($path . $filename);
 }
 
 /**
@@ -661,7 +667,7 @@ function _image_get_sizes() {
 }
 
 function _image_required_sizes() {
-  return array('thumbnail', 'preview', '_original');
+  return array('thumbnail', 'preview', IMAGE_ORIGINAL);
 }
 
 function _image_get_dimensions($label) {
@@ -677,24 +683,24 @@ function _image_get_dimensions($label) {
  * Moves temporary (working) images to the final directory and stores
  * relevant information in the files table
  */
-function _image_insert($node, $label, $image) {
+function _image_insert(&$node, $label, $image) {
+  $original = file_create_path($node->images[IMAGE_ORIGINAL]);
+  $image = file_create_path($image);
+
   // Don't duplicate images when a derivative == _original
-  if (($label != '_original') && ($image == file_create_path($node->images['_original']))) {
+  if (($label != IMAGE_ORIGINAL) && ($image == $original)) {
     return;
   }
 
-  $dest = _image_filename(basename($image));
-  if (file_move($image, $dest)) {
-    $path = file_create_path($dest);
-    $info = image_get_info($path);
-    $file = new stdClass();
-    $file->filename = $label;
-    $file->filepath = _image_filename(basename($image));
-    $file->filemime = $info['mime_type'];
-    $file->filesize = filesize($path);
+  if (file_move($image, _image_filename($original, $label))) {
+    // Update the node to reflect the actual filename, it may have been changed
+    // if a file of the same name already existed.
+    $node->images[$label] = $image;
+
+    $info = image_get_info($image);
     $fid = db_next_id('{files}_fid');
     db_query("INSERT INTO {files} (fid, nid, filename, filepath, filemime, filesize) VALUES (%d, %d, '%s', '%s', '%s', '%s')",
-             $fid, $node->nid, $file->filename, $file->filepath, $file->filemime, $file->filesize);
+             $fid, $node->nid, $label, $image, $info['mime_type'], $info['file_size']);
     db_query("INSERT INTO {file_revisions} (fid, vid, description, list) VALUES (%d, %d, '%s', %d)",
              $fid, $node->vid, '', 0);
   }
