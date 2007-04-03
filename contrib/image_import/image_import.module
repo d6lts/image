@@ -211,10 +211,10 @@ function image_import_admin_settings() {
   $form['image_import_path'] = array(
     '#type' => 'textfield',
     '#title' => t('Import path'),
-    '#default_value' => variable_get('image_import_path', 'files/images/import'),
+    '#default_value' => variable_get('image_import_path', file_directory_path() .'/images/import'),
     '#after_build' => array('_image_import_settings_check_directory'),
     '#description' => t("The directory to import image nodes from. Drupal will need to have write access to this directory so we can move the file.") .'<br />'
-      . t("<strong>Note:</strong> a path begining with a <kbd>/</kbd> indicates the path is relative to the server's root, one starting without specifies a path relative to Drupal's root. I.e. <kbd>/tmp/image</kbd> would be the temp directory off the root while <kbd>tmp/image</kbd> would be inside Drupal's directory."),
+      . t("<strong>Note:</strong> a path begining with a <kbd>/</kbd> indicates the path is relative to the server's root, not the website's root. One starting without a <kbd>/</kbd> specifies a path relative to Drupal's root. For example: <kbd>/tmp/image</kbd> would be the temp directory off the root while <kbd>tmp/image</kbd> would be inside Drupal's directory."),
     '#required' => TRUE,
   );
 
