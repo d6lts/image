@@ -438,7 +438,7 @@ function image_display(&$node, $label = 'preview', $attributes = array()) {
   }
 
   $info = image_get_info(file_create_path($node->images[$label]));
-  $attributes['class'] = "image $label". (isset($attributes['class']) ? " ". $attributes['class'] : "");
+  $attributes['class'] = "image image-$label ". (isset($attributes['class']) ? $attributes['class'] : "");
   $attributes['width'] = $info['width'];
   $attributes['height'] = $info['height'];
 
