@@ -1,0 +1,535 @@
+# Russian translation of Drupal 5.x.
+# Generated from files:
+#  image.module,v 1.202 2006/07/18 14:17:57 walkah
+#  image_attach.module,v 1.2 2006/05/14 03:39:58 weitzman
+#  image.imagemagick.inc,v 1.2 2005/09/04 22:49:26 tma0
+# Copyright 2007 vadbars <vadbars@mail.ru>
+# Thanks to Vasili Pinchuk <vasili@pinchuk.biz> for the previous version of translation.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Drupal 5.x.\n"
+"POT-Creation-Date: 2007-04-06 12:00+0500\n"
+"PO-Revision-Date: 2007-04-06 02:46+0500\n"
+"Last-Translator: vadbars <vadbars@mail.ru>\n"
+"Language-Team: Russian Drupal Translation Team (RDTT) <translators@drupal.ru>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((((n%10)==1)&&((n%100)!=11))?(0):(((((n%10)>=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
+"X-Poedit-Language: Russian\n"
+"X-Poedit-Country: RUSSIAN FEDERATION\n"
+
+#: image.module:246
+#: contrib/image_attach/image_attach.module:95
+msgid "Thumbnail"
+msgstr "Миниатюра"
+
+#: contrib/image_gallery/image_gallery.module:132
+#: contrib/image_import/image_import.module:128
+msgid "Name"
+msgstr "Имя"
+
+#: image.imagemagick.inc:18
+msgid "Location of the \"convert\" binary"
+msgstr "Расположение  \"convert\" данных"
+
+#: image.imagemagick.inc:30
+msgid "%file does not exist or is not executable."
+msgstr "файл %file недоступен или не является исполняемым."
+
+#: image.module:10
+msgid "The image module is used to create and administer images for your site. Each image is stored as a post, with thumbnails of the original generated automatically. There are two default thumbnail sizes, thumbnail and preview. The thumbnail size is shown as the preview for image posts and when browsing image galleries. The preview is the default size when first displaying an image node."
+msgstr "Модуль изображения используется, чтобы создать и управлять изображениями на вашем сайте. Каждое изображение сохраняется как сообщение, с миниатюрой, которая автоматически генерируется из исходного изображения. По умолчанию есть 2 размера миниатюры: thumbnail и preview. Миниатюра (thumbnail) показывается в режиме предварительного просмотра сообщений с изображениями и при просмотре галерей изображений. Предварительный просмотр (preview) - это размер по умолчанию для  первого показа сообщения с изображением."
+
+#: image.module:11
+msgid ""
+"Image administration allows the image directory and the image sizes to be set.</p><p>\n"
+"Image galleries are used to organize and display images in galleries.   The list tab allows users to edit existing image gallery names, descriptions, parents and relative position, known as a weight.  The add galleries tab allows you to create a new image gallery defining name, description, parent and weight."
+msgstr ""
+"Управление изображениями разрешает устанавливать папки с изображениями и размеры.</p><p>\n"
+"Галереи изображений используются для организации и показа изображений. Вкладка Список пользователей позволяет редактировать названия существующей галереи, ее описание, раздел, к которому она относится и ее относительную позицию в списке галерей, называемую \"весом\". При добавлении вы можете создать новую галерею с именем, описанием и весом."
+
+#: image.module:13
+msgid ""
+"<p>You can</p>\n"
+"<ul>\n"
+"<li>view image handling messages in <a href=\"%admin-settings\">administer &gt;&gt; settings</a>.</li>\n"
+"<li>configure image sizes and file directories at <a href=\"%admin-settings-image\">administer &gt;&gt; settings &gt;&gt; image</a>.</li>\n"
+"<li>use the <a href=\"%external-http-drupal-org-project-img_assist\">image assist module</a> to upload and insert images into posts.</li>\n"
+msgstr ""
+"<p>Вы можете</p>\n"
+"<ul>\n"
+"<li>просматривать сообщения обработки изображений в разделе <a href=\"%admin-settings\">управление сайтом &gt;&gt; настройки</a>.</li>\n"
+"<li>устанавливать размер и папку расоложения в <a href=\"%admin-settings-image\">управление сайтом &gt;&gt; настройки &gt;&gt; изображение</a>.</li>\n"
+"<li>использовать <a href=\"%external-http-drupal-org-project-img_assist\">модуль image assist</a> для загрузки и вставки изображений в сообщения.</li>\n"
+
+#: image.module:19
+msgid "For more information please read the configuration and customization handbook <a href=\"%image\">Image page</a>."
+msgstr "Для подробной информации смотрите страницу <a href=\"%image\">Изображение</a> в руководстве по настройке и установке."
+
+#: image.module:30;121;128;305;388
+#: image.info:0;0
+#: contrib/image_attach/image_attach.module:230
+#: contrib/image_attach/image_attach.info:0
+#: contrib/image_gallery/image_gallery.info:0
+#: contrib/image_import/image_import.info:0
+msgid "Image"
+msgstr "Изображение"
+
+#: image.module:32
+msgid "An image (with thumbnail). This is ideal for publishing photographs or screenshots."
+msgstr "Изображение (с миниатюрой). Это идеально для публикации фотографий или скриншотов."
+
+#: image.module:69
+msgid "File paths"
+msgstr "Пути к файлу"
+
+#: image.module:70
+msgid "Default image path"
+msgstr "Путь по умолчанию к изображениям"
+
+#: image.module:70
+msgid "Subdirectory in the directory \"%dir\" where pictures will be stored. Do not include trailing slash."
+msgstr "Подкаталог в каталоге \"%dir\", куда сохранять изображение. Не добавляйте завершающий слеш."
+
+#: image.module:72
+msgid "Image sizes"
+msgstr "Размеры изображения"
+
+#: image.module:82
+msgid "Select various pixel dimensions, \"thumbnail\" and \"preview\" are required."
+msgstr "Выберите размеры в пикселах, \"thumbnail\" и \"preview\" обязательны."
+
+#: image.module:99
+msgid "Label"
+msgstr "Метка"
+
+#: image.module:99
+msgid "Width"
+msgstr "Ширина"
+
+#: image.module:99
+msgid "Height"
+msgstr "Высота"
+
+#: image.module:123;0
+#: image.info:0
+#: contrib/image_attach/image_attach.info:0
+#: contrib/image_gallery/image_gallery.info:0
+#: contrib/image_import/image_import.info:0
+msgid "image"
+msgstr "изображение"
+
+#: image.module:133
+msgid "Image module settings."
+msgstr "Настройка свойств модуля Image."
+
+#: image.module:164
+msgid "Uploaded file is not a valid image"
+msgstr "Загруженное изображение неправильное"
+
+#: image.module:205
+msgid "original"
+msgstr "исходный размер"
+
+#: image.module:220;229
+msgid "Latest image"
+msgstr "Последнее изображение"
+
+#: image.module:221;234
+msgid "Random image"
+msgstr "Случайное изображение"
+
+#: image.module:280
+msgid "Title"
+msgstr "Заголовок"
+
+#: image.module:305
+msgid "Click \"Browse...\" to select an image to upload."
+msgstr "Нажмите \"Обзор...\" для выбора изображения для загрузки."
+
+#: image.module:306
+msgid "Body"
+msgstr "Текст"
+
+#: image.module:386
+msgid "Image: Display Image"
+msgstr "Изображение: Показать изображение"
+
+#: image.module:389
+msgid "Image with link"
+msgstr "Изображение со ссылкой"
+
+#: image.module:542
+msgid "Make sure you have a working image toolkit installed and enabled, for more information see: %settings"
+msgstr "Удостоверьтесь, что графические библиотеки установлены и активированы, дополнительную информацию смотрите: %settings"
+
+#: image.module:542
+msgid "the settings page"
+msgstr "страница настроек"
+
+#: image.module:580
+msgid "Unable to create %label image"
+msgstr "Невозможно создать изображение %label "
+
+#: image.module:41
+msgid "create images"
+msgstr "создать изображения"
+
+#: image.module:41
+msgid "view original images"
+msgstr "просмотр исходных изображений"
+
+#: image.module:41
+msgid "edit own images"
+msgstr "редактировать свои изображения"
+
+#: image.info:0
+msgid "Allows uploading, resizing and viewing of images."
+msgstr "Позволяет загружать, изменять размер и просматривать изображения."
+
+#: contrib/image_attach/image_attach.module:15
+#: contrib/image_attach/image_attach.info:0
+msgid "Allows easy attaching of image nodes to other content types."
+msgstr "Позволяет просто присоединять изображения к другому типу материалов."
+
+#: contrib/image_attach/image_attach.module:27
+msgid "Image Attachment View"
+msgstr "Просмотр присоединенного изображения"
+
+#: contrib/image_attach/image_attach.module:32
+msgid "Image attach"
+msgstr "Прикрепленное изображение"
+
+#: contrib/image_attach/image_attach.module:33
+msgid "Enable image attach for content"
+msgstr "Разрешить присоединять изображение к содержимому"
+
+#: contrib/image_attach/image_attach.module:48
+msgid "Attach existing images"
+msgstr "Присоединить существующие изображения"
+
+#: contrib/image_attach/image_attach.module:51
+msgid "When enabled, will allow existing image nodes to be attached instead of uploading new images."
+msgstr "Если доступно, существующие изображения могут присоединяться вместо загрузки новых изображений."
+
+#: contrib/image_attach/image_attach.module:66
+msgid "Attach Images"
+msgstr "Прикрепить изображения"
+
+#: contrib/image_attach/image_attach.module:68
+msgid "Disabled"
+msgstr "Запрещено"
+
+#: contrib/image_attach/image_attach.module:68
+msgid "Enabled"
+msgstr "Разрешено"
+
+#: contrib/image_attach/image_attach.module:69
+msgid "Should this node allows users to upload an image?"
+msgstr "Этот материал должен позволять пользователям загружать изображение?"
+
+#: contrib/image_attach/image_attach.module:87
+msgid "Attached Images"
+msgstr "Присоединенные изображения"
+
+#: contrib/image_attach/image_attach.module:102
+msgid "Existing Image"
+msgstr "Существующие изображения"
+
+#: contrib/image_attach/image_attach.module:105
+msgid "Choose an image already existing on the server if you do not upload a new one."
+msgstr "Выберите изображение, уже существующее на сервере, если Вы не загружаете новый."
+
+#: contrib/image_attach/image_attach.module:109
+msgid "-or-"
+msgstr "-или-"
+
+#: contrib/image_attach/image_attach.module:121
+msgid "Upload Image"
+msgstr "Загрузить изображение"
+
+#: contrib/image_attach/image_attach.module:125
+msgid "Image title"
+msgstr "Заголовок изображения"
+
+#: contrib/image_attach/image_attach.module:127
+msgid "The title the image will be shown with."
+msgstr "Будет отображаться заголовок изображения."
+
+#: contrib/image_attach/image_attach.module:228
+msgid "Image Attach: Display Image"
+msgstr "Присоединение изображения: Показать изображение"
+
+#: contrib/image_attach/image_attach.module:231
+msgid "Image with link to attaching node"
+msgstr "Изображение со ссылкой на прикрепленный материал"
+
+#: contrib/image_attach/image_attach.module:232
+msgid "Image with link to attached image"
+msgstr "Изображение со ссылкой на прикрепленное изображение"
+
+#: contrib/image_attach/image_attach.module:0
+msgid "image_attach"
+msgstr "image_attach"
+
+#: contrib/image_attach/image_attach.info:0
+msgid "Image Attach"
+msgstr "Присоединенное изображение"
+
+#: contrib/image_gallery/image_gallery.module:7
+msgid "Image galleries can be used to organize and present groups of images. Galleries may be nested. To add a new gallery click the \"add gallery\" tab."
+msgstr "Галереи изображений могут быть использованы для организации и показа групп изображений. Галереи могут быть вложенными. Для добавления галереи нажмите \"добавить галерею\" "
+
+#: contrib/image_gallery/image_gallery.module:20;24;118
+msgid "Image galleries"
+msgstr "Галереи изображений"
+
+#: contrib/image_gallery/image_gallery.module:27
+msgid "Create and manage image galleries."
+msgstr "Создать и управлять галереями изображений."
+
+#: contrib/image_gallery/image_gallery.module:28
+msgid "List"
+msgstr "Список"
+
+#: contrib/image_gallery/image_gallery.module:31
+msgid "Add gallery"
+msgstr "Добавить галерею"
+
+#: contrib/image_gallery/image_gallery.module:35
+msgid "Image gallery"
+msgstr "Галерея изображений"
+
+#: contrib/image_gallery/image_gallery.module:39
+msgid "Configure appearance of image galleries."
+msgstr "Настройка свойств галерей изображений."
+
+#: contrib/image_gallery/image_gallery.module:45
+msgid "Edit image gallery"
+msgstr "Редактировать галерею изображений"
+
+#: contrib/image_gallery/image_gallery.module:58
+msgid "Gallery settings"
+msgstr "Настройки галереи"
+
+#: contrib/image_gallery/image_gallery.module:59
+msgid "Images per page"
+msgstr "Изображений на страницу"
+
+#: contrib/image_gallery/image_gallery.module:59
+msgid "Sets the number of images to be displayed in a gallery page."
+msgstr "Установите количество изображений, отображаемых на странице."
+
+#: contrib/image_gallery/image_gallery.module:132
+msgid "Operations"
+msgstr "Действия"
+
+#: contrib/image_gallery/image_gallery.module:137
+msgid "edit gallery"
+msgstr "редактировать галерею"
+
+#: contrib/image_gallery/image_gallery.module:142
+msgid "No galleries available"
+msgstr "Нет доступных галерей"
+
+#: contrib/image_gallery/image_gallery.module:147;168;198
+msgid "Delete"
+msgstr "Удалить"
+
+#: contrib/image_gallery/image_gallery.module:159
+msgid "Gallery name"
+msgstr "Название галереи"
+
+#: contrib/image_gallery/image_gallery.module:159
+msgid "The name is used to identify the gallery."
+msgstr "Имя используется для идентификации галереи"
+
+#: contrib/image_gallery/image_gallery.module:160
+msgid "Description"
+msgstr "Описание"
+
+#: contrib/image_gallery/image_gallery.module:162
+msgid "Parent"
+msgstr "Родитель"
+
+#: contrib/image_gallery/image_gallery.module:163
+msgid "Weight"
+msgstr "Вес"
+
+#: contrib/image_gallery/image_gallery.module:163
+msgid "When listing galleries, those with with light (small) weights get listed before containers with heavier (larger) weights. Galleries with equal weights are sorted alphabetically."
+msgstr "Когда показывается список галерей, более легкие контейнеры показываются выше более тяжелых. Галереи с одинаковым весом сортируются по алфавиту."
+
+#: contrib/image_gallery/image_gallery.module:166
+msgid "Submit"
+msgstr "Отправить"
+
+#: contrib/image_gallery/image_gallery.module:180
+msgid "Created new gallery %term."
+msgstr "Создать новую галерею %term."
+
+#: contrib/image_gallery/image_gallery.module:183
+msgid "The gallery %term has been updated."
+msgstr "Галерея %term обновлена."
+
+#: contrib/image_gallery/image_gallery.module:186
+msgid "The gallery %term has been deleted."
+msgstr "Галерея %term удалена."
+
+#: contrib/image_gallery/image_gallery.module:198
+msgid "Are you sure you want to delete the image gallery %name?"
+msgstr "Вы уверены, что хотите удалить галерею %name?"
+
+#: contrib/image_gallery/image_gallery.module:198
+msgid "Deleting an image gallery will delete all sub-galleries. This action cannot be undone."
+msgstr "Удаление галереи изображения удалит все подгалереи. Это действие не может быть отменено."
+
+#: contrib/image_gallery/image_gallery.module:198
+msgid "Cancel"
+msgstr "Отмена"
+
+#: contrib/image_gallery/image_gallery.module:203
+msgid "The image gallery %term and all sub-galleries have been deleted."
+msgstr "Галерея изображений %term и все подгалереи были удалены."
+
+#: contrib/image_gallery/image_gallery.module:228
+msgid "root"
+msgstr "корень"
+
+#: contrib/image_gallery/image_gallery.module:237
+msgid "Image galleries may be nested below other galleries."
+msgstr "Галереи изображений могут быть вложенными."
+
+#: contrib/image_gallery/image_gallery.module:264
+msgid "Last updated: %date"
+msgstr "Последнее обновление: %date"
+
+#: contrib/image_gallery/image_gallery.module:284
+msgid "Posted by: %name"
+msgstr "Отправлено: %name"
+
+#: contrib/image_gallery/image_gallery.module:314
+msgid "Image Galleries"
+msgstr "Галереи изображений"
+
+#: contrib/image_gallery/image_gallery.module:262;299
+msgid "There is 1 image in this gallery"
+msgid_plural "There are @count images in this gallery"
+msgstr[0] "@count изображение в этой галерее"
+msgstr[1] "@count изображения в этой галерее"
+msgstr[2] "@count изображений в этой галерее"
+
+#: contrib/image_gallery/image_gallery.module:13
+msgid "administer images"
+msgstr "управление изображениями"
+
+#: contrib/image_gallery/image_gallery.module:0
+msgid "image_gallery"
+msgstr "image_gallery"
+
+#: contrib/image_gallery/image_gallery.info:0
+msgid "Image Gallery"
+msgstr "Галерея изображений"
+
+#: contrib/image_gallery/image_gallery.info:0
+msgid "Allows sorting and displaying of image galleries based on categories."
+msgstr "Позволяет показывать и сортировать изображения по категориям"
+
+#: contrib/image_import/image_import.module:7
+msgid "Import multiple image files and save them as image nodes. The files will be moved from their location into the image module's files directory. "
+msgstr "Импорт нескольких файлов с изображениями и сохранение их как материал типа Изображение. Файлы будут перемещены в каталог для файлов модуля Image. "
+
+#: contrib/image_import/image_import.module:8
+msgid "Searching for files ending with %extensions in %dirpath directory."
+msgstr "Поиск файлов с расширением %extensions в папке %dirpath ."
+
+#: contrib/image_import/image_import.module:11
+msgid "Configure the image import module's settings."
+msgstr "Настройка свойств модуля Image Import"
+
+#: contrib/image_import/image_import.module:26;35
+msgid "Image import"
+msgstr "Импорт изображений"
+
+#: contrib/image_import/image_import.module:31
+msgid "Import images from the filesystem."
+msgstr "Импорт изображения из файлов"
+
+#: contrib/image_import/image_import.module:40
+msgid "Change settings for the Image Import module."
+msgstr "Изменить настройки модуля Image Import"
+
+#: contrib/image_import/image_import.module:52
+msgid "You need to configure the import directory on the image import module's <a href='!admin-settings-image_import'>settings page</a>."
+msgstr "Вы должны указать папку для импорта на <href = '!admin-settings-image_import'>странице настройки</a> модуля импорта изображений."
+
+#: contrib/image_import/image_import.module:112;147
+msgid "Import"
+msgstr "Импорт"
+
+#: contrib/image_import/image_import.module:118
+msgid "No files were found"
+msgstr "Файлы не найдены"
+
+#: contrib/image_import/image_import.module:128
+msgid "Size"
+msgstr "Размер"
+
+#: contrib/image_import/image_import.module:128
+msgid "Dimensions"
+msgstr "Размеры"
+
+#: contrib/image_import/image_import.module:164
+msgid "%filename as <a href=\"!node-link\">@node-title</a> <a href=\"!edit-link\">[edit]</a>"
+msgstr "%filename в <a href=\"!node-link\">@node-title</a> <a href=\"!edit-link\">[edit]</a>"
+
+#: contrib/image_import/image_import.module:172
+msgid "Error importing %filename."
+msgstr "Ошибка импорта %filename."
+
+#: contrib/image_import/image_import.module:182
+msgid "No image files were imported."
+msgstr "Файлы изображений не были импортированы"
+
+#: contrib/image_import/image_import.module:191
+msgid "Import path"
+msgstr "Путь для импорта"
+
+#: contrib/image_import/image_import.module:194
+msgid "The directory to import image nodes from. Drupal will need to have write access to this directory so we can move the file."
+msgstr "Папка для импорта изображений. Drupal должен иметь доступ на запись к этой папке на запись, чтобы копировать туда файлы."
+
+#: contrib/image_import/image_import.module:195
+msgid "<strong>Note:</strong> a path begining with a <kbd>/</kbd> indicates the path is relative to the server's root, one starting without specifies a path relative to Drupal's root. I.e. <kbd>/tmp/image</kbd> would be the temp directory off the root while <kbd>tmp/image</kbd> would be inside Drupal's directory."
+msgstr "<strong>Примечание:</strong> путь, начинающийся с <kbd>/</kbd>, указывает путь относительно корня сайта, а без слеша - относительно корневого каталога Drupal'а. Например, <kbd>/tmp/image</kbd> - это будет папка в корневом каталоге, а <kbd>tmp/image</kbd> - в каталоге установки Drupal'а."
+
+#: contrib/image_import/image_import.module:201
+msgid "File extensions"
+msgstr "Расширения файла"
+
+#: contrib/image_import/image_import.module:203
+msgid "A comma or space separated list of file extensions to list on the import page. <strong>Note:</strong> the extensions are case sensitive, i.e. <code>JPG</code> and <code>jpg</code> are not the same."
+msgstr "Разделенный запятыми или пробелами список расширений файлов на странице импорта. <strong>Примечание:</strong> расширения являются регистрозависимыми, например, <code>JPG</code> и <code>jpg</code> - это не одно и то же."
+
+#: contrib/image_import/image_import.module:276
+msgid "You can't import from the image module's directory. The import deletes the original files so you would just be asking for trouble."
+msgstr "Вы не можете импортировать из каталога модуля Image. Поскольку импорт удаляет исходные файлы, это может создать проблемы."
+
+#: contrib/image_import/image_import.module:18
+msgid "import images"
+msgstr "импорт изображений"
+
+#: contrib/image_import/image_import.module:0
+msgid "image_import"
+msgstr "image_import"
+
+#: contrib/image_import/image_import.info:0
+msgid "Image Import"
+msgstr "Импорт изображений"
+
+#: contrib/image_import/image_import.info:0
+msgid "Allows batches of images to be imported from a directory on the server."
+msgstr "Разрешает импортировать сразу несколько изображений из каталога на сервере."
+
