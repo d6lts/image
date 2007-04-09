@@ -40,7 +40,7 @@ function image_node_info() {
  * Implementation of hook_perm
  */
 function image_perm() {
-  return array('create images', 'view original images', 'edit own images');
+  return array('create images', 'view original images', 'edit own images', 'edit images');
 }
 
 /**
@@ -54,6 +54,9 @@ function image_access($op, $node) {
   }
 
   if ($op == 'update' || $op == 'delete') {
+    if (user_access('edit images')) {
+      return TRUE;
+    }
     if (user_access('edit own images') && ($user->uid == $node->uid)) {
       return TRUE;
     }
