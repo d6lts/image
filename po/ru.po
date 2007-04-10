@@ -4,7 +4,7 @@
 #  image_attach.module,v 1.2 2006/05/14 03:39:58 weitzman
 #  image.imagemagick.inc,v 1.2 2005/09/04 22:49:26 tma0
 # Copyright 2007 vadbars <vadbars@mail.ru>
-# Thanks to Vasili Pinchuk <vasili@pinchuk.biz> for the previous version of translation.
+# Thanks to Pinchuk Vasili <vasili@pinchuk.biz> for the previous version of translation.
 #
 msgid ""
 msgstr ""
@@ -435,7 +435,7 @@ msgstr "Галерея изображений"
 
 #: contrib/image_gallery/image_gallery.info:0
 msgid "Allows sorting and displaying of image galleries based on categories."
-msgstr "Позволяет показывать и сортировать изображения по категориям"
+msgstr "Позволяет сортировать и показывать галереи изображений, основанные на категориях."
 
 #: contrib/image_import/image_import.module:7
 msgid "Import multiple image files and save them as image nodes. The files will be moved from their location into the image module's files directory. "
