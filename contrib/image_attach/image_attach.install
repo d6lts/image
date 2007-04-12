@@ -52,6 +52,6 @@ function image_attach_update_1() {
  */
 function image_attach_update_2() {
   $ret = array();
-  $ret[] = update_sql("DELETE FROM {image_attach} USING {image_attach} ia LEFT JOIN {node} n ON ia.iid = n.nid WHERE n.nid IS NULL OR n.type != 'image'");
+  $ret[] = update_sql("DELETE FROM {image_attach} USING {image_attach} LEFT JOIN {node} n ON {image_attach}.iid = n.nid WHERE n.nid IS NULL OR n.type != 'image'");
   return $ret;
 }
