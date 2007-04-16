@@ -38,6 +38,10 @@ ul.images {
   padding : 0;
 }
 
+ul.images h3 { 
+  font-size:1em;
+}
+
 ul.images li {
   float : left;
   margin : 1em;
