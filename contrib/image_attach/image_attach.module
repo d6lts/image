@@ -58,6 +58,7 @@ function image_attach_admin_settings() {
  * implementation of hook_form_alter()
  */
 function image_attach_form_alter($form_id, &$form) {
+  // Content type settings form.
   if ($form_id == 'node_type_form' && $form['#node_type']->type != 'image') {
     _image_check_settings();
     $form['workflow']['image_attach'] = array(
@@ -66,15 +67,27 @@ function image_attach_form_alter($form_id, &$form) {
       '#default_value' => variable_get('image_attach_'. $form['#node_type']->type, 0),
       '#options' => array(0 => t('Disabled'), 1 => t('Enabled')),
       '#description' => t('Should this node allows users to upload an image?'),
-      );
+    );
+    $form['workflow']['image_attach_weight_teaser'] = array(
+      '#type' => 'weight',
+      '#title' => t('Attached image teaser weight'),
+      '#default_value' => variable_get('image_attach_weight_teaser_'. $form['#node_type']->type, 0),
+      '#description' => t("This value determines the image's weight in the teaser."),
+    );
+    $form['workflow']['image_attach_weight_body'] = array(
+      '#type' => 'weight',
+      '#title' => t('Attached image body weight'),
+      '#default_value' => variable_get('image_attach_weight_body_'. $form['#node_type']->type, 0),
+      '#description' => t("This value determines the image's weight in the body."),
+    );
   }
+  // Node edit form.
   else if (isset($form['type']) && $form['type']['#value'] != 'image') {
     $type = $form['type']['#value'];
     // if enabled adjust the form
     if ($form_id == $type .'_node_form' && variable_get('image_attach_'. $type, 0)) {
       $node = $form['#node'];
       _image_check_settings();
-      $existing = variable_get('image_attach_existing', 1);
       $value = ($node->new_image) ? '#value' : '#default_value';
       $form['#attributes'] = array("enctype" => "multipart/form-data");
 
@@ -92,36 +105,36 @@ function image_attach_form_alter($form_id, &$form) {
           '#value' => image_display($image, 'thumbnail')
           );
       }
-      if ($existing && user_access('access content')) {
+      if (variable_get('image_attach_existing', 1) && user_access('access content')) {
         $form['image_attach']['iid'] = array(
           '#type' => 'select',
           '#title' => t('Existing Image'),
           '#options' => _image_attach_get_image_nodes(),
           $value => $node->iid,
           '#description' => t('Choose an image already existing on the server if you do not upload a new one.')
-          );
+        );
         $form['image_attach'][] = array(
           '#type' => 'item',
           '#value' => t('-or-'),
           '#attributes' => array('class' => 'either-choice')
-          );
-        }
+        );
+      }
       else {
         $form['image_attach']['iid'] = array(
           '#type' => 'hidden',
           '#value' => $node->iid
-          );
+        );
       }
       $form['image_attach']['image'] = array(
         '#type' => 'file',
         '#title' => t('Upload Image')
-        );
+      );
       $form['image_attach']['image_title'] = array(
         '#type' => 'textfield',
         '#title' => t('Image title'),
         $value => '',
         '#description' => t('The title the image will be shown with.')
-        );
+      );
     }
   }
 }
@@ -185,8 +198,10 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
     // Pass the body and teaser objects to the theme again to add the images
     case 'view':
       if ($node->iid && function_exists('image_display')) {
+        $teaser_or_body = $teaser ? 'teaser' : 'body';
         $node->content['image_attach'] = array(
-          '#value' => theme($teaser ? 'image_attach_teaser' : 'image_attach_body', $node)
+          '#value' => theme("image_attach_{$teaser_or_body}", $node),
+          '#weight' => variable_get("image_attach_weight_{$teaser_or_body}_{$node->type}", 0),
         );
       }
       break;
