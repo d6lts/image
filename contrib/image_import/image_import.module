@@ -198,7 +198,7 @@ function image_import_form_submit($form_id, $form_values) {
 
       // report back on our progress
       if (count($nodes)) {
-        drupal_set_message(t("Successfully imported: ". theme('item_list', $nodes)));
+        drupal_set_message(t('Successfully imported: ') . theme('item_list', $nodes));
       }
       else {
         drupal_set_message(t('No image files were imported.'));
