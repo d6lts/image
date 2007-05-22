@@ -322,7 +322,7 @@ function image_attach_views_handler_filter_iid_exist($op, $filter, $filterdata, 
  * Override this in template.php to include a case statement if you want different node types to appear differently.
  * If you have additional image sizes you defined in image.module, you can use them by theming this function as well.
  */
-function theme_image_attach_teaser($node){
+function theme_image_attach_teaser($node) {
   drupal_add_css(drupal_get_path('module', 'image_attach') .'/image_attach.css');
 
   $image = node_load($node->iid);
@@ -337,7 +337,7 @@ function theme_image_attach_teaser($node){
 /**
  * Theme the body
  */
-function theme_image_attach_body($node){
+function theme_image_attach_body($node) {
   drupal_add_css(drupal_get_path('module', 'image_attach') .'/image_attach.css');
 
   $image = node_load($node->iid);

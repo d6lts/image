@@ -10,7 +10,7 @@ function image_help($section) {
   switch ($section) {
     case 'admin/help#image':
       $output = '<p>'. t('The image module is used to create and administer images for your site. Each image is stored as a post, with thumbnails of the original generated automatically. There are two default thumbnail sizes, thumbnail and preview. The thumbnail size is shown as the preview for image posts and when browsing image galleries. The preview is the default size when first displaying an image node.') .'</p>';
-      $output .= '<p>' .t('Image administration allows the image directory and the image sizes to be set.</p><p>
+      $output .= '<p>'. t('Image administration allows the image directory and the image sizes to be set.</p><p>
 Image galleries are used to organize and display images in galleries.   The list tab allows users to edit existing image gallery names, descriptions, parents and relative position, known as a weight.  The add galleries tab allows you to create a new image gallery defining name, description, parent and weight.') .'</p>';
       $output .= t('<p>You can</p>
 <ul>
@@ -148,7 +148,7 @@ function image_menu($may_cache) {
  * Implements hook_cron. (deletes old temp images)
  */
 function image_cron() {
-  $path = variable_get('image_default_path', 'images') . '/temp';
+  $path = variable_get('image_default_path', 'images') .'/temp';
   $files = file_scan_directory(file_create_path($path), '.*');
   foreach ($files as $file => $info) {
     if (time() - filemtime($file) > 60*60*6) {
@@ -220,7 +220,7 @@ function image_prepare(&$node, $field_name) {
 function image_file_download($file) {
   $size = image_get_info(file_create_path($file));
   if ($size) {
-    $headers = array('Content-Type: ' . $size['mime_type']);
+    $headers = array('Content-Type: '. $size['mime_type']);
     return $headers;
   }
 }
@@ -235,11 +235,11 @@ function image_link($type, $node, $main = 0) {
     $request = ($_GET['size']) ? $_GET['size'] : 'preview';
     foreach (_image_get_sizes() as $size) {
       if ($node->images[$request] != $node->images[$size['label']]) {
-        $links['image_size_'. $size['label']] = array('title' => t($size['label']), 'href' => 'node/' . $node->nid, 'query' => 'size=' . urlencode($size['label']));
+        $links['image_size_'. $size['label']] = array('title' => t($size['label']), 'href' => 'node/'. $node->nid, 'query' => 'size='. urlencode($size['label']));
       }
     }
     if (user_access('view original images') && ($node->images[$request] != $node->images[IMAGE_ORIGINAL])) {
-      $links['image_size_original'] = array('title' => t('original'), 'href' => 'node/' . $node->nid, 'query' => 'size=_original');
+      $links['image_size_original'] = array('title' => t('original'), 'href' => 'node/'. $node->nid, 'query' => 'size=_original');
     }
   }
 
@@ -260,16 +260,16 @@ function image_block($op = 'list', $delta = 0) {
       return $block;
     case 'view':
       if (user_access('access content')) {
-        switch($delta) {
+        switch ($delta) {
           case 0:
             $images = image_get_latest();
             $block['subject'] = t('Latest image');
-            $block['content'] = l(image_display($images[0], 'thumbnail'), 'node/'.$images[0]->nid, array(), NULL, NULL, FALSE, TRUE);
+            $block['content'] = l(image_display($images[0], 'thumbnail'), 'node/'. $images[0]->nid, array(), NULL, NULL, FALSE, TRUE);
             break;
           case 1:
             $images = image_get_random();
             $block['subject'] = t('Random image');
-            $block['content'] = l(image_display($images[0], 'thumbnail'), 'node/'.$images[0]->nid, array(), NULL, NULL, FALSE, TRUE);
+            $block['content'] = l(image_display($images[0], 'thumbnail'), 'node/'. $images[0]->nid, array(), NULL, NULL, FALSE, TRUE);
             break;
         }
       }
@@ -553,7 +553,7 @@ function image_views_handler_filter_image_size($op) {
 function _image_check_settings() {
   // File paths
   $image_path = file_create_path(variable_get('image_default_path', 'images'));
-  $temp_path = rtrim($image_path, '/') . '/temp';
+  $temp_path = rtrim($image_path, '/') .'/temp';
 
   if (!file_check_directory($image_path, FILE_CREATE_DIRECTORY, 'image_default_path')) {
     return false;
