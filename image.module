@@ -291,8 +291,16 @@ function image_form_add_thumbnail($form_id, $edit) {
 function image_form(&$node, &$param) {
   _image_check_settings();
 
-  $form['#attributes'] = array("enctype" => "multipart/form-data");
-  $form['title'] = array('#type' => 'textfield', '#title' => t('Title'), '#size' => 60, '#maxlength' => 128, '#required' => TRUE, '#default_value' => $node->title);
+  $type = node_get_types('type', $node);
+
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => check_plain($type->title_label),
+    '#size' => 60,
+    '#maxlength' => 128,
+    '#required' => TRUE,
+    '#default_value' => $node->title
+  );
 
   if ($node->new_file) {
     $form['new_file'] = array('#type' => 'value', '#value' => TRUE);
@@ -300,24 +308,51 @@ function image_form(&$node, &$param) {
 
   $form['images']['#tree'] = TRUE;
   if ($node->new_file) {
-    $form['images'][IMAGE_ORIGINAL] = array('#type' => 'hidden', '#value' => $node->images[IMAGE_ORIGINAL]);
+    $form['images'][IMAGE_ORIGINAL] = array(
+     '#type' => 'hidden', 
+      '#value' => $node->images[IMAGE_ORIGINAL],
+    );
   }
   else {
-    $form['images'][IMAGE_ORIGINAL] = array('#type' => 'hidden', '#default_value' => $node->images[IMAGE_ORIGINAL]);
+    $form['images'][IMAGE_ORIGINAL] = array(
+      '#type' => 'hidden', 
+      '#default_value' => $node->images[IMAGE_ORIGINAL],
+    );
   }
   foreach (_image_get_sizes() as $size) {
     if ($node->new_file) {
-      $form['images'][$size['label']] = array('#type' => 'hidden', '#value' => $node->images[$size['label']]);
+      $form['images'][$size['label']] = array(
+        '#type' => 'hidden', 
+        '#value' => $node->images[$size['label']]
+      );
     }
     else {
-      $form['images'][$size['label']] = array('#type' => 'hidden', '#default_value' => $node->images[$size['label']]);
+      $form['images'][$size['label']] = array(
+        '#type' => 'hidden', 
+        '#default_value' => $node->images[$size['label']]
+      );
     }
   }
 
   $form['thumbnail']['#after_build'][] = 'image_form_add_thumbnail';
 
-  $form['image'] = array('#type' => 'file', '#title' => t('Image'), '#size' => 40, '#description' => t('Click "Browse..." to select an image to upload.'), '#weight' => -3);
-  $form['body'] = array('#type' => 'textarea', '#title' => t('Body'), '#rows' => 20, '#default_value' => $node->body);
+  $form['#attributes'] = array("enctype" => "multipart/form-data");
+  $form['image'] = array(
+    '#type' => 'file',
+    '#title' => t('Image'),
+    '#size' => 40,
+    '#description' => t('Click "Browse..." to select an image to upload.'),
+    '#weight' => -3,
+  );
+  if ($type->has_body) {
+    $form['body'] = array(
+      '#type' => 'textarea',
+      '#title' => check_plain($type->body_label),
+      '#rows' => 20,
+      '#required' => ($type->min_word_count > 0),
+      '#default_value' => $node->body,
+    );
+  }
   $form['format'] = filter_form($node->format);
 
   return $form;
