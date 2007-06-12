@@ -345,15 +345,15 @@ function image_form(&$node, &$param) {
     '#weight' => -3,
   );
   if ($type->has_body) {
-    $form['body'] = array(
+    $form['body_filter']['body'] = array(
       '#type' => 'textarea',
       '#title' => check_plain($type->body_label),
       '#rows' => 20,
       '#required' => ($type->min_word_count > 0),
       '#default_value' => $node->body,
     );
+    $form['body_filter']['format'] = filter_form($node->format);
   }
-  $form['format'] = filter_form($node->format);
 
   return $form;
 }
