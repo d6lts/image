@@ -5,6 +5,8 @@
  * @file image_attach.module
  */
 
+define('IMAGE_ATTACH_HIDDEN', 'hidden');
+
 /**
  * Implementation of hook_help().
  */
@@ -61,24 +63,52 @@ function image_attach_form_alter($form_id, &$form) {
   // Content type settings form.
   if ($form_id == 'node_type_form' && $form['#node_type']->type != 'image') {
     _image_check_settings();
+
+    $image_sizes = array(
+      IMAGE_ATTACH_HIDDEN => t('hidden'),
+      IMAGE_ORIGINAL => t('original'),
+    );
+    foreach (_image_get_sizes() as $size) {
+      $image_sizes[$size['label']] = $size['label'];
+    }
+    
     $form['workflow']['image_attach'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Image Attach settings'),
+      '#collapsible' => FALSE,
+    );
+    $form['workflow']['image_attach']['image_attach'] = array(
       '#type' => 'radios',
       '#title' => t('Attach Images'),
       '#default_value' => variable_get('image_attach_'. $form['#node_type']->type, 0),
       '#options' => array(0 => t('Disabled'), 1 => t('Enabled')),
       '#description' => t('Should this node allows users to upload an image?'),
     );
-    $form['workflow']['image_attach_weight_teaser'] = array(
-      '#type' => 'weight',
-      '#title' => t('Attached image teaser weight'),
-      '#default_value' => variable_get('image_attach_weight_teaser_'. $form['#node_type']->type, 0),
-      '#description' => t("This value determines the image's weight in the teaser."),
+    $form['workflow']['image_attach']['image_attach_size_teaser'] = array(
+      '#type' => 'select',
+      '#title' => t('Teaser image size'),
+      '#default_value' => variable_get('image_attach_size_teaser_'. $form['#node_type']->type, 'thumbnail'),
+      '#options' => $image_sizes,
+      '#description' => t("This determines the size of the image that appears when the node is displayed as a teaser. 'Hidden' will not show the image.")
     );
-    $form['workflow']['image_attach_weight_body'] = array(
+    $form['workflow']['image_attach']['image_attach_weight_teaser'] = array(
       '#type' => 'weight',
-      '#title' => t('Attached image body weight'),
+      '#title' => t('Teaser image weight'),
+      '#default_value' => variable_get('image_attach_weight_teaser_'. $form['#node_type']->type, 0),
+      '#description' => t("This value determines the order of the image when displayed in the teaser."),
+    );
+    $form['workflow']['image_attach']['image_attach_size_body'] = array(
+      '#type' => 'select',
+      '#title' => t('Full node image size'),
+      '#default_value' => variable_get('image_attach_size_body_'. $form['#node_type']->type, 'thumbnail'),
+      '#options' => $image_sizes,
+      '#description' => t("This determines the size of the image that appears when the full node is displayed. 'Hidden' will not show the image.")
+    );
+    $form['workflow']['image_attach']['image_attach_weight_body'] = array(
+      '#type' => 'weight',
+      '#title' => t('Full node image weight'),
       '#default_value' => variable_get('image_attach_weight_body_'. $form['#node_type']->type, 0),
-      '#description' => t("This value determines the image's weight in the body."),
+      '#description' => t("This value determines the order of the image when displayed in the body."),
     );
   }
   // Node edit form.
@@ -325,29 +355,39 @@ function image_attach_views_handler_filter_iid_exist($op, $filter, $filterdata, 
  * If you have additional image sizes you defined in image.module, you can use them by theming this function as well.
  */
 function theme_image_attach_teaser($node) {
-  drupal_add_css(drupal_get_path('module', 'image_attach') .'/image_attach.css');
+  $img_size = variable_get('image_attach_size_teaser_'. $node->type, 'thumbnail');
 
-  $image = node_load($node->iid);
-  $info = image_get_info(file_create_path($image->images['thumbnail']));
+  if ($img_size != IMAGE_ATTACH_HIDDEN) {
+    drupal_add_css(drupal_get_path('module', 'image_attach') .'/image_attach.css');
 
-  $output = '<div style="width: '. $info['width'] .'px" class="image-attach-teaser">';
-  $output .= l(image_display($image, 'thumbnail'), "node/$node->nid", array(), NULL, NULL, FALSE, TRUE);
-  $output .= '</div>'."\n";
-  return $output;
+    $image = node_load($node->iid);
+    $info = image_get_info(file_create_path($image->images[$img_size]));
+
+    $output = '<div style="width: '. $info['width'] .'px" class="image-attach-teaser">';
+    $output .= l(image_display($image, $img_size), "node/$node->nid", array(), NULL, NULL, FALSE, TRUE);
+    $output .= '</div>'."\n";
+
+    return $output;
+  }
 }
 
 /**
  * Theme the body
  */
 function theme_image_attach_body($node) {
-  drupal_add_css(drupal_get_path('module', 'image_attach') .'/image_attach.css');
+  $img_size = variable_get('image_attach_size_body_'. $node->type, 'thumbnail');
 
-  $image = node_load($node->iid);
-  $info = image_get_info(file_create_path($image->images['thumbnail']));
+  if ($img_size != IMAGE_ATTACH_HIDDEN) {
+    drupal_add_css(drupal_get_path('module', 'image_attach') .'/image_attach.css');
 
-  $output = '<div style="width: '. $info['width'] .'px" class="image-attach-body">';
-  $output .= l(image_display($image, 'thumbnail'), "node/$node->iid", array(), NULL, NULL, FALSE, TRUE);
-  $output .= '</div>'."\n";
-  return $output;
+    $image = node_load($node->iid);
+    $info = image_get_info(file_create_path($image->images[$img_size]));
+
+    $output = '<div style="width: '. $info['width'] .'px" class="image-attach-body">';
+    $output .= l(image_display($image, $img_size), "node/$node->iid", array(), NULL, NULL, FALSE, TRUE);
+    $output .= '</div>'."\n";
+
+    return $output;
+  }
 }
 
