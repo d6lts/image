@@ -44,6 +44,14 @@ ul.images h3 {
 
 ul.images li {
   float : left;
-  margin : 1em;
+  overflow: hidden;
+  margin : 0.5em;
+  padding : 0.5em;
+  text-align: center;
   background: transparent;
+}
+
+ul.images li h3 {
+  font-size: 1em;
+  text-align: left;
 }
