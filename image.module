@@ -239,7 +239,7 @@ function image_link($type, $node, $main = 0) {
       }
     }
     if (user_access('view original images') && ($node->images[$request] != $node->images[IMAGE_ORIGINAL])) {
-      $links['image_size_original'] = array('title' => t('original'), 'href' => 'node/'. $node->nid, 'query' => 'size=_original');
+      $links['image_size_original'] = array('title' => t('original'), 'href' => 'node/'. $node->nid, 'query' => 'size='. IMAGE_ORIGINAL);
     }
   }
 
