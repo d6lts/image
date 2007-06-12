@@ -454,14 +454,25 @@ function image_display(&$node, $label = 'preview', $attributes = array()) {
  * (e.g. image/view/25/thumbnail or image/view/14)
  */
 function image_fetch($nid = 0, $size = 'preview') {
-  if ($nid) {
-    $node = node_load(array('nid' => $nid));
-    if ($node->images[$size]) {
-      $file = $node->images[$size];
-      $headers = image_file_download($file);
-      file_transfer($file, $headers);
+  if ($size == IMAGE_ORIGINAL && !user_access('view original images')) {
+    return drupal_access_denied();
+  }
+
+  if (isset($nid)) {
+    $node = node_load(array('type' => 'image', 'nid' => $nid));
+    if ($node) {
+      if (!node_access('view', $node)) {
+        return drupal_access_denied();
+      }
+
+      if (isset($node->images[$size])) {
+        $file = $node->images[$size];
+        $headers = image_file_download($file);
+        file_transfer($file, $headers);
+      }
     }
   }
+  return drupal_not_found();  
 }
 
 /**
