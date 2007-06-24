@@ -260,7 +260,7 @@ function theme_image_gallery($galleries, $images) {
   drupal_add_css(drupal_get_path('module', 'image_gallery') .'/image_gallery.css');
 
   // We'll add height to keep thumbnails lined up.
-  $size = _image_get_dimensions('thumbnail');
+  $size = _image_get_sizes(IMAGE_THUMBNAIL);
   $width = $size['width'];
   $height = $size['height'];
 
@@ -269,8 +269,9 @@ function theme_image_gallery($galleries, $images) {
     $content .= '<ul class="galleries">';
     foreach ($galleries as $gallery) {
       $content .= '<li>';
-      if ($gallery->count)
-        $content .= l(image_display($gallery->latest, 'thumbnail'), 'image/tid/'. $gallery->tid, array(), NULL, NULL, FALSE, TRUE);
+      if ($gallery->count) {
+        $content .= l(image_display($gallery->latest, IMAGE_THUMBNAIL), 'image/tid/'. $gallery->tid, array(), NULL, NULL, FALSE, TRUE);
+      }
       $content .= "<h3>". l($gallery->name, 'image/tid/'. $gallery->tid) ."</h3>\n";
       $content .= '<div class="description">'. check_markup($gallery->description) ."</div>\n";
       $content .= '<p class="count">'. format_plural($gallery->count, 'There is 1 image in this gallery', 'There are @count images in this gallery') ."</p>\n";
@@ -291,7 +292,7 @@ function theme_image_gallery($galleries, $images) {
         $content .= ' class="sticky"';
       }
       $content .= " style='height : {$height}px; width : {$width}px;'>\n";
-      $content .= l(image_display($image, 'thumbnail'), 'node/'. $image->nid, array(), NULL, NULL, FALSE, TRUE);
+      $content .= l(image_display($image, IMAGE_THUMBNAIL), 'node/'. $image->nid, array(), NULL, NULL, FALSE, TRUE);
       $content .= '<h3>'. l($image->title, 'node/'. $image->nid) .'</h3>';
       if (theme_get_setting('toggle_node_info_'. $image->type)) {
         $content .= '<div class="author">'. t('Posted by: !name', array('!name' => theme('username', $image))) ."</div>\n";

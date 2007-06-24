@@ -36,3 +36,20 @@ function image_update_1() {
   }
   return array();
 }
+
+/**
+ * Upgrade to the new image_sizes variable format.
+ */
+function image_update_2() {
+  $sizes = variable_get('image_sizes', FALSE);
+  if ($sizes) {
+    $new_sizes = array(IMAGE_ORIGINAL => array('width' => '', 'height' => '', 'label' => t('Original')));
+    foreach ($sizes as $size) {
+      $label = $size['label'];
+      $new_sizes[$label] = $size;
+      $new_sizes[$label]['label'] = drupal_ucfirst($label);
+    }
+    variable_set('image_sizes', $new_sizes);
+  }
+  return array();
+}
