@@ -17,7 +17,7 @@ function image_gallery_menu($may_cache) {
 
   if ($may_cache) {
     $items[] = array(
-      'path' => 'image', 
+      'path' => 'image',
       'title' => t('Image galleries'),
       'access' => user_access('access content'),
       'type' => MENU_SUGGESTED_ITEM,
@@ -182,25 +182,57 @@ function image_gallery_admin_add($edit = array()) {
 }
 
 function image_gallery_admin_form($edit = array()) {
- if (empty($edit)) {
+  if (empty($edit)) {
     $edit['vid'] = _image_gallery_get_vid();
   }
 
- $form['name'] = array('#type' => 'textfield', '#title' => t('Gallery name'), '#default_value' => $edit['name'], '#size' => 60, '#maxlength' =>  64, '#description' => t('The name is used to identify the gallery.'), '#required' => TRUE);
- $form['description'] = array('#type' => 'textarea', '#title' => t('Description'), '#default_value' => $edit['description'], '#cols' => 60, '#rows' => 5, '#description' => t('The description can be used to provide more information about the image gallery.'));
- $form['parent']['#tree'] = TRUE;
- $form['parent'][0] = _image_gallery_parent_select($edit['tid'], t('Parent'), 'forum');
- $form['weight'] = array('#type' => 'weight', '#title' => t('Weight'), '#default_value' => $edit['weight'], '#delta' => 10, '#description' => t('When listing galleries, those with with light (small) weights get listed before containers with heavier (larger) weights. Galleries with equal weights are sorted alphabetically.'));
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Gallery name'),
+    '#default_value' => $edit['name'],
+    '#size' => 60,
+    '#maxlength' =>  64,
+    '#description' => t('The name is used to identify the gallery.'),
+    '#required' => TRUE,
+  );
+  $form['description'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Description'),
+    '#default_value' => $edit['description'],
+    '#cols' => 60,
+    '#rows' => 5,
+    '#description' => t('The description can be used to provide more information about the image gallery.'),
+  );
+  $form['parent']['#tree'] = TRUE;
+  $form['parent'][0] = _image_gallery_parent_select($edit['tid'], t('Parent'), 'forum');
+  $form['weight'] = array(
+    '#type' => 'weight',
+    '#title' => t('Weight'),
+    '#default_value' => $edit['weight'],
+    '#delta' => 10,
+    '#description' => t('When listing galleries, those with with light (small) weights get listed before containers with heavier (larger) weights. Galleries with equal weights are sorted alphabetically.'),
+  );
+  $form['vid'] = array(
+    '#type' => 'hidden',
+    '#value' => _image_gallery_get_vid(),
+  );
+  $form['submit' ] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+  if ($edit['tid']) {
+    $form['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete'),
+    );
+    $form['tid'] = array(
+      '#type' => 'hidden',
+      '#value' => $edit['tid'],
+    );
+  }
 
- $form['vid'] = array('#type' => 'hidden', '#value' => _image_gallery_get_vid());
- $form['submit' ] = array('#type' => 'submit', '#value' => t('Submit'));
- if ($edit['tid']) {
-   $form['delete'] = array('#type' => 'submit', '#value' => t('Delete'));
-   $form['tid'] = array('#type' => 'hidden', '#value' => $edit['tid']);
- }
-
- $form['#base'] = 'image_gallery_admin';
- return $form;
+  $form['#base'] = 'image_gallery_admin';
+  return $form;
 }
 
 function image_gallery_admin_submit($form_id, $form_values) {
@@ -264,9 +296,14 @@ function _image_gallery_parent_select($tid, $title) {
     }
   }
 
-  $description = t('Image galleries may be nested below other galleries.');
-
-  return array('#type' => 'select', '#title' => $title, '#default_value' => $parent, '#options' => $options, '#description' => $description, '#required' => TRUE);
+  return array(
+    '#type' => 'select',
+    '#title' => $title,
+    '#default_value' => $parent,
+    '#options' => $options,
+    '#description' => t('Image galleries may be nested below other galleries.'),
+    '#required' => TRUE
+  );
 }
 
 /**
