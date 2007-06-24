@@ -5,7 +5,6 @@ function image_gallery_help($section) {
   switch ($section) {
     case 'admin/image':
       return '<p>'. t('Image galleries can be used to organize and present groups of images. Galleries may be nested. To add a new gallery click the "add gallery" tab.') .'</p>';
-
   }
 }
 
@@ -17,36 +16,53 @@ function image_gallery_menu($may_cache) {
   $items = array();
 
   if ($may_cache) {
-    $items[] = array('path' => 'image', 'title' => t('Image galleries'),
-                     'access' => user_access('access content'),
-                     'type' => MENU_SUGGESTED_ITEM,
-                     'callback' => 'image_gallery_page');
-    $items[] = array('path' => 'admin/content/image', 'title' => t('Image galleries'),
-                     'access' => user_access('administer images'),
-                     'callback' => 'image_gallery_admin',
-                     'description' => t('Create and manage image galleries.'));
-    $items[] = array('path' => 'admin/content/image/list', 'title' => t('List'),
-                     'access' => user_access('administer images'),
-                     'type' => MENU_DEFAULT_LOCAL_TASK, 'weight' => -10);
-    $items[] = array('path' => 'admin/content/image/add', 'title' => t('Add gallery'),
-                     'access' => user_access('administer images'),
-                     'callback' => 'image_gallery_admin_add',
-                     'type' => MENU_LOCAL_TASK);
-    $items[] = array('path' => 'admin/settings/image_gallery', 'title' => t('Image gallery'),
-                     'access' => user_access('administer site configuration'),
-                     'callback' => 'drupal_get_form',
-                     'callback arguments' => array('image_gallery_admin_settings'),
-                     'description' => t('Configure appearance of image galleries.'));
+    $items[] = array(
+      'path' => 'image', 
+      'title' => t('Image galleries'),
+      'access' => user_access('access content'),
+      'type' => MENU_SUGGESTED_ITEM,
+      'callback' => 'image_gallery_page',
+    );
+    $items[] = array(
+      'path' => 'admin/content/image',
+      'title' => t('Image galleries'),
+      'access' => user_access('administer images'),
+      'callback' => 'image_gallery_admin',
+      'description' => t('Create and manage image galleries.'),
+    );
+    $items[] = array(
+      'path' => 'admin/content/image/list',
+      'title' => t('List'),
+      'access' => user_access('administer images'),
+      'type' => MENU_DEFAULT_LOCAL_TASK, 'weight' => -10,
+    );
+    $items[] = array(
+      'path' => 'admin/content/image/add',
+      'title' => t('Add gallery'),
+      'access' => user_access('administer images'),
+      'callback' => 'image_gallery_admin_add',
+      'type' => MENU_LOCAL_TASK,
+    );
+    $items[] = array(
+      'path' => 'admin/settings/image_gallery',
+      'title' => t('Image gallery'),
+      'access' => user_access('administer site configuration'),
+      'callback' => 'drupal_get_form',
+      'callback arguments' => array('image_gallery_admin_settings'),
+      'description' => t('Configure appearance of image galleries.'),
+    );
   }
   elseif (is_numeric(arg(4))) {
     $term = taxonomy_get_term(arg(4));
     if ($term) {
-      $items[] = array('path' => 'admin/content/image/edit',
-                       'title' => t('Edit image gallery'),
-                       'callback' => 'image_gallery_admin_add',
-                       'callback arguments' => array((array)$term),
-                       'access' => user_access('administer images'),
-                       'type' => MENU_CALLBACK);
+      $items[] = array(
+        'path' => 'admin/content/image/edit',
+        'title' => t('Edit image gallery'),
+        'callback' => 'image_gallery_admin_add',
+        'callback arguments' => array((array)$term),
+        'access' => user_access('administer images'),
+        'type' => MENU_CALLBACK,
+      );
     }
   }
   return $items;
