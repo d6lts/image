@@ -13,7 +13,6 @@ define('IMAGE_ATTACH_HIDDEN', 'hidden');
 function image_attach_help($section) {
   switch ($section) {
     case 'admin/settings/modules#description':
-      // This description is shown in the listing at admin/modules.
       return t('Allows easy attaching of image nodes to other content types.');
   }
 }
@@ -64,12 +63,9 @@ function image_attach_form_alter($form_id, &$form) {
   if ($form_id == 'node_type_form' && $form['#node_type']->type != 'image') {
     _image_check_settings();
 
-    $image_sizes = array(
-      IMAGE_ATTACH_HIDDEN => t('hidden'),
-      IMAGE_ORIGINAL => t('original'),
-    );
-    foreach (_image_get_sizes() as $size) {
-      $image_sizes[$size['label']] = $size['label'];
+    $image_sizes = array(IMAGE_ATTACH_HIDDEN => t('<Hidden>'));
+    foreach (_image_get_sizes() as $key => $size) {
+      $image_sizes[$key] = $size['label'];
     }
     
     $form['workflow']['image_attach'] = array(
@@ -87,7 +83,7 @@ function image_attach_form_alter($form_id, &$form) {
     $form['workflow']['image_attach']['image_attach_size_teaser'] = array(
       '#type' => 'select',
       '#title' => t('Teaser image size'),
-      '#default_value' => variable_get('image_attach_size_teaser_'. $form['#node_type']->type, 'thumbnail'),
+      '#default_value' => variable_get('image_attach_size_teaser_'. $form['#node_type']->type, IMAGE_THUMBNAIL),
       '#options' => $image_sizes,
       '#description' => t("This determines the size of the image that appears when the node is displayed as a teaser. 'Hidden' will not show the image.")
     );
@@ -100,7 +96,7 @@ function image_attach_form_alter($form_id, &$form) {
     $form['workflow']['image_attach']['image_attach_size_body'] = array(
       '#type' => 'select',
       '#title' => t('Full node image size'),
-      '#default_value' => variable_get('image_attach_size_body_'. $form['#node_type']->type, 'thumbnail'),
+      '#default_value' => variable_get('image_attach_size_body_'. $form['#node_type']->type, IMAGE_THUMBNAIL),
       '#options' => $image_sizes,
       '#description' => t("This determines the size of the image that appears when the full node is displayed. 'Hidden' will not show the image.")
     );
@@ -114,7 +110,7 @@ function image_attach_form_alter($form_id, &$form) {
   // Node edit form.
   else if (isset($form['type']) && $form['type']['#value'] != 'image') {
     $type = $form['type']['#value'];
-    // if enabled adjust the form
+    // If enabled adjust the form.
     if ($form_id == $type .'_node_form' && variable_get('image_attach_'. $type, 0)) {
       $node = $form['#node'];
       _image_check_settings();
@@ -229,7 +225,7 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
 
     // Pass the body and teaser objects to the theme again to add the images
     case 'view':
-      if ($node->iid && function_exists('image_display')) {
+      if ($node->iid) {
         $teaser_or_body = $teaser ? 'teaser' : 'body';
         $node->content['image_attach'] = array(
           '#value' => theme("image_attach_{$teaser_or_body}", $node),
@@ -375,7 +371,7 @@ function theme_image_attach_teaser($node) {
  * Theme the body
  */
 function theme_image_attach_body($node) {
-  $img_size = variable_get('image_attach_size_body_'. $node->type, 'thumbnail');
+  $img_size = variable_get('image_attach_size_body_'. $node->type, IMAGE_THUMBNAIL);
 
   if ($img_size != IMAGE_ATTACH_HIDDEN) {
     drupal_add_css(drupal_get_path('module', 'image_attach') .'/image_attach.css');
