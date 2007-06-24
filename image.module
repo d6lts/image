@@ -16,11 +16,11 @@ function image_help($section) {
 Image galleries are used to organize and display images in galleries.   The list tab allows users to edit existing image gallery names, descriptions, parents and relative position, known as a weight.  The add galleries tab allows you to create a new image gallery defining name, description, parent and weight.') .'</p>';
       $output .= t('<p>You can</p>
 <ul>
-<li>view image handling messages in <a href="%admin-settings">administer &gt;&gt; settings</a>.</li>
-<li>configure image sizes and file directories at <a href="%admin-settings-image">administer &gt;&gt; settings &gt;&gt; image</a>.</li>
-<li>use the <a href="%external-http-drupal-org-project-img_assist">image assist module</a> to upload and insert images into posts.</li>
-', array('%admin-settings' => url('admin/settings'), '%admin-image-galleries' => url('admin/image/galleries'), '%admin-settings-image' => url('admin/settings/image'), '%external-http-drupal-org-project-img_assist' => 'http://drupal.org/project/img_assist')) .'</ul>';
-      $output .= '<p>'. t('For more information please read the configuration and customization handbook <a href="%image">Image page</a>.', array('%image' => 'http://www.drupal.org/handbook/modules/image/')) .'</p>';
+<li>view image handling messages in <a href="!admin-settings">administer &gt;&gt; settings</a>.</li>
+<li>configure image sizes and file directories at <a href="!admin-settings-image">administer &gt;&gt; settings &gt;&gt; image</a>.</li>
+<li>use the <a href="!external-http-drupal-org-project-img_assist">image assist module</a> to upload and insert images into posts.</li>
+', array('!admin-settings' => url('admin/settings'), '!admin-image-galleries' => url('admin/image/galleries'), '!admin-settings-image' => url('admin/settings/image'), '!external-http-drupal-org-project-img_assist' => 'http://drupal.org/project/img_assist')) .'</ul>';
+      $output .= '<p>'. t('For more information please read the configuration and customization handbook <a href="!image">Image page</a>.', array('!image' => 'http://www.drupal.org/handbook/modules/image/')) .'</p>';
       return $output;
   }
 }
@@ -196,20 +196,27 @@ function image_menu($may_cache) {
   $items = array();
 
   if ($may_cache) {
-    $items[] = array('path' => 'node/add/image', 'title' => t('Image'),
-                     'access' => user_access('create images'));
-    $items[] = array('path' => 'image/view', 'title' => t('image'),
-                     'access' => user_access('access content'),
-                     'type' => MENU_CALLBACK,
-                     'callback' => 'image_fetch');
-    $items[] = array('path' => 'admin/settings/image',
-                     'title' => t('Image'),
-                     'callback' => 'drupal_get_form',
-                     'callback arguments' => array('image_admin_settings'),
-                     'access' => user_access('administer site configuration'),
-                     'type' => MENU_NORMAL_ITEM,
-                     'description' => t('Image module settings.'),
-                     );
+    $items[] = array(
+      'path' => 'node/add/image',
+      'title' => t('Image'),
+      'access' => user_access('create images'),
+    );
+    $items[] = array(
+      'path' => 'image/view',
+      'title' => t('image'),
+      'access' => user_access('access content'),
+      'type' => MENU_CALLBACK,
+      'callback' => 'image_fetch',
+    );
+    $items[] = array(
+      'path' => 'admin/settings/image',
+      'title' => t('Image'),
+      'callback' => 'drupal_get_form',
+      'callback arguments' => array('image_admin_settings'),
+      'access' => user_access('administer site configuration'),
+      'type' => MENU_NORMAL_ITEM,
+      'description' => t('Image module settings.'),
+    );
   }
 
   return $items;
