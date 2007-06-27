@@ -499,7 +499,7 @@ function image_insert($node) {
  */
 function image_update($node) {
   foreach (_image_get_sizes() as $key => $size) {
-    $old_file = db_fetch_object(db_queryd("SELECT fid, filepath FROM {files} WHERE filename='%s' AND nid=%d", $key, $node->nid));
+    $old_file = db_fetch_object(db_query("SELECT fid, filepath FROM {files} WHERE filename='%s' AND nid=%d", $key, $node->nid));
 
     // This is a new image.
     if (!isset($node->images[$key]) || $old_file->filepath != $node->images[$key]) {
@@ -848,9 +848,9 @@ function _image_insert(&$node, $size, $image_path) {
 
     $info = image_get_info($image_path);
     $fid = db_next_id('{files}_fid');
-    db_queryd("INSERT INTO {files} (fid, nid, filename, filepath, filemime, filesize) VALUES (%d, %d, '%s', '%s', '%s', '%s')",
+    db_query("INSERT INTO {files} (fid, nid, filename, filepath, filemime, filesize) VALUES (%d, %d, '%s', '%s', '%s', '%s')",
              $fid, $node->nid, $size, $image_path, $info['mime_type'], $info['file_size']);
-    db_queryd("INSERT INTO {file_revisions} (fid, vid, description, list) VALUES (%d, %d, '%s', %d)",
+    db_query("INSERT INTO {file_revisions} (fid, vid, description, list) VALUES (%d, %d, '%s', %d)",
              $fid, $node->vid, '', 0);
   }
 }
