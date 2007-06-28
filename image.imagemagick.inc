@@ -23,14 +23,17 @@ function image_imagemagick_settings() {
 }
 
 function _image_imagemagick_build_version($form, $form_element) {
-  $valid = _image_imagemagick_check_path($form_element['image_imagemagick_convert'], 'image_imagemagick_convert');
-  if ($valid) {
-    _image_imagemagick_convert_exec('-version', $output, $errors);
-    $form['image_imagemagick_version'] = array(
-      '#type' => 'item',
-      '#title' => t('Version'),
-      '#value' => '<pre>'. check_plain($output) .'</pre>',
-    );
+  // Don't check the path when another toolkit is being selected.  
+  if (!isset($form['#post']['image_toolkit']) || $form['#post']['image_toolkit'] == 'imagemagick') {
+    $valid = _image_imagemagick_check_path($form_element['image_imagemagick_convert'], 'image_imagemagick_convert');
+    if ($valid) {
+      _image_imagemagick_convert_exec('-version', $output, $errors);
+      $form['image_imagemagick_version'] = array(
+        '#type' => 'item',
+        '#title' => t('Version'),
+        '#value' => '<pre>'. check_plain($output) .'</pre>',
+      );
+    }
   }
   return $form;
 }
