@@ -657,7 +657,7 @@ function theme_image_body($node, $size) {
  * Theme an img tag for displaying the image.
  */
 function theme_image_display($node, $label, $url, $attributes) {
-  return '<img src="'. check_url($url) .'" alt="'. check_plain($node->title) .'" title="'. check_plain($node->title) .'" '. drupal_attributes($attributes) .' />';
+  return theme('image', $url, $node->title, $node->title, $attributes, FALSE);
 }
 
 
