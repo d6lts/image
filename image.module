@@ -5,6 +5,10 @@ define('IMAGE_ORIGINAL', '_original');
 define('IMAGE_PREVIEW', 'preview');
 define('IMAGE_THUMBNAIL', 'thumbnail');
 
+define('IMAGE_LINK_HIDDEN', 0);
+define('IMAGE_LINK_SHOWN', 1);
+define('IMAGE_LINK_NEW', 2);
+
 /**
  * Implementation of hook_help
  */
@@ -106,10 +110,22 @@ function image_admin_settings() {
     '#validate' => array('image_settings_sizes_validate' => array()),
   );
 
-  // Add some empty rows for user defined sizes.
+  $link_options = array(
+    IMAGE_LINK_HIDDEN => t('Hidden'),
+    IMAGE_LINK_SHOWN => t('Same window'),
+    IMAGE_LINK_NEW => t('New window'),
+  );
+  
   $sizes = _image_get_sizes();
+  // Add some empty rows for user defined sizes.
   for ($i = count($sizes); $i < 6; $i++) {
-    $sizes['new'. $i] = array('label' => '', 'width' => '', 'height' => '', 'new' => TRUE);
+    $sizes['new'. $i] = array(
+      'label' => '',
+      'width' => '', 
+      'height' => '', 
+      'link' => IMAGE_LINK_SHOWN, 
+      'new' => TRUE,
+    );
   }
 
   foreach ($sizes as $key => $size) {
@@ -133,6 +149,11 @@ function image_admin_settings() {
       '#default_value' => $size['height'],
       '#size' => 5,
       '#maxlength' => 5,
+    );
+    $form['image_sizes'][$key]['link'] = array(
+      '#type' => 'select',
+      '#default_value' => $size['link'],
+      '#options' => $link_options,
     );
     $form['image_sizes'][$key]['new'] = array(
       '#type' => 'value',
@@ -175,12 +196,13 @@ function image_settings_sizes_submit($form_id, &$form_values) {
 }
 
 function theme_image_settings_sizes_form(&$form) {
-  $header = array(t('Label'), t('Width'), t('Height'));
+  $header = array(t('Label'), t('Width'), t('Height'), t('Link'));
   foreach (element_children($form) as $key) {
     $row = array();
     $row[] = drupal_render($form[$key]['label']);
     $row[] = drupal_render($form[$key]['width']);
     $row[] = drupal_render($form[$key]['height']);
+    $row[] = drupal_render($form[$key]['link']);
     $rows[] = $row;
   }
   $output .= theme('table', $header, $rows);
@@ -326,11 +348,27 @@ function image_link($type, $node, $main = 0) {
   if ($type == 'node' && $node->type == 'image' && !$main) {
     $request = ($_GET['size']) ? $_GET['size'] : IMAGE_PREVIEW;
     foreach (_image_get_sizes() as $key => $size) {
-      // For smaller images some derivative images may not have been created.
-      // The thumbnail and preview images will be equal to the original images
-      // but other sizes will not be set.
-      if (isset($node->images[$key]) && $node->images[$key] != $node->images[$request]) {
-        $links['image_size_'. $key] = array('title' => $size['label'], 'href' => 'node/'. $node->nid, 'query' => 'size='. urlencode($key));
+      if ($size['link']) {
+        // For smaller images some derivative images may not have been created.
+        // The thumbnail and preview images will be equal to the original images
+        // but other sizes will not be set.
+        if (isset($node->images[$key]) && $node->images[$key] != $node->images[$request]) {
+          if ($size['link'] == IMAGE_LINK_NEW) {
+            $links['image_size_'. $key] = array(
+              'title' => $size['label'],
+              'href' => 'image/view/'. $node->nid,
+              'attributes' => array('target' => '_blank'),
+              'query' => 'size='. urlencode($key),
+            );
+          }
+          else {            
+            $links['image_size_'. $key] = array(
+              'title' => $size['label'],
+              'href' => 'node/'. $node->nid, 
+              'query' => 'size='. urlencode($key)
+            );
+          }
+        }
       }
     }
     if (!user_access('view original images')) {
@@ -555,8 +593,12 @@ function image_display(&$node, $label = IMAGE_PREVIEW, $attributes = array()) {
   // regenerate images?
   if ($node->images[$label] != $node->images[IMAGE_ORIGINAL] &&
       (!file_exists(file_create_path($node->images[$label])) ||
-       filemtime(file_create_path($node->images[$label])) < variable_get('image_updated', 0))) {
+       filemtime(file_create_path($node->images[$label])) < variable_get('image_updated', 0))) 
+  {
+    _image_remove_derivatives($node);
     _image_build_derivatives($node);
+    node_save($node);
+    drupal_set_message('The image %title had missing derivative images. The have been regenerated.', array('%title' => $node->title));
   }
 
   if (empty($node->images[$label])) {
@@ -799,9 +841,9 @@ function _image_filename($filename, $label = IMAGE_ORIGINAL, $temp = FALSE) {
  */
 function _image_get_sizes($size = NULL) {
   $defaults = array(
-    IMAGE_ORIGINAL => array('width' => '', 'height' => '', 'label' => t('Original')),
-    IMAGE_THUMBNAIL => array('width' => 100, 'height' => 100, 'label' => t('Thumbnail')),
-    IMAGE_PREVIEW   => array('width' => 640, 'height' => 640, 'label' => t('Preview')),
+    IMAGE_ORIGINAL => array('width' => '', 'height' => '', 'label' => t('Original'), 'link' => IMAGE_LINK_SHOWN),
+    IMAGE_THUMBNAIL => array('width' => 100, 'height' => 100, 'label' => t('Thumbnail'), 'link' => IMAGE_LINK_SHOWN),
+    IMAGE_PREVIEW   => array('width' => 640, 'height' => 640, 'label' => t('Preview'), 'link' => IMAGE_LINK_SHOWN),
   );
 
   $sizes = array();

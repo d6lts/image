@@ -53,3 +53,19 @@ function image_update_2() {
   }
   return array();
 }
+
+/**
+ * Add the link field to each size.
+ */
+function image_update_3() {
+  $sizes = variable_get('image_sizes', FALSE);
+  if ($sizes) {
+    $new_sizes = array();
+    foreach ($sizes as $key => $size) {
+      $size['link'] = 1;
+      $new_sizes[$key] = $size;
+    }
+    variable_set('image_sizes', $new_sizes);
+  }
+  return array();
+}
