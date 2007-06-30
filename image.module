@@ -482,6 +482,12 @@ function image_form(&$node, &$param) {
   return $form;
 }
 
+function image_validate($node) {
+  if (empty($node->images[IMAGE_ORIGINAL])) {
+    form_set_error('image', t('You must upload an image.'));
+  }
+}
+
 function image_submit(&$node) {
   if ($node->new_file) {
     _image_remove_derivatives($node);
