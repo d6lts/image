@@ -356,9 +356,8 @@ function image_link($type, $node, $main = 0) {
           if ($size['link'] == IMAGE_LINK_NEW) {
             $links['image_size_'. $key] = array(
               'title' => $size['label'],
-              'href' => 'image/view/'. $node->nid,
+              'href' => "image/view/{$node->nid}/$key",
               'attributes' => array('target' => '_blank'),
-              'query' => 'size='. urlencode($key),
             );
           }
           else {            
