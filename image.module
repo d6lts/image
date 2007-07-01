@@ -603,7 +603,7 @@ function image_display(&$node, $label = IMAGE_PREVIEW, $attributes = array()) {
     _image_remove_derivatives($node);
     _image_build_derivatives($node);
     node_save($node);
-    drupal_set_message('The image %title had missing derivative images. The have been regenerated.', array('%title' => $node->title));
+    drupal_set_message(t('The image %title had missing derivative image which has been regenerated.', array('%title' => $node->title)));
   }
 
   if (empty($node->images[$label])) {
