@@ -18,7 +18,7 @@ function image_update_1() {
       $fields = array('thumb_path' => 'thumbnail',
                       'preview_path' => 'preview',
                       'image_path' => '_original');
-      
+
       while ($old_image = db_fetch_object($result)) {
         foreach ($fields as $old => $new) {
           $old_file = '';
