@@ -237,6 +237,21 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
         );
       }
       break;
+
+    case 'rss item':
+      $ret = array();
+      if ($node->iid && $image = node_load($node->iid)) {
+        $info = image_get_info(file_create_path($image->images[IMAGE_PREVIEW]));
+        $ret[] = array(
+          'key' => 'enclosure',
+          'attributes' => array(
+            'url' => url("image/view/{$node->iid}/". IMAGE_PREVIEW, NULL, NULL, TRUE),
+            'length' => $info['file_size'],
+            'type' => $info['mime_type'],
+          )
+        );
+      }
+      return $ret;
   }
 }
 
