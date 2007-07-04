@@ -71,8 +71,23 @@ function image_gallery_menu($may_cache) {
 function image_gallery_admin_settings() {
   _image_check_settings();
 
-  $form['gallery'] = array('#type' => 'fieldset', '#title' => t('Gallery settings'));
-  $form['gallery']['image_images_per_page'] = array('#type' => 'textfield', '#title' => t('Images per page'), '#default_value' => variable_get('image_images_per_page', 6), '#size' => 3, '#description' => t('Sets the number of images to be displayed in a gallery page.'));
+  $form['gallery'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Gallery settings'),
+  );
+  $form['gallery']['image_images_per_page'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Images per page'),
+    '#default_value' => variable_get('image_images_per_page', 6),
+    '#size' => 3,
+    '#description' => t('Sets the number of images to be displayed in a gallery page.'),
+  );
+  $form['gallery']['image_gallery_node_info'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display node info'),
+    '#default_value' => variable_get('image_gallery_node_info', 0),
+    '#description' => t("Checking this will display the \"Posted by\" node information on the gallery pages."),
+  );
 
   return system_settings_form($form);
 }
@@ -347,7 +362,7 @@ function theme_image_gallery($galleries, $images) {
       $content .= " style='height : {$height}px; width : {$width}px;'>\n";
       $content .= l(image_display($image, IMAGE_THUMBNAIL), 'node/'. $image->nid, array(), NULL, NULL, FALSE, TRUE);
       $content .= '<h3>'. l($image->title, 'node/'. $image->nid) .'</h3>';
-      if (theme_get_setting('toggle_node_info_'. $image->type)) {
+      if (variable_get('image_gallery_node_info', 0)) {
         $content .= '<div class="author">'. t('Posted by: !name', array('!name' => theme('username', $image))) ."</div>\n";
         if ($image->created > 0) {
           $content .= '<div class="date">'. format_date($image->created) ."</div>\n";
