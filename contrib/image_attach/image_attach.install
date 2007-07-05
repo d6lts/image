@@ -52,6 +52,15 @@ function image_attach_update_1() {
  */
 function image_attach_update_2() {
   $ret = array();
-  $ret[] = update_sql("DELETE FROM {image_attach} USING {image_attach} LEFT JOIN {node} n ON {image_attach}.iid = n.nid WHERE n.nid IS NULL OR n.type != 'image'");
+  switch ($GLOBALS['db_type']) {
+    case 'mysqli':
+    case 'mysql':
+      $ret[] = update_sql("DELETE FROM {image_attach} USING {image_attach} LEFT JOIN {node} n ON {image_attach}.iid = n.nid WHERE n.nid IS NULL OR n.type != 'image'");
+      break;
+
+    case 'pgsql':
+      $ret[] = update_sql("DELETE FROM {image_attach} USING {node} n WHERE {image_attach}.iid = n.nid AND (n.nid IS NULL OR n.type != 'image')");
+      break;
+  }
   return $ret;
 }
