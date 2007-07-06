@@ -175,11 +175,11 @@ function image_import_form_submit($form_id, $form_values) {
         $origname = $form_values['file_list'][$index];
         $filename = file_check_location($dirpath .'/'. $origname, $dirpath);
         if ($filename) {
-          $node = _image_import_file(
+          $node = image_create_node_from(
             $filename,
-            $form_values['taxonomy'],
             $form_values['title'][$index],
-            $form_values['body'][$index]
+            $form_values['body'][$index],
+            $form_values['taxonomy']
           );
 
           if ($node) {
@@ -219,61 +219,6 @@ function image_import_admin_settings() {
   );
 
   return system_settings_form($form);
-}
-
-function _image_import_file($filepath, $taxonomy, $title = '', $body = '') {
-  global $user;
-
-  //check for user permission...
-  if (!user_access('create images')) {
-    drupal_access_denied();
-  }
-
-  // build a file object
-  $file = new stdClass();
-  $file->filepath = realpath($filepath);
-  $file->filename = basename($file->filepath);
-
-  // start building a node
-  $node = new stdClass();
-  $node->type = 'image';
-  $node->uid = $user->uid;
-  $node->name = $user->name;
-
-  // set the node's defaults... (copied this from node and comment.module)
-  $node_options = variable_get('node_options_'. $node->type, array('status', 'promote'));
-  $node->status = in_array('status', $node_options);
-  $node->promote = in_array('promote', $node_options);
-  if (module_exists('comment')) {
-    $node->comment = variable_get("comment_$node->type", COMMENT_NODE_READ_WRITE);
-  }
-  if (module_exists('taxonomy')) {
-    $node->taxonomy = $taxonomy;
-  }
-
-  // Fill in the node content
-  $node->title = $title ? $title : $file->filename;
-  $node->body = $body;
-
-  // copy the file so if there's a problem it can be re-imported.
-  if (file_copy($file, _image_filename($file->filename, NULL, TRUE), FILE_EXISTS_RENAME)) {
-    if ($image = image_get_info($file->filepath)) {
-      $node->images[IMAGE_ORIGINAL] = $file->filepath;
-      _image_build_derivatives($node, TRUE);
-      $node->new_file = TRUE;
-
-      $node = node_submit($node);
-      node_save($node);
-
-      // remove the original file
-      file_delete($filepath);
-
-      return $node;
-    }
-    // the copied file wasn't a proper image, trash it
-    file_delete($file->filepath);
-  }
-  return FALSE;
 }
 
 /**
