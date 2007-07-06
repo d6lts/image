@@ -508,11 +508,23 @@ function image_submit(&$node) {
  * Implementation of hook_view
  */
 function image_view($node, $teaser = 0, $page = 0) {
-  $request = ($_GET['size']) ? $_GET['size'] : IMAGE_PREVIEW;
-  $request = check_plain($request);
+  $sizes = _image_get_sizes();
+  $size = IMAGE_PREVIEW;
+  if (isset($_GET['size'])) {
+    // Invalid size specified.
+    if (!isset($sizes[$_GET['size']])) {
+      drupal_goto("node/$node->nid"); 
+    }
+    $size = $_GET['size'];
+    // Not allowed to view the original.
+    if ($size == IMAGE_ORIGINAL && !user_access('view original images')) {
+      drupal_goto("node/$node->nid");
+    }
+  }
+
   $node = node_prepare($node, $teaser);
   $node->content['image'] = array(
-    '#value' => theme($teaser ? 'image_teaser' : 'image_body', $node, $request),
+    '#value' => theme($teaser ? 'image_teaser' : 'image_body', $node, $size),
     '#weight' => 0,
   );
   return $node;
