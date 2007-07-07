@@ -8,7 +8,7 @@ function image_gallery_install() {
 function image_gallery_update_1() {
   $ret = array();
   if ($vid = variable_get('image_nav_vocabulary', '')) {
-    $ret[] = update_sql("UPDATE {vocabulary} SET module='image_gallery' WHERE vid=%d", $vid);
+    $ret[] = update_sql("UPDATE {vocabulary} SET module='image_gallery' WHERE vid=". (int) $vid);
   }
   else {
     $ret[] = update_sql("UPDATE {vocabulary} SET module='image_gallery' WHERE module='image'");
