@@ -103,7 +103,7 @@ function image_update_4() {
   }
 
   // Delete rows from {file_revisions} that don't have matching {files}. 
-  $ret[] = update_sql("DELETE FROM {file_revisions} WHERE NOT EXISTS (SELECT * FROM {files} WHERE files.fid = file_revisions.fid)");
+  $ret[] = update_sql("DELETE FROM {file_revisions} WHERE NOT EXISTS (SELECT * FROM {files} WHERE {files}.fid = {file_revisions}.fid)");
 
   return $ret;
 }
