@@ -64,8 +64,8 @@ function image_imagemagick_resize($source, $dest, $width, $height) {
 /**
  * Rotate an image
  */
-function image_imagemagick_rotate($source, $dest, $degrees) {
-  $filter = ' -rotate '. escapeshellarg($degrees) .' -background #000000';
+function image_imagemagick_rotate($source, $dest, $degrees, $bg_color = 0x000000) {
+  $filter = ' -rotate '. escapeshellarg($degrees) .' -background #'. str_pad(dechex($params['bg_color']), 6, 0);
   return _image_imagemagick_convert($source, $dest, $filter);
 }
 
