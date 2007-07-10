@@ -9,6 +9,10 @@ define('IMAGE_LINK_HIDDEN', 0);
 define('IMAGE_LINK_SHOWN', 1);
 define('IMAGE_LINK_NEW', 2);
 
+if (module_exists('views')) {
+  include(drupal_get_path('module', 'image') .'/views.inc');
+}
+
 /**
  * Implementation of hook_help
  */
@@ -588,31 +592,6 @@ function image_delete($node) {
 }
 
 /**
- * Implementation of hook_views_tables()
- */
-function image_views_tables() {
-  $tables['image'] = array(
-    'name' => 'node',
-    'fields' => array(
-      'nid' => array(
-        'name' => t('Image: Display Image'),
-        'handler' => array(
-          'image_views_handler_image_img' => t('Image'),
-          'image_views_handler_image_img_link' => t('Image with link'),
-        ),
-        'option' => array(
-          '#type' => 'select',
-          '#options' => 'image_views_handler_filter_image_size',
-        ),
-        'notafield' => true,
-        'sortable' => false,
-      ),
-    ),
-  );
-  return $tables;
-}
-
-/**
  * Create an <img> tag for an image.
  */
 function image_display(&$node, $label = IMAGE_PREVIEW, $attributes = array()) {
@@ -720,32 +699,6 @@ function image_get_latest($count = 1, $tid = 0) {
     $output[] = node_load(array('nid' => $nid->nid));
   }
   return $output;
-}
-
-/**
- * Views handler for displaying the image.
- */
-function image_views_handler_image_img($fieldinfo, $fielddata, $value, $data) {
-  $node = node_load($data->nid);
-  return image_display($node, $fielddata['options']);
-}
-
-/**
- * Views handler for displaying the image in a link to the the image node
- */
-function image_views_handler_image_img_link($fieldinfo, $fielddata, $value, $data) {
-  $node = node_load($data->nid);
-  return l(image_display($node, $fielddata['options']), "node/{$node->nid}", array(), NULL, NULL, FALSE, TRUE);
-}
-
-/**
- * Views - Generate a list of all the valid sizes that are available
- */
-function image_views_handler_filter_image_size($op) {
-  foreach (_image_get_sizes() as $key => $size) {
-    $a[$key] = $size['label'];
-  }
-  return $a;
 }
 
 /**
