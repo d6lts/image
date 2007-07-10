@@ -13,11 +13,33 @@ function image_imagemagick_info() {
  */
 function image_imagemagick_settings() {
   $form['#after_build'] = array('_image_imagemagick_build_version');
-  $form['image_imagemagick_convert'] = array(
+  
+  $form['imagemagick_binary'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('ImageMagick Binary'),
+    '#collapsible' => FALSE,
+    '#description' => t('ImageMagick is a standalone program used to manipulate images. To use it, it must be installed on your server and you need to know where it is located. If you are unsure of the exact path consult your ISP or server administrator.'),
+  );
+  $form['imagemagick_binary']['image_imagemagick_convert'] = array(
     '#type' => 'textfield',
     '#title' => t('Path to the "convert" binary'),
     '#default_value' => variable_get('image_imagemagick_convert', '/usr/bin/convert'),
     '#required' => TRUE,
+    '#description' => t('Specify the complete path to the ImageMagic <kbd>convert</kbd> binary. For example: <kbd>/usr/bin/convert</kbd> or <kbd>C:\Program Files\ImageMagick-6.3.4-Q16\convert.exe</kbd>'),
+  );
+
+  $form['imagemagick_options'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('ImageMagick Advanced Options'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#description' => t('These are advanced options for controling the ImageMagick. If you do not understand what these settings do you should not change them.'),
+  );
+  $form['imagemagick_options']['image_imagemagick_option_strip'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Strip the image of any profiles or comments'),
+    '#default_value' => variable_get('image_imagemagick_option_strip', 0),
+    '#description' => t('Checking this option may reduce file sizes by removing any color profiles or comments embedded in the image. <a href="!link">More information on -strip</a>', array('!link' => url('http://www.imagemagick.org/script/command-line-options.php#strip'))),
   );
   return $form;
 }
@@ -28,10 +50,9 @@ function _image_imagemagick_build_version($form, $form_element) {
     $valid = _image_imagemagick_check_path($form_element['image_imagemagick_convert'], 'image_imagemagick_convert');
     if ($valid) {
       _image_imagemagick_convert_exec('-version', $output, $errors);
-      $form['image_imagemagick_version'] = array(
+      $form['imagemagick_binary']['version'] = array(
         '#type' => 'item',
-        '#title' => t('Version'),
-        '#value' => '<pre>'. check_plain($output) .'</pre>',
+        '#value' => '<pre>'. check_plain(trim($output)) .'</pre>',
       );
     }
   }
@@ -81,6 +102,10 @@ function image_imagemagick_crop($source, $dest, $x, $y, $width, $height) {
  * Calls the convert executable with the specified filter
  */
 function _image_imagemagick_convert($source, $dest, $filter) {
+  if (variable_get('image_imagemagick_option_strip', 0)) {
+    $filter .= ' -strip ';
+  }
+
   $command = implode(' ', array(
     preg_replace("/[^A-Za-z0-9\!\.\-\+\040]/", '', $filter),
     escapeshellarg($source),
