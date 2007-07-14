@@ -2,7 +2,17 @@
 // $Id$
 
 function image_gallery_install() {
-  //Nothing to do.
+  // Nothing to do.
+}
+
+function image_gallery_uninstall() {
+  if ($vid = variable_get('image_gallery_nav_vocabulary', FALSE)) {
+    taxonomy_del_vocabulary($vid);
+  }
+
+  variable_del('image_images_per_page');
+  variable_del('image_gallery_nav_vocabulary');
+  variable_del('image_gallery_node_info');
 }
 
 function image_gallery_update_1() {

@@ -4,9 +4,15 @@
 /**
  * Installing and updating image.module.
  */
-
 function image_install() {
-  //Nothing to do.
+  // Nothing to do.
+}
+
+function image_uninstall() {
+  variable_del('image_max_upload_size');
+  variable_del('image_updated');
+  variable_del('image_default_path');
+  #variable_del('image_sizes');
 }
 
 /**
