@@ -68,7 +68,7 @@ function image_attach_form_alter($form_id, &$form) {
     _image_check_settings();
 
     $image_sizes = array(IMAGE_ATTACH_HIDDEN => t('<Hidden>'));
-    foreach (_image_get_sizes() as $key => $size) {
+    foreach (image_get_sizes() as $key => $size) {
       $image_sizes[$key] = $size['label'];
     }
     

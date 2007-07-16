@@ -328,7 +328,7 @@ function theme_image_gallery($galleries, $images) {
   drupal_add_css(drupal_get_path('module', 'image_gallery') .'/image_gallery.css');
 
   // We'll add height to keep thumbnails lined up.
-  $size = _image_get_sizes(IMAGE_THUMBNAIL);
+  $size = image_get_sizes(IMAGE_THUMBNAIL);
   $width = $size['width'];
   $height = $size['height'];
 

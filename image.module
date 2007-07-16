@@ -120,7 +120,7 @@ function image_admin_settings() {
     IMAGE_LINK_NEW => t('New window'),
   );
 
-  $sizes = _image_get_sizes();
+  $sizes = image_get_sizes();
   // Add some empty rows for user defined sizes.
   for ($i = count($sizes); $i < 6; $i++) {
     $sizes['new'. $i] = array(
@@ -315,7 +315,7 @@ function image_prepare(&$node, $field_name) {
 
     // Resize the original.
     $aspect_ratio = $image_info['height'] / $image_info['width'];
-    $original_size = _image_get_sizes(IMAGE_ORIGINAL, $aspect_ratio);
+    $original_size = image_get_sizes(IMAGE_ORIGINAL, $aspect_ratio);
     if (!empty($original_size['width']) && !empty($original_size['height'])) {
       $result = image_scale($file->filepath, $file->filepath, $original_size['width'], $original_size['height']);
       if ($result) {
@@ -361,7 +361,7 @@ function image_link($type, $node, $main = 0) {
 
   if ($type == 'node' && $node->type == 'image' && !$main) {
     $request = ($_GET['size']) ? $_GET['size'] : IMAGE_PREVIEW;
-    foreach (_image_get_sizes() as $key => $size) {
+    foreach (image_get_sizes() as $key => $size) {
       if ($size['link']) {
         // For smaller images some derivative images may not have been created.
         // The thumbnail and preview images will be equal to the original images
@@ -458,7 +458,7 @@ function image_form(&$node, &$param) {
   }
 
   $form['images']['#tree'] = TRUE;
-  foreach (_image_get_sizes() as $key => $size) {
+  foreach (image_get_sizes() as $key => $size) {
     if ($node->new_file) {
       $form['images'][$key] = array(
         '#type' => 'hidden',
@@ -513,7 +513,7 @@ function image_submit(&$node) {
  * Implementation of hook_view
  */
 function image_view($node, $teaser = 0, $page = 0) {
-  $sizes = _image_get_sizes();
+  $sizes = image_get_sizes();
   $size = IMAGE_PREVIEW;
   if (isset($_GET['size'])) {
     // Invalid size specified.
@@ -558,7 +558,7 @@ function image_load(&$node) {
  * Implementation of hook_insert
  */
 function image_insert($node) {
-  foreach (_image_get_sizes() as $key => $size_info) {
+  foreach (image_get_sizes() as $key => $size_info) {
     _image_insert($node, $key, $node->images[$key]);
   }
 }
@@ -567,7 +567,7 @@ function image_insert($node) {
  * Implementation of hook_update
  */
 function image_update($node) {
-  foreach (_image_get_sizes() as $key => $size) {
+  foreach (image_get_sizes() as $key => $size) {
     $old_file = db_fetch_object(db_query("SELECT fid, filepath FROM {files} WHERE filename='%s' AND nid=%d", $key, $node->nid));
 
     // This is a new image.
@@ -741,7 +741,7 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
   }
   $aspect_ratio = $image_info['height'] / $image_info['width'];
 
-  foreach (_image_get_sizes(NULL, $aspect_ratio) as $key => $size) {
+  foreach (image_get_sizes(NULL, $aspect_ratio) as $key => $size) {
     // Skip over the original.
     if ($key == IMAGE_ORIGINAL) {
       continue;
@@ -821,7 +821,7 @@ function _image_filename($filename, $label = IMAGE_ORIGINAL, $temp = FALSE) {
  *   If a $size parameter was specified and it cannot be found FALSE will be 
  *   returned.
  */
-function _image_get_sizes($size = NULL, $aspect_ratio = NULL) {
+function image_get_sizes($size = NULL, $aspect_ratio = NULL) {
   $defaults = array(
     IMAGE_ORIGINAL => array('width' => '', 'height' => '', 'label' => t('Original'), 'link' => IMAGE_LINK_SHOWN),
     IMAGE_THUMBNAIL => array('width' => 100, 'height' => 100, 'label' => t('Thumbnail'), 'link' => IMAGE_LINK_SHOWN),
@@ -856,9 +856,20 @@ function _image_get_sizes($size = NULL, $aspect_ratio = NULL) {
 }
 
 /**
+ * Helper function to preserve backwards compatibility. This has been
+ * deprecated in favor of image_get_sizes().
+ *
+ * @TODO: Remove this in a future version.
+ */
+function _image_get_sizes($size = NULL, $aspect_ratio = NULL) {
+  return image_get_sizes($size, $aspect_ratio);
+}
+
+
+/**
  * Is a given size a built-in, required size?
  * @param $size
- *   On of the keys in the array returned by _image_get_sizes().
+ *   One of the keys in the array returned by image_get_sizes().
  * @return boolean
  */
 function _image_is_required_size($size) {
@@ -949,7 +960,7 @@ function image_create_node_from($filepath, $title = NULL, $body = '', $taxonomy 
 
   // Resize the original.
   $aspect_ratio = $image_info['height'] / $image_info['width'];
-  $original_size = _image_get_sizes(IMAGE_ORIGINAL, $aspect_ratio);
+  $original_size = image_get_sizes(IMAGE_ORIGINAL, $aspect_ratio);
   if (!empty($original_size['width']) && !empty($original_size['height'])) {
     if (image_scale($file->filepath, $file->filepath, $original_size['width'], $original_size['height'])) {
       clearstatcache();
