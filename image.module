@@ -197,7 +197,8 @@ function image_settings_sizes_submit($form_id, &$form_values) {
     // Set a key for new rows.
     else if ($value['new']) {
       unset($form_values['image_sizes'][$key]);
-      $form_values['image_sizes'][$value['label']] = $value;
+      $new_key = drupal_strtolower(drupal_substr($value['label'], 0, 32));
+      $form_values['image_sizes'][$new_key] = $value;
     }
   }
   return system_settings_form_submit($form_id, $form_values);

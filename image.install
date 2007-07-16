@@ -51,9 +51,9 @@ function image_update_2() {
   if ($sizes) {
     $new_sizes = array(IMAGE_ORIGINAL => array('width' => '', 'height' => '', 'label' => t('Original')));
     foreach ($sizes as $size) {
-      $label = $size['label'];
-      $new_sizes[$label] = $size;
-      $new_sizes[$label]['label'] = drupal_ucfirst($label);
+      $key = drupal_strtolower($size['label']);
+      $size['label'] = drupal_ucfirst($size['label']);
+      $new_sizes[$key] = $size;
     }
     variable_set('image_sizes', $new_sizes);
   }
@@ -110,6 +110,45 @@ function image_update_4() {
 
   // Delete rows from {file_revisions} that don't have matching {files}. 
   $ret[] = update_sql("DELETE FROM {file_revisions} WHERE NOT EXISTS (SELECT * FROM {files} WHERE {files}.fid = {file_revisions}.fid)");
+
+  return $ret;
+}
+
+/**
+ * Make sure that everyone's size settings are in the right format.
+ */
+function image_update_5() {
+  $ret = array();
+
+  if ($old_sizes = variable_get('image_sizes', FALSE)) {
+    // Make sure all the required sizes are represented.
+    if (!isset($old_sizes[IMAGE_ORIGINAL])) {
+      drupal_set_message(t("The original image size was missing so no changes were made. See this <a href='!link'>image module issue</a> for more information. Include the following:<br /><pre>@old_sizes\n</pre>", array('!link' => url('http://drupal.org/node/158334'), '@old_sizes' => print_r($old_sizes, 1))), 'error');
+      return array();
+    }
+    // These sizes may already exist under incorrect keys. We'll put a default
+    // copy in that will either be overwritten by the existing version, or used
+    // if there isn't an existing version.
+    if (!isset($old_sizes[IMAGE_PREVIEW])) {
+      $old_sizes[IMAGE_PREVIEW] = array('width' => 640, 'height' => 640, 'label' => t('Preview'), 'link' => IMAGE_LINK_SHOWN);
+    }
+    if (!isset($old_sizes[IMAGE_THUMBNAIL])) {
+      $old_sizes[IMAGE_THUMBNAIL] = array('width' => 100, 'height' => 100, 'label' => t('Thumbnail'), 'link' => IMAGE_LINK_SHOWN);
+    }
+
+    $new_sizes = array();
+    foreach ($old_sizes as $old_key => $size) {
+      // Keys should be lowercase and less than 32 chars long.
+      $new_key = drupal_strtolower(drupal_substr($old_key, 0, 32));
+      // Update the files.
+      if ($new_key != $old_key) {
+        $ret[] = update_sql("UPDATE {files} f INNER JOIN {node} n ON f.nid = n.nid SET f.filename = '". db_escape_string($new_key) ."' WHERE n.type = 'image' AND filename = '". db_escape_string($old_key) ."'");
+      }
+      $new_sizes[$new_key] = $size;
+    }
+    // Save the sizes.
+    variable_set('image_sizes', $new_sizes);
+  }
 
   return $ret;
 }
