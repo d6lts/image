@@ -935,14 +935,26 @@ function image_create_node_from($filepath, $title = NULL, $body = '', $taxonomy 
     return FALSE;
   }
 
-  $file = new stdClass();
-  $file->filepath = realpath($filepath);
-  $file->filename = basename($file->filepath);
+  // Make sure we can copy the file into our temp directory.
+  $original_path = $filepath;
+  if (!file_copy($filepath, _image_filename($filepath, IMAGE_ORIGINAL, TRUE))) {
+    return FALSE;
+  }
 
+  // Resize the original image.
+  $aspect_ratio = $image_info['height'] / $image_info['width'];
+  $size = image_get_sizes(IMAGE_ORIGINAL, $aspect_ratio);
+  if (!empty($size['width']) && !empty($size['height'])) {
+    image_scale($filepath, $filepath, $size['width'], $size['height']);
+  }
+
+  // Build the node.
   $node = new stdClass();
   $node->type = 'image';
   $node->uid = $user->uid;
   $node->name = $user->name;
+  $node->title = isset($title) ? $title : basename($filepath);
+  $node->body = $body;
 
   // Set the node's defaults... (copied this from node and comment.module)
   $node_options = variable_get('node_options_'. $node->type, array('status', 'promote'));
@@ -954,26 +966,17 @@ function image_create_node_from($filepath, $title = NULL, $body = '', $taxonomy 
   if (module_exists('taxonomy')) {
     $node->taxonomy = $taxonomy;
   }
-  
-  $node->title = isset($title) ? $title : $file->filename;
-  $node->body = $body;
 
-  // Resize the original.
-  $aspect_ratio = $image_info['height'] / $image_info['width'];
-  $original_size = image_get_sizes(IMAGE_ORIGINAL, $aspect_ratio);
-  if (!empty($original_size['width']) && !empty($original_size['height'])) {
-    if (image_scale($file->filepath, $file->filepath, $original_size['width'], $original_size['height'])) {
-      clearstatcache();
-      $file->filesize = filesize($file->filepath);
-    }
-  }
-
-  $node->images[IMAGE_ORIGINAL] = $file->filepath;
-  _image_build_derivatives($node, TRUE);
   $node->new_file = TRUE;
+  $node->images[IMAGE_ORIGINAL] = $filepath;
+  _image_build_derivatives($node, TRUE);
 
+  // Save the node.
   $node = node_submit($node);
   node_save($node);
+
+  // Remove the original image now that the import has completed.
+  file_delete($original_path);
 
   return $node;
 }
