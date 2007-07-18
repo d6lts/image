@@ -283,9 +283,7 @@ function image_operations_rebuild($nids) {
   foreach ($nids as $nid) {
     if ($node = node_load($nid)) {
       if ($node->type == 'image') {
-        drupal_set_message(t("Rebuilding %node-title's resized images.", array('%node-title' => $node->title)));
-        _image_remove_derivatives($node);
-        _image_build_derivatives($node, FALSE);
+        $node->rebuild_images = TRUE;
         node_save($node);
       }
     }
@@ -295,10 +293,23 @@ function image_operations_rebuild($nids) {
 /**
  * Implementation of hook_prepare().
  */
-function image_prepare(&$node, $field_name) {
+function image_prepare(&$node, $field_name = NULL) {
+  // We need to be aware that a user may try to edit multiple image nodes at
+  // once. By using the $nid variable each node's files can be stored separately
+  // in the session.
+  $nid = ($node->nid) ? $node->nid : 'new_node';
+  // When you enter the edit view the first time we need to clear our files in
+  // session for this node. This is so if you upload a file, then decide you
+  // don't want it and reload the form (without posting), the files will be
+  // discarded.
+  if(count($_POST) == 0) {
+    unset($_SESSION['image_new_files'][$nid]);
+  }
+
   if (is_null($field_name)) {
     $field_name = 'image';
   }
+
   if ($file = file_check_upload($field_name)) {
     // Ensure the file is an image.
     $image_info = image_get_info($file->filepath);
@@ -334,11 +345,19 @@ function image_prepare(&$node, $field_name) {
 
     // We're good to go.
     $node->images[IMAGE_ORIGINAL] = $file->filepath;
+    $node->rebuild_images = FALSE;
     $node->new_file = TRUE;
 
     // Call hook to allow other modules to modify the original image.
     module_invoke_all('image_alter', $node, $file->filepath, IMAGE_ORIGINAL);
     _image_build_derivatives($node, TRUE);
+
+    // Store the new file into the session.
+    $_SESSION['image_new_files'][$nid] = $node->images;
+  }
+  // Reload new files uploaded in a previous preview.
+  else if (isset($_SESSION['image_new_files'][$nid])) {
+    $node->images = $_SESSION['image_new_files'][$nid];
   }
 }
 
@@ -423,15 +442,10 @@ function image_block($op = 'list', $delta = 0) {
   }
 }
 
-function image_form_add_thumbnail($form_id, $edit) {
-  if ($edit['images']['thumbnail']) {
-    $node = (object)($edit);
-    $form = array(
-      '#type' => 'item',
-      '#title' => t('Thumbnail'),
-      '#value' => image_display($node, IMAGE_THUMBNAIL),
-      '#weight' => -10,
-    );
+function image_form_add_thumbnail($form, $form_values) {
+  if ($form_values['images']['thumbnail']) {
+    $node = (object)($form_values);
+    $form['#value'] = image_display($node, IMAGE_THUMBNAIL);
   }
   return $form;
 }
@@ -453,25 +467,28 @@ function image_form(&$node, &$param) {
     '#default_value' => $node->title
   );
 
-  if ($node->new_file) {
-    $form['new_file'] = array('#type' => 'value', '#value' => TRUE);
-  }
-
   $form['images']['#tree'] = TRUE;
   foreach (image_get_sizes() as $key => $size) {
-    if ($node->new_file) {
-      $form['images'][$key] = array(
-        '#type' => 'hidden',
-        '#value' => $node->images[$key]
-      );
-    }
-    else {
-      $form['images'][$key] = array(
-        '#type' => 'hidden',
-        '#default_value' => $node->images[$key]
-      );
-    }
+    $form['images'][$key] = array(
+      '#type' => 'value',
+      '#value' => $node->images[$key]
+    );
   }
+
+  $form['thumbnail'] = array(
+    '#type' => 'item',
+    '#title' => t('Thumbnail'),
+    '#value' => image_display($node, IMAGE_THUMBNAIL),
+    '#weight' => -10,
+    '#after_build' => array('image_form_add_thumbnail'),
+  );
+
+  $form['rebuild_images'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Rebuild derivative images.'),
+    '#default_value' => FALSE,
+    '#description' => t('Check this to rebuild the derivative images for this node.'),
+  );
 
   $form['thumbnail']['#after_build'][] = 'image_form_add_thumbnail';
 
@@ -497,15 +514,19 @@ function image_form(&$node, &$param) {
 }
 
 function image_validate($node) {
-  if (empty($node->images[IMAGE_ORIGINAL])) {
+  $nid = ($node->nid) ? $node->nid : 'new_node';
+  if (!isset($node->images[IMAGE_ORIGINAL]) && !isset($_SESSION['image_new_files'][$nid])) {
     form_set_error('image', t('You must upload an image.'));
   }
 }
 
-function image_submit(&$node) {
-  if ($node->new_file) {
-    _image_remove_derivatives($node);
-    _image_build_derivatives($node, FALSE);
+function image_submit($node) {
+  $nid = ($node->nid) ? $node->nid : 'new_node';
+  if (isset($_SESSION['image_new_files'][$nid])) {
+    $node->new_file = TRUE;
+    $node->rebuild_images = FALSE;
+    $node->images = $_SESSION['image_new_files'][$nid];
+    unset($_SESSION['image_new_files'][$nid]);
   }
 }
 
@@ -539,10 +560,10 @@ function image_view($node, $teaser = 0, $page = 0) {
  * Implementation of hook_load
  */
 function image_load(&$node) {
-  $result = db_query("SELECT filename, filepath FROM {files} WHERE nid=%d", $node->nid);
   $node->images = array();
+  $result = db_query("SELECT i.image_size, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d", $node->nid);
   while ($file = db_fetch_object($result)) {
-    $node->images[$file->filename] = $file->filepath;
+    $node->images[$file->image_size] = $file->filepath;
   }
   // If the image is smaller than the thumbnail and prevew images, we just use
   // original image rather than creating new deriviatives.
@@ -558,24 +579,51 @@ function image_load(&$node) {
  * Implementation of hook_insert
  */
 function image_insert($node) {
-  foreach (image_get_sizes() as $key => $size_info) {
-    _image_insert($node, $key, $node->images[$key]);
-  }
+ _image_save($node);
 }
 
 /**
  * Implementation of hook_update
  */
 function image_update($node) {
-  foreach (image_get_sizes() as $key => $size) {
-    $old_file = db_fetch_object(db_query("SELECT fid, filepath FROM {files} WHERE filename='%s' AND nid=%d", $key, $node->nid));
+  if ($node->new_file || $node->rebuild_images) {
+    if ($node->new_file) {
+      // The derivative images were built during image_prepare() or 
+      // image_create_node_from() so all we need to do is remove the old images 
+      // save the derivatives with _image_save().
 
-    // This is a new image.
-    if (!isset($node->images[$key]) || $old_file->filepath != $node->images[$key]) {
-      file_delete(file_create_path($old_file->filepath));
-      db_query("DELETE FROM {files} WHERE fid = %d", $old_file->fid);
-      db_query("DELETE FROM {file_revisions} WHERE fid = %d", $old_file->fid);
-      _image_insert($node, $key, $node->images[$key]);
+      // Remove all the existing images. 
+      $result = db_query("SELECT f.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d", $node->nid);
+      while ($file = db_fetch_object($result)) {
+        file_delete(file_create_path($file->filepath));
+        db_query("DELETE FROM {files} WHERE fid = %d", $file->fid);
+      }
+      db_query("DELETE FROM {image} WHERE nid = %d", $node->nid); 
+
+      _image_save($node);
+    }
+    else if ($node->rebuild_images) {
+      // Find the original image.
+      $original_file = db_fetch_object(db_query("SELECT i.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d AND image_size = '%s'", $node->nid, IMAGE_ORIGINAL));
+
+      // Delete all but the original image.
+      $result = db_query("SELECT i.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d AND f.fid <> %d", $node->nid, $original_file->fid);
+      while ($file = db_fetch_object($result)) {
+        // Beware of derivative images that have the same path as the original.
+        if ($file->filepath != $original_file->filepath) {
+          file_delete(file_create_path($file->filepath));
+        }
+        db_query("DELETE FROM {files} WHERE fid = %d", $file->fid);
+        db_query("DELETE FROM {image} WHERE fid = %d", $file->fid);
+      }
+
+      _image_build_derivatives($node);
+      drupal_set_message(t('The derivative images for <a href="!link">%title</a> have been regenerated.', array('!link' => url('node/'. $node->nid), '%title' => $node->title)));
+      
+      // Save all but the original image.
+      $sizes = image_get_sizes();
+      unset($sizes[IMAGE_ORIGINAL]);
+      _image_save($node, array_keys($sizes));
     }
   }
 }
@@ -584,12 +632,12 @@ function image_update($node) {
  * Implementation of hook_delete.
  */
 function image_delete($node) {
-  $result = db_query('SELECT fid, filepath FROM {files} WHERE nid = %d', $node->nid);
+  $result = db_query('SELECT i.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d', $node->nid);
   while ($file = db_fetch_object($result)) {
     file_delete(file_create_path($file->filepath));
-    db_query("DELETE FROM {file_revisions} WHERE fid = %d", $file->fid);
+    db_query('DELETE FROM {files} WHERE fid = %d', $file->fid);
   }
-  db_query('DELETE FROM {files} WHERE nid = %d', $node->nid);
+  db_query("DELETE FROM {image} WHERE nid = %d", $node->nid);
 }
 
 /**
@@ -601,10 +649,8 @@ function image_display(&$node, $label = IMAGE_PREVIEW, $attributes = array()) {
       (!file_exists(file_create_path($node->images[$label])) ||
        filemtime(file_create_path($node->images[$label])) < variable_get('image_updated', 0)))
   {
-    _image_remove_derivatives($node);
-    _image_build_derivatives($node);
+    $node->rebuild_images = TRUE;
     node_save($node);
-    drupal_set_message(t('The image %title had missing derivative image which has been regenerated.', array('%title' => $node->title)));
   }
 
   if (empty($node->images[$label])) {
@@ -767,19 +813,6 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
   }
 }
 
-function _image_remove_derivatives($node) {
-  $original_file = db_fetch_object(db_query("SELECT * FROM {files} WHERE nid=%d AND filename = '%s'", $node->nid, IMAGE_ORIGINAL));
-  $result = db_query("SELECT * FROM {files} WHERE nid=%d AND fid <> %d", $node->nid, $original_file->fid);
-  while ($file = db_fetch_object($result)) {
-    // Never delete the original!
-    if ($file->filepath != $original_file->filepath) {
-      file_delete(file_create_path($file->filepath));
-    }
-  }
-  db_query("DELETE FROM {files} WHERE nid = %d AND fid <> %d", $node->nid, $original_file->fid);
-  db_query("DELETE FROM {file_revisions} WHERE vid = %d AND fid <> %d", $node->vid, $original_file->fid);
-}
-
 /**
  * Creates an image filename.
  */
@@ -877,33 +910,44 @@ function _image_is_required_size($size) {
 }
 
 /**
- * Moves temporary (working) images to the final directory and stores
- * relevant information in the files table
+ * Moves temporary images to the final directory and stores relevant 
+ * information in the image and files tables.
+ * 
+ * @param $node
+ *   The image node object.
+ * @param $sizes
+ *   Optional array of keys from image_get_sizes() to save the sizes of. If this is not provided then all sizes will be saved.
  */
-function _image_insert(&$node, $size, $image_path) {
-  // Make sure there's an image.
-  if (empty($image_path)) {
-    return;
+function _image_save(&$node, $sizes = NULL) {
+  if (!isset($sizes)) {
+    $sizes = array_keys(image_get_sizes());
   }
 
   $original_path = $node->images[IMAGE_ORIGINAL];
 
-  // Don't duplicate images when a derivative == _original
-  if (($size != IMAGE_ORIGINAL) && (realpath($image_path) == realpath($original_path))) {
-    return;
-  }
+  foreach ($sizes as $size) {
+    // Make sure there's an image.
+    if (empty($node->images[$size])) {
+      continue;
+    }
+    $image_path = $node->images[$size];
+    // Don't duplicate images when a derivative == _original
+    if ($size != IMAGE_ORIGINAL && $image_path == $original_path) {
+      continue;
+    }
 
-  if (file_move($image_path, _image_filename($original_path, $size))) {
-    // Update the node to reflect the actual filename, it may have been changed
-    // if a file of the same name already existed.
-    $node->images[$size] = $image_path;
+    if (file_move($image_path, _image_filename($original_path, $size))) {
+      // Update the node to reflect the actual filename, it may have been changed
+      // if a file of the same name already existed.
+      $node->images[$size] = $image_path;
 
-    $image_info = image_get_info($image_path);
-    $fid = db_next_id('{files}_fid');
-    db_query("INSERT INTO {files} (fid, nid, filename, filepath, filemime, filesize) VALUES (%d, %d, '%s', '%s', '%s', '%s')",
+      $image_info = image_get_info($image_path);
+      $fid = db_next_id('{files}_fid');
+      db_query("INSERT INTO {files} (fid, nid, filename, filepath, filemime, filesize) VALUES (%d, %d, '%s', '%s', '%s', '%s')",
              $fid, $node->nid, $size, $image_path, $image_info['mime_type'], $image_info['file_size']);
-    db_query("INSERT INTO {file_revisions} (fid, vid, description, list) VALUES (%d, %d, '%s', %d)",
-             $fid, $node->vid, '', 0);
+      db_query("INSERT INTO {image} (nid, image_size, fid) VALUES (%d, '%s', %d)",
+             $node->nid, $size, $fid);
+    }
   }
 }
 
