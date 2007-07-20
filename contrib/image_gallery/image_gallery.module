@@ -327,10 +327,7 @@ function _image_gallery_parent_select($tid, $title) {
 function theme_image_gallery($galleries, $images) {
   drupal_add_css(drupal_get_path('module', 'image_gallery') .'/image_gallery.css');
 
-  // We'll add height to keep thumbnails lined up.
   $size = image_get_sizes(IMAGE_THUMBNAIL);
-  $width = $size['width'];
-  $height = $size['height'];
 
   $content = '';
   if (count($galleries)) {
@@ -352,23 +349,9 @@ function theme_image_gallery($galleries, $images) {
   }
 
   if (!empty($images)) {
-    $height += 75;
     $content .= '<ul class="images">';
     foreach ($images as $image) {
-      $content .= '<li';
-      if ($image->sticky) {
-        $content .= ' class="sticky"';
-      }
-      $content .= " style='height : {$height}px; width : {$width}px;'>\n";
-      $content .= l(image_display($image, IMAGE_THUMBNAIL), 'node/'. $image->nid, array(), NULL, NULL, FALSE, TRUE);
-      $content .= '<h3>'. l($image->title, 'node/'. $image->nid) .'</h3>';
-      if (variable_get('image_gallery_node_info', 0)) {
-        $content .= '<div class="author">'. t('Posted by: !name', array('!name' => theme('username', $image))) ."</div>\n";
-        if ($image->created > 0) {
-          $content .= '<div class="date">'. format_date($image->created) ."</div>\n";
-        }
-      }
-      $content .= "</li>\n";
+      $content .= theme('image_gallery_img', $image, $size);
     }
     $content .= "</ul>\n";
   }
@@ -380,6 +363,29 @@ function theme_image_gallery($galleries, $images) {
   If (count($images) + count($galleries) == 0) {
       $content .= '<p class="count">'. format_plural(0, 'There is 1 image in this gallery', 'There are @count images in this gallery') ."</p>\n";
   }
+
+  return $content;
+}
+
+function theme_image_gallery_img($image, $size) {
+  $width = $size['width'];
+  // We'll add height to keep thumbnails lined up.
+  $height = $size['height'] + 75;
+
+  $content = '<li';
+  if ($image->sticky) {
+    $content .= ' class="sticky"';
+  }
+  $content .= " style='height : {$height}px; width : {$width}px;'>\n";
+  $content .= l(image_display($image, IMAGE_THUMBNAIL), 'node/'. $image->nid, array(), NULL, NULL, FALSE, TRUE);
+  $content .= '<h3>'. l($image->title, 'node/'. $image->nid) .'</h3>';
+  if (variable_get('image_gallery_node_info', 0)) {
+    $content .= '<div class="author">'. t('Posted by: !name', array('!name' => theme('username', $image))) ."</div>\n";
+    if ($image->created > 0) {
+      $content .= '<div class="date">'. format_date($image->created) ."</div>\n";
+    }
+  }
+  $content .= "</li>\n";
 
   return $content;
 }
