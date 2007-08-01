@@ -112,7 +112,7 @@ function image_gallery_term_path($term) {
 function image_gallery_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
   switch ($op) {
     case 'view':
-      if ($page && $node->type == 'image') {
+      if ($page && !$teaser && $node->type == 'image') {
         $vid = _image_gallery_get_vid();
         $terms = taxonomy_node_get_terms_by_vocabulary($node->nid, $vid);
         $term = array_pop($terms);
