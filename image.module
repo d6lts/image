@@ -544,13 +544,13 @@ function image_load(&$node) {
   while ($file = db_fetch_object($result)) {
     $node->images[$file->filename] = $file->filepath;
   }
-  // If the image is smaller than the thumbnail and prevew images, we just use
-  // original image rather than creating new deriviatives.
-  if (empty($node->images[IMAGE_THUMBNAIL])) {
-    $node->images[IMAGE_THUMBNAIL] = $node->images[IMAGE_ORIGINAL];
-  }
-  if (empty($node->images[IMAGE_PREVIEW])) {
-    $node->images[IMAGE_PREVIEW] = $node->images[IMAGE_ORIGINAL];
+  // If the original image is smaller than the desired dimensions for a size, 
+  // we don't bother creating a derivative image and just use the original
+  // instead. 
+  foreach (image_get_sizes() as $key => $size) {
+    if (empty($node->images[$key])) {
+      $node->images[$key] = $node->images[IMAGE_ORIGINAL];
+    }
   }
 }
 
