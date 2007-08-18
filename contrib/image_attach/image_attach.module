@@ -191,6 +191,13 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
       $image->name = $node->name;
       $image->created = $node->created;
       $image->type = 'image';
+      // Set the node's defaults... (copied this from node and comment.module)
+      $node_options = variable_get('node_options_image', array('status', 'promote'));
+      $image->status = in_array('status', $node_options);
+      $image->promote = in_array('promote', $node_options);
+      if (module_exists('comment')) {
+        $image->comment = variable_get('comment_image', COMMENT_NODE_READ_WRITE);
+      }
       image_prepare($image, 'image');
       if ($image->images) {
         if (empty($image->title)) {
@@ -376,6 +383,10 @@ function theme_image_attach_teaser($node) {
     drupal_add_css(drupal_get_path('module', 'image_attach') .'/image_attach.css');
 
     $image = node_load($node->iid);
+    if (!node_access('view', $image)) {
+      // If the image is restricted, don't show it as an attachment.
+      return NULL;
+    }
     $info = image_get_info(file_create_path($image->images[$img_size]));
 
     $output = '<div style="width: '. $info['width'] .'px" class="image-attach-teaser">';
@@ -396,6 +407,10 @@ function theme_image_attach_body($node) {
     drupal_add_css(drupal_get_path('module', 'image_attach') .'/image_attach.css');
 
     $image = node_load($node->iid);
+    if (!node_access('view', $image)) {
+      // If the image is restricted, don't show it as an attachment.
+      return NULL;
+    }
     $info = image_get_info(file_create_path($image->images[$img_size]));
 
     $output = '<div style="width: '. $info['width'] .'px" class="image-attach-body">';
