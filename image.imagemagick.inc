@@ -28,6 +28,19 @@ function image_imagemagick_settings() {
     '#description' => t('Specify the complete path to the ImageMagic <kbd>convert</kbd> binary. For example: <kbd>/usr/bin/convert</kbd> or <kbd>C:\Program Files\ImageMagick-6.3.4-Q16\convert.exe</kbd>'),
   );
 
+  $form['imagemagick_options'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('ImageMagick Advanced Options'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#description' => t('These are advanced options for controling the ImageMagick. If you do not understand what these settings do you should not change them.'),
+  );
+  $form['imagemagick_options']['image_imagemagick_option_strip'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Strip the image of any profiles or comments'),
+    '#default_value' => variable_get('image_imagemagick_option_strip', 0),
+    '#description' => t('Checking this option may reduce file sizes by removing any color profiles or comments embedded in the image. <a href="!link">More information on -strip</a>', array('!link' => url('http://www.imagemagick.org/script/command-line-options.php#strip'))),
+  );
   return $form;
 }
 
@@ -62,62 +75,39 @@ function _image_imagemagick_check_path($path, $attach_error_to = FALSE) {
 }
 
 /**
- * Invoke hook_imagemagick_alter().
- *
- * Implementors of hook_imagemagick_alter() should accept two parameters: $op
- * and &$args (passed by reference), which are described below.
- *
- * @param $op
- *   String with the operation: 'resize', 'crop', 'rotate'.
- * @param $args
- *   Array containing ImageMagick options.
- * @return
- *   Array of modified arguments.
- */
-function _image_imagemagick_alter_invoke($op, $args) {
-  foreach (module_implements('imagemagick_alter') as $module) {
-    $function = $module .'_imagemagick_alter'; 
-    $function($op, $args);
-  }
-  return $args;
-}
-
-/**
  * Resize an image to the given width and height.
  */
 function image_imagemagick_resize($source, $dest, $width, $height) {
-  $args = array('resize' => '-resize '. $width .'x'. $height .'!');
-  $args = _image_imagemagick_alter_invoke('resize', $args);
-  return _image_imagemagick_convert($source, $dest, $args);
+  $filter = ' -scale '. $width .'x'. $height .'! -filter QUADRATIC';
+  return _image_imagemagick_convert($source, $dest, $filter);
 }
 
 /**
  * Rotate an image.
  */
 function image_imagemagick_rotate($source, $dest, $degrees, $bg_color = 0x000000) {
-  $args = array(
-    'rotate' => '-rotate '. (float) $degrees,
-    'background' => '-background #'. str_pad(dechex($bg_color), 6, 0),
-  );
-  $args = _image_imagemagick_alter_invoke('rotate', $args);
-  return _image_imagemagick_convert($source, $dest, $args);
+  $filter = ' -rotate '. escapeshellarg($degrees) .' -background #'. str_pad(dechex($bg_color), 6, 0);
+  return _image_imagemagick_convert($source, $dest, $filter);
 }
 
 /**
  * Crop an image to the specified dimensions.
  */
 function image_imagemagick_crop($source, $dest, $x, $y, $width, $height) {
-  $args = array('crop' => '-crop '. $width .'x'. $height .'+'. $x .'+'. $y);
-  $args = _image_imagemagick_alter_invoke('crop', $args);
-  return _image_imagemagick_convert($source, $dest, $args);
+  $filter = ' -crop '. $width .'x'. $height .'+'. $x .'+'. $y;
+  return _image_imagemagick_convert($source, $dest, $filter);
 }
 
 /**
  * Calls the convert executable with the specified filter.
  */
-function _image_imagemagick_convert($source, $dest, $args) {
+function _image_imagemagick_convert($source, $dest, $filter) {
+  if (variable_get('image_imagemagick_option_strip', 0)) {
+    $filter .= ' -strip ';
+  }
+
   $command = implode(' ', array(
-    preg_replace("/[^A-Za-z0-9\!\.\-\+\_\/\040]/", '', implode(' ', $args)),
+    preg_replace("/[^A-Za-z0-9\!\.\-\+\040]/", '', $filter),
     escapeshellarg($source),
     escapeshellarg($dest),
   ));
