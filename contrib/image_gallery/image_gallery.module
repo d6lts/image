@@ -333,7 +333,7 @@ function theme_image_gallery($galleries, $images) {
   if (count($galleries)) {
     $content .= '<ul class="galleries">';
     foreach ($galleries as $gallery) {
-      $content .= '<li>';
+      $content .= '<li class="clear-block">';
       if ($gallery->count) {
         $content .= l(image_display($gallery->latest, IMAGE_THUMBNAIL), 'image/tid/'. $gallery->tid, array(), NULL, NULL, FALSE, TRUE);
       }
