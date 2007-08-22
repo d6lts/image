@@ -677,6 +677,13 @@ function image_display(&$node, $label = IMAGE_PREVIEW, $attributes = array()) {
   {
     $node->rebuild_images = TRUE;
     node_save($node);
+
+    // Log a notice for the admin and display a message to the user if they're
+    // be able to modify the node. 
+    watchdog('image', t('Missing derivative images were regenerated for %title.', array('%title' => $node->title)), WATCHDOG_NOTICE, l(t('view'), 'node/'. $node->nid));
+    if (image_access('update', $node)) {
+      drupal_set_message(t('Missing derivative images were regenerated for %title.', array('%title' => $node->title)));
+    }
   }
 
   if (empty($node->images[$label])) {
