@@ -202,3 +202,16 @@ function image_update_5200() {
 
   return $ret;
 }
+
+/**
+ * Updating image size settings to use scaling as the default operation.
+ */
+function image_update_5201() {
+  $sizes = _image_get_sizes();
+  foreach ($sizes as $key => $size) {
+    $sizes[$key]['operation'] = 'scale';
+  }
+  variable_set('image_sizes', $sizes);
+  
+  return array();
+}
