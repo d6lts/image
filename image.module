@@ -313,7 +313,7 @@ function image_prepare(&$node, $field_name = NULL) {
   if ($file = file_check_upload($field_name)) {
     // Ensure the file is an image.
     $image_info = image_get_info($file->filepath);
-    if (!$image_info || !isset($image_info['extension'])) {
+    if (!$image_info || empty($image_info['extension'])) {
       form_set_error($field_name, t('Uploaded file is not a valid image. Only JPG, PNG and GIF files are allowed.'));
       return;
     }
