@@ -343,15 +343,33 @@ function image_prepare(&$node, $field_name) {
 }
 
 /**
- * implement hook_file_download
+ * Implementation of hook_file_download().
+ *
+ * Note that in Drupal 5, the upload.module's hook_file_download() checks its
+ * permissions for all files in the {files} table. We store our file
+ * information in {files} if private files transfers are selected and the
+ * upload.module is enabled, users will the 'view uploaded files'permission to
+ * view images.
  */
-function image_file_download($file) {
-  $size = image_get_info(file_create_path($file));
-  if ($size) {
-    $headers = array('Content-Type: '. $size['mime_type']);
-    return $headers;
-  }
-}
+function image_file_download($filename) {
+  $filepath = file_create_path($filename);
+  $result = db_query("SELECT f.nid, f.filename, f.filesize, f.filemime FROM {files} f WHERE f.filepath = '%s'", $filepath);
+  if ($file = db_fetch_object($result)) {
+    // If it's not an original anyone with 'view' permission on the node can
+    // see the image. If it's an original they also need to have
+    // 'view original images' permissions.
+    if ($file->filename != IMAGE_ORIGINAL || user_access('view original images')) {
+      $node = node_load($file->nid);
+      if (node_access('view', $node)) {
+        return array(
+          'Content-Type: '. mime_header_encode($file->filemime),
+          'Content-Length: '. (int) $file->filesize,
+        );
+      }
+    }
+    return -1;
+   }
+ }
 
 /**
  * Implementation of hook_link.
