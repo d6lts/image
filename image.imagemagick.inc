@@ -2,14 +2,14 @@
 // $Id$
 
 /**
- * Return information about the imagemagick toolkit
+ * Return information about the imagemagick toolkit.
  */
 function image_imagemagick_info() {
   return array('name' => 'imagemagick', 'title' => 'ImageMagick Toolkit.');
 }
 
 /**
- * Validate and return toolkit specific settings
+ * Validate and return toolkit specific settings.
  */
 function image_imagemagick_settings() {
   $form['#after_build'] = array('_image_imagemagick_build_version');
@@ -64,20 +64,22 @@ function _image_imagemagick_check_path($path, $attach_error_to = FALSE) {
 /**
  * Invoke hook_imagemagick_alter().
  *
- * Implementors of hook_imagemagick_alter() should accept two parameters: $op
- * and &$args (passed by reference), which are described below.
+ * Implementors of hook_imagemagick_alter() should accept three parameters: $op,
+ * $filepath and &$args (passed by reference), which are described below.
  *
  * @param $op
  *   String with the operation: 'resize', 'crop', 'rotate'.
+ * @param $filepath
+ *   String containing the path to the image that is being processed.
  * @param $args
  *   Array containing ImageMagick options.
  * @return
  *   Array of modified arguments.
  */
-function _image_imagemagick_alter_invoke($op, $args) {
+function _image_imagemagick_alter_invoke($op, $filepath, $args) {
   foreach (module_implements('imagemagick_alter') as $module) {
     $function = $module .'_imagemagick_alter'; 
-    $function($op, $args);
+    $function($op, $filepath, $args);
   }
   return $args;
 }
@@ -87,7 +89,7 @@ function _image_imagemagick_alter_invoke($op, $args) {
  */
 function image_imagemagick_resize($source, $dest, $width, $height) {
   $args = array('resize' => '-resize '. $width .'x'. $height .'!');
-  $args = _image_imagemagick_alter_invoke('resize', $args);
+  $args = _image_imagemagick_alter_invoke('resize', $source, $args);
   return _image_imagemagick_convert($source, $dest, $args);
 }
 
@@ -99,7 +101,7 @@ function image_imagemagick_rotate($source, $dest, $degrees, $bg_color = 0x000000
     'rotate' => '-rotate '. (float) $degrees,
     'background' => '-background #'. str_pad(dechex($bg_color), 6, 0),
   );
-  $args = _image_imagemagick_alter_invoke('rotate', $args);
+  $args = _image_imagemagick_alter_invoke('rotate', $source, $args);
   return _image_imagemagick_convert($source, $dest, $args);
 }
 
@@ -108,7 +110,7 @@ function image_imagemagick_rotate($source, $dest, $degrees, $bg_color = 0x000000
  */
 function image_imagemagick_crop($source, $dest, $x, $y, $width, $height) {
   $args = array('crop' => '-crop '. $width .'x'. $height .'+'. $x .'+'. $y);
-  $args = _image_imagemagick_alter_invoke('crop', $args);
+  $args = _image_imagemagick_alter_invoke('crop', $source, $args);
   return _image_imagemagick_convert($source, $dest, $args);
 }
 
