@@ -82,7 +82,7 @@ function image_admin_settings() {
   $form['#submit'] = array('image_settings_sizes_submit' => array());
   $form['image_updated'] = array(
     '#type' => 'hidden',
-    '#value' => time(),
+    '#value' => variable_get('image_updated', time()),
   );
 
   $form['paths'] = array(
@@ -167,10 +167,6 @@ function image_admin_settings() {
       '#default_value' => $size['link'],
       '#options' => $link_options,
     );
-    $form['image_sizes'][$key]['new'] = array(
-      '#type' => 'value',
-      '#value' => isset($size['new']) ? $size['new'] : FALSE,
-    );
   }
 
   return system_settings_form($form);
@@ -196,18 +192,50 @@ function image_settings_sizes_validate(&$form) {
  * indexes for new sizes.
  */
 function image_settings_sizes_submit($form_id, &$form_values) {
-  foreach ($form_values['image_sizes'] as $key => $value) {
-    // Remove rows with no label.
-    if (empty($value['label'])) {
+  $old_sizes = image_get_sizes();
+
+  // If the size's operation, or dimensions change we need to rebuild.
+  $rebuild = FALSE;
+
+  foreach ($form_values['image_sizes'] as $key => $size) {
+    // Changed to the original setting only affect new images and they
+    // shouldn't be able to add or remove it.
+    if ($key == IMAGE_ORIGINAL) {
+      continue;
+    }
+
+    // Remove sizes without labels.
+    if (empty($size['label'])) {
       unset($form_values['image_sizes'][$key]);
     }
-    // Set a key for new rows.
-    else if ($value['new']) {
-      unset($form_values['image_sizes'][$key]);
-      $new_key = drupal_strtolower(drupal_substr($value['label'], 0, 32));
-      $form_values['image_sizes'][$new_key] = $value;
+
+    // Check if only one is set, indicating an addition or removal.
+    if (isset($form_values['image_sizes'][$key]) ^ isset($old_sizes[$key])) {
+      $rebuild |= TRUE;
+
+      // When adding a new size, we need to assign a key.
+      if (isset($form_values['image_sizes'][$key])) {
+        unset($form_values['image_sizes'][$key]);
+        $new_key = drupal_strtolower(drupal_substr($size['label'], 0, 32));
+        $form_values['image_sizes'][$new_key] = $size;
+      }
+    }
+    // Check for changes.
+    else if (isset($form_values['image_sizes'][$key]) && isset($old_sizes[$key])) {
+      // Did the operation, height or width change?
+      foreach (array('operation', 'height', 'width') as $field) {
+        $rebuild |= ($form_values['image_sizes'][$key][$field] != $old_sizes[$key][$field]);
+      }
     }
   }
+
+  // If we've changed anything update the image_update variable so the
+  // derivative images are rebuilt.
+  if ($rebuild) {
+    drupal_set_message(t('Changes to the images sizes mean that the derivative images will need to be regenerated.'));
+    $form_values['image_updated'] = time();
+  }
+
   return system_settings_form_submit($form_id, $form_values);
 }
 
