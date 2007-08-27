@@ -49,7 +49,7 @@ function image_im_advanced_form_alter($form_id, &$form) {
       '#type' => 'textfield',
       '#title' => t('Strip metadata from images at this size and below'),
       '#default_value' => $options['strip'],
-      '#description' => t('You may choose to strip all metadata, such as camera information and color profiles, from the processed images in order to reduce their file size. Please choose at what maximum size you want images to be stripped of their metadata. Example: "150x150". Enter "0x0" to disable this feature. <a href="!link">More information on -strip</a>', array('!link' => url('http://www.imagemagick.org/script/command-line-options.php#strip'))),
+      '#description' => t('You may choose to strip all metadata, such as camera information and color profiles, from the processed images in order to reduce their file size. Please choose at what maximum size you want images to be stripped of their metadata. Example: "150x150". Enter "0x0" to disable this feature. This option requires ImageMagick 6.0.0 or higher. <a href="!link">More information on -strip</a>', array('!link' => url('http://www.imagemagick.org/script/command-line-options.php#strip'))),
     );
     $form['image_im_advanced_options']['colorspace'] = array(
       '#type' => 'select',
