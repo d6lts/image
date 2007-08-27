@@ -55,8 +55,8 @@ function image_im_advanced_form_alter($form_id, &$form) {
       '#type' => 'select',
       '#title' => t('Convert colorspace'),
       '#default_value' => $options['colorspace'],
-      '#options' => array(0 => '<None>', 'RGB' => 'RGB', 'Gray' => 'Gray'),
-      '#description' => t('This option lets you convert images to the specified colorspace. <a href="!link">More information on -colorspace</a>', array('!link' => url('http://www.imagemagick.org/script/command-line-options.php#colorspace'))),
+      '#options' => array(0 => t('<None>'), 'RGB' => t('RGB'), 'GRAY' => t('Gray')),
+      '#description' => t('This option lets you convert images to the specified colorspace. This will be overridden by the Color profile option, if used. <a href="!link">More information on -colorspace</a>', array('!link' => url('http://www.imagemagick.org/script/command-line-options.php#colorspace'))),
     );
     $form['image_im_advanced_options']['density'] = array(
       '#type' => 'checkbox',
@@ -180,6 +180,12 @@ function image_im_advanced_imagemagick_alter($op, $filepath, &$args) {
     $args['profile'] = '-profile ' . $options['profile']['path'];
   }
 
+  // Assign a color space. Skip this if a color profile has been provided,
+  // as it will be more accurate.
+  if ($options['colorspace'] && !isset($args['profile'])) {
+    $args['colorspace'] = ' -colorspace '. $options['colorspace'];
+  }
+
   // Determine if the -strip parameter should be used.
   list($strip_width, $strip_height) = explode('x', $options['strip']);
   if ((int) $width <= (int) $strip_width && (int) $height <= (int) $strip_height) {
@@ -191,11 +197,6 @@ function image_im_advanced_imagemagick_alter($op, $filepath, &$args) {
     if (empty($args['quality']) && $options['jpeg_quality']) {
       $args['quality'] = '-quality ' . $options['jpeg_quality'];
     }
-  }
-
-  // Convert the colorspace.
-  if ($options['colorspace']) {
-    $args['colorspace'] = ' -colorspace '. $options['colorspace'];
   }
 
   // Change image density (this doesn't affect the image dimensions/resolution).
