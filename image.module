@@ -338,7 +338,7 @@ function image_prepare(&$node, $field_name = NULL) {
   // session for this node. This is so if you upload a file, then decide you
   // don't want it and reload the form (without posting), the files will be
   // discarded.
-  if(count($_POST) == 0) {
+  if (count($_POST) == 0) {
     unset($_SESSION['image_new_files'][$nid]);
   }
 
@@ -865,7 +865,7 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
           // Depending on the operation, the image will be scaled or resized & cropped
           case 'scale':
             $status = image_scale($original_path, $destination, $size['width'], $size['height']);
- 	        break;
+            break;
 
           case 'scale_crop':
             // This is based on Drupal 6's image_scale_and_crop(). Scales the

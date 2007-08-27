@@ -46,7 +46,8 @@ function image_update_1() {
           $old_file = '';
           if (file_exists($old_image->$old)) {
             $old_file = $old_image->$old;
-          } else {
+          }
+          else {
             $old_file = file_create_path($old_image->$old);
           }
           if ($old_file && $old_image->$old != '' && db_num_rows(db_query("SELECT fid FROM {files} WHERE nid=%d and filename='%s'", $old_image->nid, $new)) == 0) {
@@ -108,7 +109,8 @@ function image_update_4() {
       if (db_result(db_query("SELECT COUNT(*) FROM {files} f INNER JOIN {node} n ON f.nid = n.nid WHERE n.type = 'image' AND filepath = '%s' AND fid <> %d", $file->filepath, $file->fid))) {
         $ret[] = update_sql("DELETE FROM {files} WHERE fid = ". (int)$file->fid);
         $ret[] = update_sql("DELETE FROM {file_revisions} WHERE fid = ". (int)$file->fid);
-      } else {
+      }
+      else {
         $ret[] = update_sql("UPDATE {files} SET filepath = '". db_escape_string($file->filepath) ."' WHERE fid = ". (int)$file->fid);
       }
     }
