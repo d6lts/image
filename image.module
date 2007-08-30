@@ -889,7 +889,7 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
         module_invoke_all('image_alter', $node, $destination, $key);
       }
       else {
-        $node->images[$key] = NULL;
+        $node->images[$key] = $original_path;
       }
     }
   }
