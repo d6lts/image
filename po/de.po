@@ -94,7 +94,7 @@ msgstr "Bild"
 msgid ""
 "An image (with thumbnail). This is ideal for publishing photographs or "
 "screenshots."
-msgstr "Bild (mit Vorschaubild). Ideal für Fotos oder Grafiken."
+msgstr "Bild (mit Miniaturansicht). Ideal für Fotos oder Grafiken."
 
 #: image.module:86
 msgid "File paths"
@@ -189,7 +189,7 @@ msgstr "Bildeinstellungen"
 
 #: image.module:266
 msgid "Rebuild image thumbnails"
-msgstr "Vorschaubilder neu erstellen"
+msgstr "Miniaturansichten neu erstellen"
 
 #: image.module:277
 msgid "Rebuilding %node-title's resized images."
@@ -228,7 +228,7 @@ msgstr "Zufälliges Bild"
 
 #: image.module:417;850
 msgid "Thumbnail"
-msgstr "Vorschaubild"
+msgstr "Miniaturansicht"
 
 #: image.module:469
 msgid "Click \"Browse...\" to select an image to upload."
