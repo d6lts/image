@@ -188,8 +188,9 @@ function image_settings_sizes_validate(&$form) {
 
 /**
  * Make changes to the settings before passing them off to
- * system_settings_form_submit(). Remove deleted sizes and use the label as
- * indexes for new sizes.
+ * system_settings_form_submit().
+ *
+ * Remove deleted sizes, and use the label as indexes for new sizes.
  */
 function image_settings_sizes_submit($form_id, &$form_values) {
   $old_sizes = image_get_sizes();
@@ -320,7 +321,7 @@ function image_operations_rebuild($nids) {
     if ($node = node_load($nid)) {
       if ($node->type == 'image') {
         $node->rebuild_images = TRUE;
-        node_save($node);
+        image_update($node);
       }
     }
   }
@@ -499,6 +500,7 @@ function image_block($op = 'list', $delta = 0) {
 function image_form_add_thumbnail($form, $form_values) {
   if ($form_values['images']['thumbnail']) {
     $node = (object)($form_values);
+    $form['#title'] = t('Thumbnail');
     $form['#value'] = image_display($node, IMAGE_THUMBNAIL);
   }
   return $form;
@@ -531,8 +533,6 @@ function image_form(&$node, &$param) {
 
   $form['thumbnail'] = array(
     '#type' => 'item',
-    '#title' => t('Thumbnail'),
-    '#value' => image_display($node, IMAGE_THUMBNAIL),
     '#weight' => -10,
     '#after_build' => array('image_form_add_thumbnail'),
   );
@@ -543,8 +543,6 @@ function image_form(&$node, &$param) {
     '#default_value' => FALSE,
     '#description' => t('Check this to rebuild the derivative images for this node.'),
   );
-
-  $form['thumbnail']['#after_build'][] = 'image_form_add_thumbnail';
 
   $form['#attributes'] = array("enctype" => "multipart/form-data");
   $form['image'] = array(
@@ -614,18 +612,56 @@ function image_view($node, $teaser = 0, $page = 0) {
  * Implementation of hook_load
  */
 function image_load(&$node) {
-  $node->images = array();
   $result = db_query("SELECT i.image_size, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d", $node->nid);
+  $node->images = array();
   while ($file = db_fetch_object($result)) {
-    $node->images[$file->image_size] = $file->filepath;
+    $node->images[$file->image_size] = file_create_path($file->filepath);
   }
-  // If the original image is smaller than the desired dimensions for a size, 
-  // we don't bother creating a derivative image and just use the original
-  // instead. 
-  foreach (image_get_sizes() as $key => $size) {
+
+  $original_path = $node->images[IMAGE_ORIGINAL];
+  if (empty($original_path)) {
+    // There's no original image, we're in trouble...
+    return;
+  }
+  $node->rebuild_images = FALSE;
+
+  // Figure out which sizes should have been generated.
+  $all_sizes = image_get_sizes();
+  unset($all_sizes[IMAGE_ORIGINAL]);
+  $needed_sizes = array_keys(image_get_derivative_sizes($original_path));
+  $unneeded_sizes = array_diff(array_keys($all_sizes), $needed_sizes);
+
+  // Derivative sizes that are larger than the original get set to the 
+  // original.
+  foreach ($unneeded_sizes as $key) {
     if (empty($node->images[$key])) {
-      $node->images[$key] = $node->images[IMAGE_ORIGINAL];
+      $node->images[$key] = $original_path;
+    } 
+    else {
+      // Need to remove an extra derivative image in the database.
+      drupal_set_message(t("%title's has an unneeded %key derivative images. The derivatives will be rebuilt to remove it.", array('%title' => $node->title, '%key' => $key)));
+      $node->rebuild_images = TRUE;
     }
+  }
+
+  // Check that the derivative images are present and current.
+  foreach ($needed_sizes as $key) {
+    // If the file is missing or created after the last change to the sizes,
+    // rebuild the derivatives.
+    if (empty($node->images[$key]) || !file_exists($node->images[$key])) {
+      drupal_set_message(t("%title's %key derivative image %filepath was missing. The derivatives will be rebuilt to regenerate it.", array('%title' => $node->title, '%key' => $key, '%filepath' => $node->images[$key])));
+      $node->rebuild_images = TRUE; 
+    }
+    else if (filemtime($node->images[$key]) < variable_get('image_updated', 0)) {
+      drupal_set_message(t("%title's %key derivative image had a timestamp (%filetime) that predates the last changes to the image size settings (%vartime). The derivatives will be rebuilt to regenerate it.", array('%title' => $node->title, '%key' => $key, '%filetime' => format_date(filemtime($node->images[$key])), '%vartime' => format_date(variable_get('image_updated', 0)))));
+      $node->rebuild_images = TRUE;
+    }
+  }
+
+  // Correct any problems with the derivative images.
+  if ($node->rebuild_images) {
+    image_update($node);
+    watchdog('image', t('Derivative images were regenerated for %title.', array('%title' => $node->title)), WATCHDOG_NOTICE, l(t('view'), 'node/'. $node->nid));
   }
 }
 
@@ -633,18 +669,42 @@ function image_load(&$node) {
  * Implementation of hook_insert
  */
 function image_insert($node) {
- _image_save($node);
+  // Derivative images that aren't needed are set to the original file. Make
+  // note of the current path before calling _image_insert() because if it's
+  // in the temp directory it'll be moved. We'll need it later to determine
+  // which derivative images need to be saved with _image_insert().
+  $original_path = $node->images[IMAGE_ORIGINAL];
+
+  // Save the original first so that it if it's moved the derivatives are
+  // placed in the correct directory.
+  _image_insert($node, IMAGE_ORIGINAL, $original_path);
+
+  $sizes = image_get_derivative_sizes($node->images[IMAGE_ORIGINAL]);
+  foreach ($sizes as $key => $size_info) {
+    if (!empty($node->images[$key]) && $node->images[$key] != $original_path) {
+      _image_insert($node, $key, $node->images[$key]);
+    }
+  }
 }
 
 /**
  * Implementation of hook_update
+ *
+ * Take $node by reference so we can use this to save the node after
+ * rebuilding derivatives.
  */
-function image_update($node) {
+function image_update(&$node) {
   if ($node->new_file || $node->rebuild_images) {
+    // Derivative images that aren't needed are set to the original file. Make
+    // note of the current path before calling _image_insert() because if it's
+    // in the temp directory it'll be moved. We'll need it later to determine
+    // which derivative images need to be saved with _image_insert().
+    $original_path = $node->images[IMAGE_ORIGINAL];
+
     if ($node->new_file) {
       // The derivative images were built during image_prepare() or 
-      // image_create_node_from() so all we need to do is remove the old images 
-      // save the derivatives with _image_save().
+      // image_create_node_from() so all we need to do is remove all the old,
+      // existing images.
 
       // Remove all the existing images. 
       $result = db_query("SELECT f.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d", $node->nid);
@@ -652,9 +712,11 @@ function image_update($node) {
         file_delete(file_create_path($file->filepath));
         db_query("DELETE FROM {files} WHERE fid = %d", $file->fid);
       }
-      db_query("DELETE FROM {image} WHERE nid = %d", $node->nid); 
+      db_query("DELETE FROM {image} WHERE nid = %d", $node->nid);
 
-      _image_save($node);
+      // Save the original first so that it if it's moved the derivatives are
+      // placed in the correct directory.
+      _image_insert($node, IMAGE_ORIGINAL, $original_path);
     }
     else if ($node->rebuild_images) {
       // Find the original image.
@@ -671,13 +733,23 @@ function image_update($node) {
         db_query("DELETE FROM {image} WHERE fid = %d", $file->fid);
       }
 
-      _image_build_derivatives($node);
-      drupal_set_message(t('The derivative images for <a href="!link">%title</a> have been regenerated.', array('!link' => url('node/'. $node->nid), '%title' => $node->title)));
-      
-      // Save all but the original image.
-      $sizes = image_get_sizes();
-      unset($sizes[IMAGE_ORIGINAL]);
-      _image_save($node, array_keys($sizes));
+      _image_build_derivatives($node, FALSE);
+
+      // Display a message to the user if they're be able to modify the node
+      // (this might have been called as part of a rebuild by a visitor).
+      if (image_access('update', $node)) {
+        drupal_set_message(t('The derivative images for <a href="!link">%title</a> have been regenerated.', array('!link' => url('node/'. $node->nid), '%title' => $node->title)));
+      }
+
+      // Clear the flag so that we don't some how rebuild the images twice.
+      $node->rebuild_images = FALSE;
+    }
+
+    $sizes = image_get_derivative_sizes($node->images[IMAGE_ORIGINAL]);
+    foreach ($sizes as $key => $size_info) {
+      if (!empty($node->images[$key]) && $node->images[$key] != $original_path) {
+        _image_insert($node, $key, $node->images[$key]);
+      }
     }
   }
 }
@@ -698,22 +770,6 @@ function image_delete($node) {
  * Create an <img> tag for an image.
  */
 function image_display(&$node, $label = IMAGE_PREVIEW, $attributes = array()) {
-  // regenerate images?
-  if ($node->images[$label] != $node->images[IMAGE_ORIGINAL] &&
-      (!file_exists(file_create_path($node->images[$label])) ||
-       filemtime(file_create_path($node->images[$label])) < variable_get('image_updated', 0)))
-  {
-    $node->rebuild_images = TRUE;
-    node_save($node);
-
-    // Log a notice for the admin and display a message to the user if they're
-    // be able to modify the node. 
-    watchdog('image', t('Missing derivative images were regenerated for %title.', array('%title' => $node->title)), WATCHDOG_NOTICE, l(t('view'), 'node/'. $node->nid));
-    if (image_access('update', $node)) {
-      drupal_set_message(t('Missing derivative images were regenerated for %title.', array('%title' => $node->title)));
-    }
-  }
-
   if (empty($node->images[$label])) {
     return;
   }
@@ -833,6 +889,40 @@ function _image_check_settings() {
 }
 
 /**
+ * Determine which sizes of derivative images need to be built for this image.
+ *
+ * @param $image_path
+ *   String file path to the image.
+ * @return
+ *   Returns a subset of image_get_sizes()'s results depending on what
+ *   derivative images are needed.
+ */
+function image_get_derivative_sizes($image_path) {
+  $sizes = array();
+
+  // Can't do much if we can't read the image.
+  if (!$image_info = image_get_info($image_path)) {
+    return $sizes;
+  }
+
+  $all_sizes = image_get_sizes(NULL, $image_info['height'] / $image_info['width']);
+  foreach ($all_sizes as $key => $size) {
+    // We don't want to include the original.
+    if ($key == IMAGE_ORIGINAL) {
+      continue;
+    }
+
+    // If the original isn't bigger than the requested size then there's no
+    // need to resize it.
+    if ($image_info['width'] > $size['width'] || $image_info['height'] > $size['height']) {
+      $sizes[$key] = $size;
+    }
+  }
+
+  return $sizes;
+}
+
+/**
  * Generate image derivatives.
  */
 function _image_build_derivatives(&$node, $temp = FALSE) {
@@ -842,56 +932,48 @@ function _image_build_derivatives(&$node, $temp = FALSE) {
   }
   $original_path = file_create_path($node->images[IMAGE_ORIGINAL]);
 
-  // If we can't find our original image, we can not proceed.
-  if (!$image_info = image_get_info($original_path)) {
-    return FALSE;
+  // Figure out which sizes we need to generate.
+  $all_sizes = image_get_sizes();
+  $needed_sizes = image_get_derivative_sizes($original_path);
+  $unneeded_sizes = array_diff(array_keys($all_sizes), array_keys($needed_sizes));
+
+  // Images that don't need a derivative image get set to the original.
+  foreach ($unneeded_sizes as $key) {
+    $node->images[$key] = $original_path;
   }
-  $aspect_ratio = $image_info['height'] / $image_info['width'];
 
-  foreach (image_get_sizes(NULL, $aspect_ratio) as $key => $size) {
-    // Skip over the original.
-    if ($key == IMAGE_ORIGINAL) {
-      continue;
+  // Resize for the necessary sizes.
+  $image_info = image_get_info($original_path);
+  foreach ($needed_sizes as $key => $size) {
+    $destination = _image_filename($original_path, $key, $temp);
+
+    $status = FALSE;
+    switch ($size['operation']) {
+      // Depending on the operation, the image will be scaled or resized & cropped
+      case 'scale':
+        $status = image_scale($original_path, $destination, $size['width'], $size['height']);
+        break;
+
+      case 'scale_crop':
+        // This is based on Drupal 6's image_scale_and_crop(). Scales the
+        // image so that the image's smaller dimension matches the
+        // requested size and the crops any overlap on the image's larger
+        // dimension.
+        $scale = max($size['width'] / $image_info['width'], $size['height'] / $image_info['height']);
+        $x = round(($image_info['width'] * $scale - $size['width']) / 2);
+        $y = round(($image_info['height'] * $scale - $size['height']) / 2);
+        if (image_resize($original_path, $destination, $image_info['width'] * $scale, $image_info['height'] * $scale)) {
+          $status = image_crop($destination, $destination, $x, $y, $size['width'], $size['height']);
+        }
+        break;
     }
 
-    if (!empty($size['width']) && !empty($size['height'])) {
-      $destination = _image_filename($original_path, $key, $temp);
-
-      // If the original isn't bigger than the requested size then there's no
-      // need to resize it.
-      if ($image_info['width'] > $size['width'] || $image_info['height'] > $size['height']) {
-        $status = FALSE;
-        switch ($size['operation']) {
-          // Depending on the operation, the image will be scaled or resized & cropped
-          case 'scale':
-            $status = image_scale($original_path, $destination, $size['width'], $size['height']);
-            break;
-
-          case 'scale_crop':
-            // This is based on Drupal 6's image_scale_and_crop(). Scales the
-            // image so that the image's smaller dimension matches the
-            // requested size and the crops any overlap on the image's larger
-            // dimension.  
-            $scale = max($size['width'] / $image_info['width'], $size['height'] / $image_info['height']);
-            $x = round(($image_info['width'] * $scale - $size['width']) / 2);
-            $y = round(($image_info['height'] * $scale - $size['height']) / 2);
-            if (image_resize($original_path, $destination, $image_info['width'] * $scale, $image_info['height'] * $scale)) {
-              $status = image_crop($destination, $destination, $x, $y, $size['width'], $size['height']);
-            }
-            break;
-        }
-
-        if (!$status) {
-          drupal_set_message(t('Unable to create scaled %label image', array('%label' => $size['label'])), 'error');
-          return FALSE;
-        }
-        $node->images[$key] = $destination;
-        module_invoke_all('image_alter', $node, $destination, $key);
-      }
-      else {
-        $node->images[$key] = $original_path;
-      }
+    if (!$status) {
+      drupal_set_message(t('Unable to create scaled %label image', array('%label' => $size['label'])), 'error');
+      return FALSE;
     }
+    $node->images[$key] = $destination;
+    module_invoke_all('image_alter', $node, $destination, $key);
   }
 }
 
@@ -992,44 +1074,22 @@ function _image_is_required_size($size) {
 }
 
 /**
- * Moves temporary images to the final directory and stores relevant 
- * information in the image and files tables.
- * 
- * @param $node
- *   The image node object.
- * @param $sizes
- *   Optional array of keys from image_get_sizes() to save the sizes of. If this is not provided then all sizes will be saved.
+ * Moves temporary (working) images to the final directory and stores
+ * relevant information in the files table
  */
-function _image_save(&$node, $sizes = NULL) {
-  if (!isset($sizes)) {
-    $sizes = array_keys(image_get_sizes());
-  }
-
+function _image_insert(&$node, $size, $image_path) {
   $original_path = $node->images[IMAGE_ORIGINAL];
+  if (file_move($image_path, _image_filename($original_path, $size))) {
+    // Update the node to reflect the actual filename, it may have been changed
+    // if a file of the same name already existed.
+    $node->images[$size] = $image_path;
 
-  foreach ($sizes as $size) {
-    // Make sure there's an image.
-    if (empty($node->images[$size])) {
-      continue;
-    }
-    $image_path = $node->images[$size];
-    // Don't duplicate images when a derivative == _original
-    if ($size != IMAGE_ORIGINAL && $image_path == $original_path) {
-      continue;
-    }
-
-    if (file_move($image_path, _image_filename($original_path, $size))) {
-      // Update the node to reflect the actual filename, it may have been changed
-      // if a file of the same name already existed.
-      $node->images[$size] = $image_path;
-
-      $image_info = image_get_info($image_path);
-      $fid = db_next_id('{files}_fid');
-      db_query("INSERT INTO {files} (fid, nid, filename, filepath, filemime, filesize) VALUES (%d, %d, '%s', '%s', '%s', '%s')",
+    $image_info = image_get_info($image_path);
+    $fid = db_next_id('{files}_fid');
+    db_query("INSERT INTO {files} (fid, nid, filename, filepath, filemime, filesize) VALUES (%d, %d, '%s', '%s', '%s', '%s')",
              $fid, $node->nid, $size, $image_path, $image_info['mime_type'], $image_info['file_size']);
-      db_query("INSERT INTO {image} (nid, image_size, fid) VALUES (%d, '%s', %d)",
+    db_query("INSERT INTO {image} (nid, image_size, fid) VALUES (%d, '%s', %d)",
              $node->nid, $size, $fid);
-    }
   }
 }
 
