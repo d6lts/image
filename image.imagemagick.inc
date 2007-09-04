@@ -27,6 +27,12 @@ function image_imagemagick_settings() {
     '#required' => TRUE,
     '#description' => t('Specify the complete path to the ImageMagic <kbd>convert</kbd> binary. For example: <kbd>/usr/bin/convert</kbd> or <kbd>C:\Program Files\ImageMagick-6.3.4-Q16\convert.exe</kbd>'),
   );
+  $form['imagemagick_binary']['image_imagemagick_debugging'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display debugging information'),
+    '#default_value' => variable_get('image_imagemagick_debugging', 0),
+    '#description' => t('Checking this option will display the ImageMagick commands and ouput to users with the <em>administer site configuration</em> permission.'),
+  );
 
   $form['imagemagick_options'] = array(
     '#type' => 'fieldset',
@@ -149,8 +155,12 @@ function _image_imagemagick_convert_exec($command_args, &$output, &$errors) {
       $errors .= fgets($pipes[2]);
     }
 
-    #drupal_set_message(t("ImageMagick command: %command", array('%command' => $convert_path .' '. $command_args)));
-    #drupal_set_message(t("ImageMagick output: %output", array('%output' => $output)));
+    // Display debugging information to authorized users.
+    if (variable_get('image_imagemagick_debugging', FALSE) && user_access('administer site configuration')) {
+      drupal_set_message(t("ImageMagick command: @command", array('@command' => $convert_path .' '. $command_args)));
+      drupal_set_message(t("ImageMagick output: @output", array('@output' => $output)));
+    }
+
     if ($errors) {
       drupal_set_message(t("ImageMagick reported an error: %error", array('%error' => $errors)), 'error');
     }
