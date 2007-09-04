@@ -84,7 +84,7 @@ function _image_imagemagick_check_path($path, $attach_error_to = FALSE) {
  * Resize an image to the given width and height.
  */
 function image_imagemagick_resize($source, $dest, $width, $height) {
-  $filter = ' -scale '. $width .'x'. $height .'! -filter QUADRATIC';
+  $filter = ' -scale '. (int) $width .'x'. (int) $height .'! -filter QUADRATIC';
   return _image_imagemagick_convert($source, $dest, $filter);
 }
 
@@ -100,7 +100,7 @@ function image_imagemagick_rotate($source, $dest, $degrees, $bg_color = 0x000000
  * Crop an image to the specified dimensions.
  */
 function image_imagemagick_crop($source, $dest, $x, $y, $width, $height) {
-  $filter = ' -crop '. $width .'x'. $height .'+'. $x .'+'. $y;
+  $filter = ' -crop '. (int) $width .'x'. (int) $height .'+'. (int) $x .'+'. (int) $y;
   return _image_imagemagick_convert($source, $dest, $filter);
 }
 
