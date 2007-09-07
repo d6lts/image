@@ -144,7 +144,10 @@ function image_gallery_page($type = NULL, $tid = 0) {
     $galleries[$i]->count = taxonomy_term_count_nodes($galleries[$i]->tid, 'image');
     $tree = taxonomy_get_tree(_image_gallery_get_vid(), $galleries[$i]->tid, -1);
     $descendant_tids = array_merge(array($galleries[$i]->tid), array_map('_taxonomy_get_tid_from_term', $tree));
-    $last = db_fetch_object(db_query_range(db_rewrite_sql('SELECT n.nid FROM {node} n INNER JOIN {term_node} tn ON n.nid = tn.nid WHERE tn.tid IN (%s) AND n.status = 1 ORDER BY n.sticky DESC, n.created DESC'), implode(',', $descendant_tids), 0, 1));
+    // The values of $descendant_tids should be safe for raw inclusion in the
+    // SQL since they're all loaded from integer fields in the database.
+    $sql = 'SELECT n.nid FROM {node} n INNER JOIN {term_node} tn ON n.nid = tn.nid WHERE tn.tid IN ('. implode(',', $descendant_tids) .') AND n.status = 1 ORDER BY n.sticky DESC, n.created DESC';
+    $last = db_fetch_object(db_query_range(db_rewrite_sql($sql), 0, 1));
     $galleries[$i]->latest = node_load(array('nid' => $last->nid));
   }
 
