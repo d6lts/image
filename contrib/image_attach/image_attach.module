@@ -152,7 +152,7 @@ function image_attach_form_alter($form_id, &$form) {
       else {
         $form['image_attach']['iid'] = array(
           '#type' => 'hidden',
-          $value => $node->iid
+          '#value' => $node->iid
         );
       }
       $form['image_attach']['image'] = array(
