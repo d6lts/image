@@ -126,14 +126,14 @@ function image_attach_form_alter($form_id, &$form) {
         '#title' => t('Attached Images'),
         '#collapsible' => TRUE,
         '#collapsed' => !$node->iid
-        );
+      );
       if ($node->iid) {
         $image = node_load($node->iid);
         $form['image_attach']['image_thumbnail'] = array(
           '#type' => 'item',
           '#title' => t('Thumbnail'),
           '#value' => image_display($image, 'thumbnail')
-          );
+        );
       }
       if (variable_get('image_attach_existing', 1) && user_access('access content')) {
         $form['image_attach']['iid'] = array(
@@ -152,7 +152,7 @@ function image_attach_form_alter($form_id, &$form) {
       else {
         $form['image_attach']['iid'] = array(
           '#type' => 'hidden',
-          '#value' => $node->iid
+          $value => $node->iid
         );
       }
       $form['image_attach']['image'] = array(
