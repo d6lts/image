@@ -384,12 +384,15 @@ function image_file_download($filename) {
   $filepath = file_create_path($filename);
   $result = db_query("SELECT f.nid, f.filename, f.filesize, f.filemime FROM {files} f WHERE f.filepath = '%s'", $filepath);
   if ($file = db_fetch_object($result)) {
-    // If it's not an original anyone with 'view' permission on the node can
-    // see the image. If it's an original they also need to have
-    // 'view original images' permissions.
-    if ($file->filename != IMAGE_ORIGINAL || user_access('view original images')) {
-      $node = node_load($file->nid);
-      if (node_access('view', $node)) {
+    $node = node_load($file->nid);
+    if (node_access('view', $node)) {
+      // The user either needs to have 'view original images' permission or
+      // the path must be listed for something other than the node's original
+      // size. This will be the case when the orignal is smaller than a 
+      // derivative size.
+      $images = $node->images;
+      unset($images[IMAGE_ORIGINAL]);
+      if (user_access('view original images') || in_array($filepath, $images)) {
         return array(
           'Content-Type: '. mime_header_encode($file->filemime),
           'Content-Length: '. (int) $file->filesize,
