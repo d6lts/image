@@ -2,14 +2,14 @@
 // $Id$
 
 /**
- * Return information about the imagemagick toolkit
+ * Return information about the imagemagick toolkit.
  */
 function image_imagemagick_info() {
   return array('name' => 'imagemagick', 'title' => 'ImageMagick Toolkit.');
 }
 
 /**
- * Validate and return toolkit specific settings
+ * Validate and return toolkit specific settings.
  */
 function image_imagemagick_settings() {
   $form['#after_build'] = array('_image_imagemagick_build_version');
@@ -32,20 +32,6 @@ function image_imagemagick_settings() {
     '#title' => t('Display debugging information'),
     '#default_value' => variable_get('image_imagemagick_debugging', 0),
     '#description' => t('Checking this option will display the ImageMagick commands and ouput to users with the <em>administer site configuration</em> permission.'),
-  );
-
-  $form['imagemagick_options'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('ImageMagick Advanced Options'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-    '#description' => t('These are advanced options for controling the ImageMagick. If you do not understand what these settings do you should not change them.'),
-  );
-  $form['imagemagick_options']['image_imagemagick_option_strip'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Strip the image of any profiles or comments'),
-    '#default_value' => variable_get('image_imagemagick_option_strip', 0),
-    '#description' => t('Checking this option may reduce file sizes by removing any color profiles or comments embedded in the image. <a href="!link">More information on -strip</a>', array('!link' => url('http://www.imagemagick.org/script/command-line-options.php#strip'))),
   );
   return $form;
 }
@@ -81,39 +67,64 @@ function _image_imagemagick_check_path($path, $attach_error_to = FALSE) {
 }
 
 /**
+ * Invoke hook_imagemagick_alter().
+ *
+ * Implementors of hook_imagemagick_alter() should accept three parameters: $op,
+ * $filepath and &$args (passed by reference), which are described below.
+ *
+ * @param $op
+ *   String with the operation: 'resize', 'crop', 'rotate'.
+ * @param $filepath
+ *   String containing the path to the image that is being processed.
+ * @param $args
+ *   Array containing ImageMagick options.
+ * @return
+ *   Array of modified arguments.
+ */
+function _image_imagemagick_alter_invoke($op, $filepath, $args) {
+  foreach (module_implements('imagemagick_alter') as $module) {
+    $function = $module .'_imagemagick_alter'; 
+    $function($op, $filepath, $args);
+  }
+  return $args;
+}
+
+/**
  * Resize an image to the given width and height.
  */
 function image_imagemagick_resize($source, $dest, $width, $height) {
-  $filter = ' -scale '. (int) $width .'x'. (int) $height .'! -filter QUADRATIC';
-  return _image_imagemagick_convert($source, $dest, $filter);
+  $args = array('resize' => '-resize '. (int) $width .'x'. (int) $height .'!');
+  $args = _image_imagemagick_alter_invoke('resize', $source, $args);
+  return _image_imagemagick_convert($source, $dest, $args);
 }
 
 /**
  * Rotate an image.
  */
 function image_imagemagick_rotate($source, $dest, $degrees, $bg_color = 0x000000) {
-  $filter = ' -rotate '. escapeshellarg($degrees) .' -background #'. str_pad(dechex($bg_color), 6, 0);
-  return _image_imagemagick_convert($source, $dest, $filter);
+  $args = array(
+    'rotate' => '-rotate '. (float) $degrees,
+    'background' => '-background #'. str_pad(dechex($bg_color), 6, 0),
+  );
+  $args = _image_imagemagick_alter_invoke('rotate', $source, $args);
+  return _image_imagemagick_convert($source, $dest, $args);
 }
 
 /**
  * Crop an image to the specified dimensions.
  */
 function image_imagemagick_crop($source, $dest, $x, $y, $width, $height) {
-  $filter = ' -crop '. (int) $width .'x'. (int) $height .'+'. (int) $x .'+'. (int) $y;
-  return _image_imagemagick_convert($source, $dest, $filter);
+  $args = array('crop' => '-crop '. (int) $width .'x'. (int) $height .'+'. (int) $x .'+'. (int) $y);
+  $args = _image_imagemagick_alter_invoke('crop', $source, $args);
+  return _image_imagemagick_convert($source, $dest, $args);
 }
 
 /**
  * Calls the convert executable with the specified filter.
  */
-function _image_imagemagick_convert($source, $dest, $filter) {
-  if (variable_get('image_imagemagick_option_strip', 0)) {
-    $filter .= ' -strip ';
-  }
-
+function _image_imagemagick_convert($source, $dest, $args) {
   $command = implode(' ', array(
-    preg_replace("/[^A-Za-z0-9\!\.\-\+\040]/", '', $filter),
+    preg_replace("/[^A-Za-z0-9\!\.\-\+\_\/\040]/", '', implode(' ', $args)),
     escapeshellarg($source),
     escapeshellarg($dest),
   ));
