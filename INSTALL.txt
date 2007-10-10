@@ -57,3 +57,9 @@ ImageMagick toolkit installation instructions
 
     Once enabled, this module will add more conversion options at: 
     Administer > Site configuration > Image toolkit
+
+suPHP notes
+
+1.) If suPHP is used, either use the private download method or change the
+    umask in /etc/suphp.conf to be 0000, as opposed to 0077. Please be aware
+    of the security repercussions in doing this.
