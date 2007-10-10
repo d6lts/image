@@ -152,7 +152,7 @@ function image_attach_form_alter($form_id, &$form) {
       else {
         $form['image_attach']['iid'] = array(
           '#type' => 'hidden',
-          '#value' => $node->iid
+          $value => $node->iid
         );
       }
       $form['image_attach']['image'] = array(
@@ -186,33 +186,35 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
   }
   switch ($op) {
     case 'prepare':
-      $image->title = $_POST['image_title'];
-      $image->uid = $node->uid;
-      $image->name = $node->name;
-      $image->created = $node->created;
-      $image->type = 'image';
-      // Set the node's defaults... (copied this from node and comment.module)
-      $node_options = variable_get('node_options_image', array('status', 'promote'));
-      $image->status = in_array('status', $node_options);
-      $image->promote = in_array('promote', $node_options);
-      if (module_exists('comment')) {
-        $image->comment = variable_get('comment_image', COMMENT_NODE_READ_WRITE);
-      }
-      image_prepare($image, 'image');
-      if ($image->images) {
-        if (empty($image->title)) {
-          $image->title = basename($image->images[IMAGE_ORIGINAL]);
+      if (file_check_upload('image')) {
+        $image->title = $_POST['image_title'];
+        $image->uid = $node->uid;
+        $image->name = $node->name;
+        $image->created = $node->created;
+        $image->type = 'image';
+        // Set the node's defaults... (copied this from node and comment.module)
+        $node_options = variable_get('node_options_image', array('status', 'promote'));
+        $image->status = in_array('status', $node_options);
+        $image->promote = in_array('promote', $node_options);
+        if (module_exists('comment')) {
+          $image->comment = variable_get('comment_image', COMMENT_NODE_READ_WRITE);
         }
-        node_validate($image);
-        if (!form_get_errors()) {
-          $image = node_submit($image);
-          node_save($image);
-          $node->iid = $image->nid;
-          $node->new_image = TRUE;
+        image_prepare($image, 'image');
+        if ($image->images) {
+          if (empty($image->title)) {
+            $image->title = basename($image->images[IMAGE_ORIGINAL]);
+          }
+          node_validate($image);
+          if (!form_get_errors()) {
+            $image = node_submit($image);
+            node_save($image);
+            $node->iid = $image->nid;
+            $node->new_image = TRUE;
+          }
         }
       }
-      elseif (variable_get('image_attach_existing', 1) && $_POST['iid']) {
-        $node->iid = $_POST['iid'];
+      elseif (!empty($_POST['iid'])) {
+        $node->iid = (int) $_POST['iid'];
       }
       break;
 
