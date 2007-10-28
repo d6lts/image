@@ -114,7 +114,7 @@ function image_imagemagick_rotate($source, $dest, $degrees, $bg_color = 0x000000
  * Crop an image to the specified dimensions.
  */
 function image_imagemagick_crop($source, $dest, $x, $y, $width, $height) {
-  $args = array('crop' => '-crop '. (int) $width .'x'. (int) $height .'+'. (int) $x .'+'. (int) $y);
+  $args = array('crop' => '-crop '. (int) $width .'x'. (int) $height .'+'. (int) $x .'+'. (int) $y .'!');
   $args = _image_imagemagick_alter_invoke('crop', $source, $args);
   return _image_imagemagick_convert($source, $dest, $args);
 }
