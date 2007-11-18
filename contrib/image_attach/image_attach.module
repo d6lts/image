@@ -60,6 +60,66 @@ function image_attach_admin_settings() {
 }
 
 /**
+ * Implementation of hook_block().
+ */
+function image_attach_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks[0] = array(
+        'info'       => t('Attached Images'),
+        'status'     => TRUE,
+        'weight'     => 0,
+        'visibility' => 1,
+        'pages'      => 'node/*',
+      );
+      return $blocks;
+
+    case 'view':
+      if ($delta == 0) {
+        if (arg(0) == 'node' && is_numeric(arg(1))) {
+          $node = node_load(arg(1));
+          if ($node->iid) {
+            $image = node_load($node->iid);
+            if (node_access('view', $image)) {
+              $img = image_display($image, variable_get('image_attach_block_0_size', IMAGE_THUMBNAIL));
+              return array(
+                'subject' => t('Attached Images'),
+                'content' => l($img, "node/$node->iid", array(), NULL, NULL, FALSE, TRUE),
+              );
+            }
+          }
+        }
+      }
+      break;
+
+    case 'configure':
+      if ($delta == 0) {
+        $image_sizes = array();
+        foreach (image_get_sizes() as $key => $size) {
+          $image_sizes[$key] = $size['label'];
+        }
+        $form['image_attach_block_0_size'] = array(
+          '#type' => 'select',
+          '#title' => t('Image size'),
+          '#default_value' => variable_get('image_attach_block_0_size', IMAGE_THUMBNAIL),
+          '#options' => $image_sizes,
+          '#description' => t("This determines the size of the image that appears in the block."),
+        );
+        return $form;
+      }
+      break;
+
+    case 'save':
+      if ($delta == 0) {
+        variable_set('image_attach_block_0_size', $edit['image_attach_block_0_size']);
+      }
+      break;
+  }
+}
+
+
+
+/**
  * implementation of hook_form_alter()
  */
 function image_attach_form_alter($form_id, &$form) {
