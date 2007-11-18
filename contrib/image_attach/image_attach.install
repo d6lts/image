@@ -27,6 +27,7 @@ function image_attach_install() {
 function image_attach_uninstall() {
   db_query('DROP TABLE {image_attach}');
   variable_del('image_attach_existing');
+  variable_del('image_attach_block_0_size');
 }
 
 /**
