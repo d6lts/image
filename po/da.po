@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Danish translation of Drupal (image.module) $Id$\n"
 "POT-Creation-Date: 2005-05-16 17:12-0300\n"
-"PO-Revision-Date: 2007-09-12 11:35+0100\n"
+"PO-Revision-Date: 2007-12-07 13:34+0100\n"
 "Last-Translator: Morten Wulff <wulff@ratatosk.net>\n"
 "Language-Team: Danish <l10nh@drupaldanmark.dk>\n"
 "MIME-Version: 1.0\n"
@@ -38,60 +38,61 @@ msgstr "Hvis debug-information"
 msgid "Checking this option will display the ImageMagick commands and ouput to users with the <em>administer site configuration</em> permission."
 msgstr "Vis ImageMagick kommandoer og output til brugere med tilladelsen <em>administrer indstillinger</em>."
 
-#: image.imagemagick.inc:39
-msgid "ImageMagick Advanced Options"
-msgstr "ImageMagick advanced valg"
-
-#: image.imagemagick.inc:42
-msgid "These are advanced options for controling the ImageMagick. If you do not understand what these settings do you should not change them."
-msgstr "Avancerede indstillinger for ImageMagick. Du bør ikke ændre indstillingerne med mindre du er vant til at bruge ImageMagick."
-
-#: image.imagemagick.inc:46
-msgid "Strip the image of any profiles or comments"
-msgstr "Fjern farveprofiler og kommentarer fra billede"
-
-#: image.imagemagick.inc:48
-msgid "Checking this option may reduce file sizes by removing any color profiles or comments embedded in the image. <a href=\"!link\">More information on -strip</a>"
-msgstr "Du kan reducere filstørrelsen ved at fjerne farveprofiler og kommentarer, der er indlejret i billedet. <a href=\"!link\">Yderligere information om -strip</a>."
-
-#: image.imagemagick.inc:74
+#: image.imagemagick.inc:60
 msgid "No file %file could be found. PHP's <a href='!open-basedir'>open_basedir</a> security resriction is set to %open-basedir, which may be interfearing with the attempts to locate ImageMagick."
 msgstr "Kan ikke finde filen %file. PHP's <a href='!open-basedir'>open_basedir</a> sikkerhedsindstilling er sat til %open-basedir, hvilket kan gøre det umuligt at finde ImageMagick."
 
-#: image.imagemagick.inc:77
+#: image.imagemagick.inc:63
 msgid "The specified ImageMagic path %file does not exist."
 msgstr "Stien %file til ImageMagick findes ikke."
 
-#: image.imagemagick.inc:130
+#: image.imagemagick.inc:141
 msgid "ImageMagick could not be found. The admin will need to set the path on the <a href='@image-toolkit-settings'>image toolkit page</a>."
 msgstr "Kan ikke finde ImageMagick. Administrator skal angive placeringen under <a href='@image-toolkit-settings'>billedværktøjer</a>."
 
-#: image.imagemagick.inc:160
+#: image.imagemagick.inc:171
 msgid "ImageMagick command: @command"
 msgstr "ImageMagick kommando: @command"
 
-#: image.imagemagick.inc:161
+#: image.imagemagick.inc:172
 msgid "ImageMagick output: @output"
 msgstr "ImageMagick output: @output"
 
-#: image.imagemagick.inc:165
+#: image.imagemagick.inc:176
 msgid "ImageMagick reported an error: %error"
 msgstr "ImageMagick fejl: %error"
 
-#: views.inc:12
-msgid "Image: Display Image"
-msgstr "Image: Vis billede"
-
-#: views.inc:14
-#: image.module:42
-#: ;261;273;528 image.info:0
-#: ;0
+#: image.info:0
+#: ;0 image.module:42
+#: ;261;273;531 views.inc:14
 msgid "Image"
 msgstr "Billede"
 
-#: views.inc:15
-msgid "Image with link"
-msgstr "Billede med link"
+#: image.info:0
+msgid "Allows uploading, resizing and viewing of images."
+msgstr "Gør det muligt at overføre og vise billeder."
+
+#: image.install:53
+#: image.module:973
+msgid "Original"
+msgstr "Original"
+
+#: image.install:128
+msgid ""
+"The original image size was missing so no changes were made. See this <a href='!link'>image module issue</a> for more information. Include the following:<br /><pre>@old_sizes\n"
+"</pre>"
+msgstr "Kan ikke finde den originale billedstørrelser, så der er ikke foretaget nogen ændringer. Se denne <a href='!link'>fejlrapport</a> for yderligere information. Inkluder følgende information: <br /><pre>@old_sizes</pre>"
+
+#: image.install:135
+#: image.module:975
+msgid "Preview"
+msgstr "Eksempel"
+
+#: image.install:138
+#: image.module:481
+#: ;974
+msgid "Thumbnail"
+msgstr "Miniature"
 
 #: image.module:22
 msgid "The image module is used to create and administer images for your site. Each image is stored as a post, with thumbnails of the original generated automatically. There are two default thumbnail sizes, thumbnail and preview. The thumbnail size is shown as the preview for image posts and when browsing image galleries. The preview is the default size when first displaying an image node."
@@ -196,7 +197,7 @@ msgid "Link"
 msgstr "Link"
 
 #: image.module:266
-#: ;637;0
+#: ;640;0
 msgid "image"
 msgstr "billede"
 
@@ -224,58 +225,43 @@ msgstr "Det originale billede er blevet skaleret for at kunne passe til den maks
 msgid "The image you uploaded was too big. You are only allowed upload files less than %max_size but your file was %file_size."
 msgstr "Det overførte billeder er for stort. Du kan højst overføre billeder på %max_size, men din fil er %file_size."
 
-#: image.module:450
-#: ;459
+#: image.module:453
+#: ;462
 msgid "Latest image"
 msgstr "Seneste billede"
 
-#: image.module:451
-#: ;464
+#: image.module:454
+#: ;467
 msgid "Random image"
 msgstr "Tilfældigt billede"
 
-#: image.module:478
-#: ;971 image.install:138
-msgid "Thumbnail"
-msgstr "Miniature"
-
-#: image.module:530
+#: image.module:533
 msgid "Click \"Browse...\" to select an image to upload."
 msgstr "Klik på \"Gennemse...\" for at overføre et billede."
 
-#: image.module:548
+#: image.module:551
 msgid "You must upload an image."
 msgstr "Du skal uploade et billede."
 
-#: image.module:637
+#: image.module:640
 msgid "Derivative images were regenerated for %title."
 msgstr "Afledte billede genopbygget ffor %title."
 
-#: image.module:637
+#: image.module:640
 msgid "view"
 msgstr "vis"
 
-#: image.module:711
+#: image.module:714
 msgid "The derivative images for <a href=\"!link\">%title</a> have been regenerated."
 msgstr "Afledte billeder for <a href=\"!link\">%title</a> genopbygget."
 
-#: image.module:855
+#: image.module:858
 msgid "No image toolkit is currently enabled. Without one the image module will not be able to resize your images. You can select one from the <a href=\"!link\">image toolkit settings page</a>."
 msgstr "Ingen billedværktøjskasse aktiveret. Uden en værktøjskasse kan modulet ikke skalere billederne. Du kan vælge en værktøjskasse under <a href=\"!link\">indstillinger for billedværktøjskasse</a>."
 
-#: image.module:919
+#: image.module:922
 msgid "Unable to create scaled %label image"
 msgstr "Kan ikke oprette skaleret billede %label"
-
-#: image.module:970
-#: image.install:53
-msgid "Original"
-msgstr "Original"
-
-#: image.module:972
-#: image.install:135
-msgid "Preview"
-msgstr "Eksempel"
 
 #: image.module:53
 msgid "create images"
@@ -293,13 +279,11 @@ msgstr "rediger egne billeder"
 msgid "edit images"
 msgstr "rediger billeder"
 
-#: image.install:128
-msgid ""
-"The original image size was missing so no changes were made. See this <a href='!link'>image module issue</a> for more information. Include the following:<br /><pre>@old_sizes\n"
-"</pre>"
-msgstr "Kan ikke finde den originale billedstørrelser, så der er ikke foretaget nogen ændringer. Se denne <a href='!link'>fejlrapport</a> for yderligere information. Inkluder følgende information: <br /><pre>@old_sizes</pre>"
+#: views.inc:12
+msgid "Image: Display Image"
+msgstr "Image: Vis billede"
 
-#: image.info:0
-msgid "Allows uploading, resizing and viewing of images."
-msgstr "Gør det muligt at overføre og vise billeder."
+#: views.inc:15
+msgid "Image with link"
+msgstr "Billede med link"
 
