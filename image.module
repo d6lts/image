@@ -411,13 +411,13 @@ function image_file_download($filename) {
   $filepath = file_create_path($filename);
   $result = db_query("SELECT i.nid, f.filemime, f.filesize FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE f.filepath = '%s'", $filepath);
   if ($file = db_fetch_object($result)) {
-    $node = node_load($file->nid);
+    $node = node_load(array('type' => 'image', 'nid' => $file->nid));
     if (node_access('view', $node)) {
       // The user either needs to have 'view original images' permission or
       // the path must be listed for something other than the node's original
       // size. This will be the case when the orignal is smaller than a 
       // derivative size.
-      $images = $node->images;
+      $images = (array) $node->images;
       unset($images[IMAGE_ORIGINAL]);
       if (user_access('view original images') || in_array($filepath, $images)) {
         return array(
