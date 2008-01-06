@@ -112,3 +112,55 @@ function image_views_handler_filter_image_size($op) {
   return $a;
 }
 
+/**
+ * Implementation of hook_views_style_plugins()
+ */
+function image_views_style_plugins() {
+  $items['image_gallery'] = array(
+    'name' => t('Image: Gallery'),
+    'theme' => 'image_gallery_view',
+    'validate' => 'views_ui_plugin_validate_list',
+    'needs_fields' => TRUE,
+  );
+  return $items;
+}
+
+/**
+ * Display the nodes of a view as an image gallery.
+ */
+function theme_image_gallery_view($view, $nodes, $type) {
+  drupal_add_css(drupal_get_path('module', 'image_gallery') .'/image_gallery.css');
+
+  $fields = _views_get_fields();
+
+  // get the size of images
+  // TODO: If the user adds more than one image field with different sizes... this breaks
+  foreach ($view->field as $field) {
+    if ($field['tablename'] == 'image_node') {
+      $size = image_get_sizes($field['options']);
+    }
+  }
+  $width = $size['width'];
+  // We'll add height to keep thumbnails lined up.
+  $height = $size['height'] + 25;
+
+  $content .= '<ul class="images clear-block">'; 
+
+  foreach ($nodes as $node) {
+    $item = '';
+
+    foreach ($view->field as $field) {
+     if ($fields[$field['id']]['visible'] !== FALSE) {
+        if ($field['label']) {
+          $item .= "<div class='view-label view-label-$field[queryname]'>". $field['label'] .'</div>';
+        }
+        $item .= "<div class='view-field view-data-$field[queryname]'>". views_theme_field('views_handle_field', $field['queryname'], $fields, $field, $node, $view) .'</div>';
+      }
+    }
+    $content .= "<li class='' style='height : {$height}px; width : {$width}px;'><div class='view-item view-item-$view->name'>$item</div></li>\n"; 
+  }
+
+  $content .= "</ul>\n";
+
+  return $content;
+}

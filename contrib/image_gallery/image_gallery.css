@@ -43,7 +43,14 @@ ul.images h3 {
 }
 
 ul.images li {
-  float : left;
-  margin : 1em;
+  float: left;
+  margin: 1em;
+  margin-left: 0;
+  margin-right: 2em;
+  padding: 0;
   background: transparent;
+}
+/* gallery view in a block */
+.block ul.images li {
+  margin-top:0;
 }

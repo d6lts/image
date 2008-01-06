@@ -1,6 +1,11 @@
 <?php
 // $Id$
 
+if (module_exists('views')) {
+  include(drupal_get_path('module', 'image_gallery') .'/views_defaults.inc');
+}
+
+
 function image_gallery_help($section) {
   switch ($section) {
     case 'admin/image':
@@ -154,9 +159,19 @@ function image_gallery_page($type = NULL, $tid = 0) {
 
   $images = array();
   if ($tid) {
-    $result = pager_query(db_rewrite_sql("SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid=n.nid WHERE n.status=1 AND n.type='image' AND t.tid=%d ORDER BY n.sticky DESC, n.created DESC"), variable_get('image_images_per_page', 6), 0, NULL, $tid);
-    while ($node = db_fetch_object($result)) {
-      $images[] = node_load(array('nid' => $node->nid));
+    /* Depending on whether the Views module is enabled, either:
+     * - Build (and theme) the image gallery ourselves.
+     * - Embed a view to show the image gallery, appending it to the themed 
+     *   child gallery list.
+     */
+    if (module_exists('views')) {
+      $view = views_get_view('image_gallery');
+    }
+    else {
+      $result = pager_query(db_rewrite_sql("SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid=n.nid WHERE n.status=1 AND n.type='image' AND t.tid=%d ORDER BY n.sticky DESC, n.created DESC"), variable_get('image_images_per_page', 6), 0, NULL, $tid);
+      while ($node = db_fetch_object($result)) {
+        $images[] = node_load(array('nid' => $node->nid));
+      }
     }
 
     $gallery = taxonomy_get_term($tid);
@@ -172,6 +187,11 @@ function image_gallery_page($type = NULL, $tid = 0) {
   $breadcrumb[] = array('path' => $_GET['q']);
   menu_set_location($breadcrumb);
   $content = theme('image_gallery', $galleries, $images);
+
+  if ($view) {
+   $content .= views_build_view('embed', $view, array($tid), $view->use_pager, $view->nodes_per_page, 0, 0);
+  }
+
   return $content;
 }
 
@@ -353,7 +373,7 @@ function theme_image_gallery($galleries, $images) {
   }
 
   if (!empty($images)) {
-    $content .= '<ul class="images">';
+    $content .= '<ul class="images clear-block">';
     foreach ($images as $image) {
       $content .= theme('image_gallery_img', $image, $size);
     }
@@ -364,8 +384,9 @@ function theme_image_gallery($galleries, $images) {
     $content .= $pager;
   }
 
-  If (count($images) + count($galleries) == 0) {
-      $content .= '<p class="count">'. format_plural(0, 'There is 1 image in this gallery', 'There are @count images in this gallery') ."</p>\n";
+  // Skip this if using Views, as $images is always empty
+  if (!module_exists('views') && count($images) + count($galleries) == 0) {
+    $content .= '<p class="count">'. format_plural(0, 'There is 1 image in this gallery', 'There are @count images in this gallery') ."</p>\n";
   }
 
   return $content;
