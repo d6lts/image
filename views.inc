@@ -99,7 +99,7 @@ function image_views_handler_image_img($fieldinfo, $fielddata, $value, $data) {
  */
 function image_views_handler_image_img_link($fieldinfo, $fielddata, $value, $data) {
   $node = node_load($data->nid);
-  return l(image_display($node, $fielddata['options']), "node/{$node->nid}", array(), NULL, NULL, FALSE, TRUE);
+  return l(image_display($node, $fielddata['options']), "node/{$node->nid}", array('html' => TRUE));
 }
 
 /**

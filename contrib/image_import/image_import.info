@@ -2,5 +2,6 @@
 name = Image Import
 description = Allows batches of images to be imported from a directory on the server.
 package = Image
-dependencies = image
+dependencies[] = image
+core = 6.x
 

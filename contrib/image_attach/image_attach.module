@@ -10,8 +10,8 @@ define('IMAGE_ATTACH_HIDDEN', 'hidden');
 /**
  * Implementation of hook_help().
  */
-function image_attach_help($section) {
-  switch ($section) {
+function image_attach_help($path, $arg) {
+  switch ($path) {
     case 'admin/settings/modules#description':
       return t('Allows easy attaching of image nodes to other content types.');
   }
@@ -20,27 +20,23 @@ function image_attach_help($section) {
 /**
  * Implementation of hook_menu()
  */
-function image_attach_menu($may_cache) {
+function image_attach_menu() {
   $items = array();
 
-  if ($may_cache) {
-      $items[] = array(
-        'path' => 'image_attach',
-        'title' => t('Image Attachment View'),
-        'callback' => 'image_attach_view_image',
-        'access' => user_access('access content'),
-        'type' => MENU_CALLBACK,
-      );
-      $items[] = array(
-        'path' => 'admin/settings/image_attach',
-        'title' => t('Image attach'),
-        'description' => t('Enable image attach for content'),
-        'callback' => 'drupal_get_form',
-        'callback arguments' => array('image_attach_admin_settings'),
-        'access' => user_access('administer site configuration'),
-        'type' => MENU_NORMAL_ITEM,
-      );
-  }
+  $items['image_attach'] = array(
+    'title' => 'Image Attachment View',
+    'page callback' => 'image_attach_view_image',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/settings/image_attach'] = array(
+    'title' => 'Image attach',
+    'description' => 'Enable image attach for content',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('image_attach_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
   return $items;
 }
 
@@ -84,7 +80,7 @@ function image_attach_block($op = 'list', $delta = 0, $edit = array()) {
               $img = image_display($image, variable_get('image_attach_block_0_size', IMAGE_THUMBNAIL));
               return array(
                 'subject' => t('Attached Images'),
-                'content' => l($img, "node/$node->iid", array(), NULL, NULL, FALSE, TRUE),
+                'content' => l($img, "node/$node->iid", array('html' => TRUE)),
               );
             }
           }
@@ -122,7 +118,7 @@ function image_attach_block($op = 'list', $delta = 0, $edit = array()) {
 /**
  * implementation of hook_form_alter()
  */
-function image_attach_form_alter($form_id, &$form) {
+function image_attach_form_alter(&$form, $form_state, $form_id) {
   // Content type settings form.
   if ($form_id == 'node_type_form' && $form['#node_type']->type != 'image') {
     _image_check_settings();
@@ -246,7 +242,10 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
   }
   switch ($op) {
     case 'prepare':
-      if (file_check_upload('image')) {
+	  $validators = array(
+	    'file_validate_is_image' => array(),
+	  );
+      if (file_save_upload('image', $validators)) {
         $image->title = $_POST['image_title'];
         $image->uid = $node->uid;
         $image->name = $node->name;
@@ -329,7 +328,8 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
  */
 function _image_attach_get_image_nodes() {
   $result = db_query(db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE n.status=1 AND type='image' ORDER BY n.sticky DESC, n.title ASC"));
-  if (db_num_rows($result) == 0) {
+  $result_count = db_result(db_query("SELECT COUNT(*) FROM {node} n WHERE n.status=1 AND type='image'"));
+  if ($result_count == 0) {
     return array();
   }
 
@@ -433,6 +433,20 @@ function image_attach_views_handler_filter_iid_exist($op, $filter, $filterdata, 
 }
 
 /**
+ * Implementation of hook_theme() registry.
+ **/
+function image_attach_theme() {
+  return array(
+    'image_attach_teaser' => array(
+      'arguments' => array('node' => new stdClass()),
+    ),
+    'image_attach_body' => array(
+      'arguments' => array('node' => new stdClass()),
+    ),
+  );
+}
+
+/**
  * Theme the teaser.
  *
  * Override this in template.php to include a case statement if you want different node types to appear differently.
@@ -452,7 +466,7 @@ function theme_image_attach_teaser($node) {
     $info = image_get_info(file_create_path($image->images[$img_size]));
 
     $output = '<div style="width: '. $info['width'] .'px" class="image-attach-teaser">';
-    $output .= l(image_display($image, $img_size), "node/$node->nid", array(), NULL, NULL, FALSE, TRUE);
+    $output .= l(image_display($image, $img_size), "node/$node->nid", array('html' => TRUE));
     $output .= '</div>'."\n";
 
     return $output;
@@ -476,7 +490,7 @@ function theme_image_attach_body($node) {
     $info = image_get_info(file_create_path($image->images[$img_size]));
 
     $output = '<div style="width: '. $info['width'] .'px" class="image-attach-body">';
-    $output .= l(image_display($image, $img_size), "node/$node->iid", array(), NULL, NULL, FALSE, TRUE);
+    $output .= l(image_display($image, $img_size), "node/$node->iid", array('html' => TRUE));
     $output .= '</div>'."\n";
 
     return $output;

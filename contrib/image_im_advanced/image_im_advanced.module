@@ -24,7 +24,7 @@ function image_im_advanced_options() {
  *
  * Add options to the Image toolkit settings form.
  */
-function image_im_advanced_form_alter($form_id, &$form) {
+function image_im_advanced_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == 'system_image_toolkit_settings' && 'imagemagick' == image_get_toolkit()) {
     $options = image_im_advanced_options();
 
@@ -158,7 +158,7 @@ function image_im_advanced_imagemagick_alter($op, $filepath, &$args) {
       // Add sharpening filter.
       if ($options['unsharp']['amount'] && $options['unsharp']['radius']) {
         // 0.7 and 0.02 are reasonable values for Sigma and Threshold.
-        $args['unsharp'] = '-unsharp ' . $options['unsharp']['radius'] . 'x0.7+' . round($options['unsharp']['amount'] / 100, 2) . '+0.02';
+        $args['unsharp'] = '-unsharp '. $options['unsharp']['radius'] .'x0.7+'. round($options['unsharp']['amount'] / 100, 2) .'+0.02';
       }
       break;
 
@@ -177,7 +177,7 @@ function image_im_advanced_imagemagick_alter($op, $filepath, &$args) {
 
   // Convert to specified color profile.
   if (!empty($options['profile']['path']) && is_readable($options['profile']['path'])) {
-    $args['profile'] = '-profile ' . $options['profile']['path'];
+    $args['profile'] = '-profile '. $options['profile']['path'];
   }
 
   // Assign a color space. Skip this if a color profile has been provided,
@@ -195,7 +195,7 @@ function image_im_advanced_imagemagick_alter($op, $filepath, &$args) {
   // Set JPEG quality.
   if ($image['mime_type'] == 'image/jpeg') {
     if (empty($args['quality']) && $options['jpeg_quality']) {
-      $args['quality'] = '-quality ' . $options['jpeg_quality'];
+      $args['quality'] = '-quality '. $options['jpeg_quality'];
     }
   }
 

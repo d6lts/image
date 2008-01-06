@@ -7,4 +7,4 @@ other nodes, or used on their own to display photographs, screenshots or
 diagrams. 
 
 Author:
-James Walker <james@bryght.com>
+James Walker <james@lullabot.com>

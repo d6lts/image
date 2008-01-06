@@ -2,3 +2,4 @@
 name = ImageMagick Advanced Options
 description = Adds advanced options to the ImageMagick image toolkit.
 package = Image
+core = 6.x

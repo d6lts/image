@@ -13,7 +13,7 @@ function image_imagemagick_info() {
  */
 function image_imagemagick_settings() {
   $form['#after_build'] = array('_image_imagemagick_build_version');
-  
+
   $form['imagemagick_binary'] = array(
     '#type' => 'fieldset',
     '#title' => t('ImageMagick Binary'),

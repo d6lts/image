@@ -2,4 +2,5 @@
 name = Image Attach
 description = Allows easy attaching of image nodes to other content types.
 package = Image
-dependencies = image
+dependencies[] = image
+core = 6.x

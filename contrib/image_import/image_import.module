@@ -4,8 +4,8 @@
 /**
  * Implementation of hook_help().
  */
-function image_import_help($section = '') {
-  switch ($section) {
+function image_import_help($path, $arg) {
+  switch ($path) {
     case 'admin/content/image_import':
       $output = '<p>'. t("Import multiple image files and save them as image nodes. The files will be moved from their location into the image module's files directory. ")
         . t("Searching for image files in %dirpath.", array('%dirpath' => realpath(variable_get('image_import_path', '')))) .'</p>';
@@ -27,28 +27,25 @@ function image_import_perm() {
 /**
  * Implementation of hook_menu().
  */
-function image_import_menu($may_cache) {
+function image_import_menu() {
   $items = array();
-  if ($may_cache) {
-    $items[] = array(
-      'path' => 'admin/content/image_import',
-      'title' => t('Image import'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => array('image_import_form'),
-      'access' => user_access('import images'),
-      'type' => MENU_NORMAL_ITEM,
-      'description' => t('Import images from the filesystem.')
-    );
-    $items[] = array(
-      'path' => 'admin/settings/image_import',
-      'title' => t('Image import'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => array('image_import_admin_settings'),
-      'access' => user_access('administer site configuration'),
-      'type' => MENU_NORMAL_ITEM,
-      'description' => t('Change settings for the Image Import module.')
-    );
-  }
+  
+  $items['admin/content/image_import'] = array(
+    'title' => 'Image import',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('image_import_form'),
+    'access arguments' => array('import images'),
+    'type' => MENU_NORMAL_ITEM,
+    'description' => 'Import images from the filesystem.',
+  );
+  $items['admin/settings/image_import'] = array(
+    'title' => 'Image import',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('image_import_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    'description' => 'Change settings for the Image Import module.',
+  );
 
   return $items;
 }
@@ -67,11 +64,11 @@ function image_import_form() {
 
   if ($files) {
     if (module_exists('taxonomy')) {
-      // here's a little hack to get the taxonmy controls onto our form
+      // here's a little hack to get the taxonomy controls onto our form
       $form['type'] = array('#type' => 'value', '#value' => 'image');
       $form['#node'] = new stdClass();
       $form['#node']->type = 'image';
-      taxonomy_form_alter('image_node_form', $form);
+      taxonomy_form_alter(&$form, $form_state, 'image_node_form');
       unset($form['type']);
       unset($form['#node']);
     }
@@ -146,6 +143,17 @@ function image_import_form() {
   return $form;
 }
 
+/**
+ * Implementation of hook_theme() registry.
+ **/
+function image_import_form_theme() {
+  return array(
+    'image_import_form' => array(
+      'arguments' => array($form),
+    ),
+  );
+}
+
 function theme_image_import_form($form) {
   $output = '';
   if (isset($form['import_file']) && $form['import_file']['#type'] == 'checkboxes') {
@@ -168,27 +176,27 @@ function theme_image_import_form($form) {
   return $output . drupal_render($form);
 }
 
-function image_import_form_submit($form_id, $form_values) {
-  $op = isset($form_values['op']) ? $form_values['op'] : '';
+function image_import_form_submit($form, &$form_state) {
+  $op = isset($form_state['values']['op']) ? $form_state['values']['op'] : '';
   if ($op == t('Import')) {
     $dirpath = variable_get('image_import_path', '');
     if (file_check_directory($dirpath)) {
       $nodes = array();
       $files = array();
-      foreach (array_filter($form_values['import_file']) as $index) {
+      foreach (array_filter($form_state['values']['import_file']) as $index) {
         // try to avoid php's script timeout with a bunch of large files or
         // a slow machine
         if (!ini_get('safe_mode')) {
           set_time_limit(0);
         }
-        $origname = $form_values['file_list'][$index];
+        $origname = $form_state['values']['file_list'][$index];
         $filename = file_check_location($dirpath .'/'. $origname, $dirpath);
         if ($filename) {
           $node = image_create_node_from(
             $filename,
-            $form_values['title'][$index],
-            $form_values['body'][$index],
-            $form_values['taxonomy']
+            $form_state['values']['title'][$index],
+            $form_state['values']['body'][$index],
+            $form_state['values']['taxonomy']
           );
 
           if ($node) {

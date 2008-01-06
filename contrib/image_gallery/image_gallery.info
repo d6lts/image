@@ -2,5 +2,6 @@
 name = Image Gallery
 description = Allows sorting and displaying of image galleries based on categories.
 package = Image
-dependencies = image taxonomy
-
+dependencies[] = image
+dependencies[] = taxonomy
+core = 6.x

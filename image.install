@@ -2,37 +2,48 @@
 // $Id$
 
 /**
- * Installing and updating image.module.
+ * Implementation of hook_schema().
+ */
+function image_schema() {
+  $schema['image'] = array(
+    'description' => t('Stores image files information.'),
+    'fields' => array(
+      'nid' => array(
+        'description' => t('Primary Key: The {node}.nid of the image node.'),
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'fid' => array(
+        'description' => t('Index: The {files}.fid of the image file.'),
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'image_size' => array(
+        'description' => t('Primary Key: The {files}.filename of the image file.  For image module this indicates the file size.'),
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
  */
 function image_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      db_query("CREATE TABLE {image} (
-          `nid` INTEGER UNSIGNED NOT NULL,
-          `fid` INTEGER UNSIGNED NOT NULL,
-          `image_size` VARCHAR(32) NOT NULL,
-          PRIMARY KEY (`nid`, `image_size`),
-          INDEX image_fid(`fid`)
-        ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
-      break;
-    case 'pgsql':
-      db_query("CREATE TABLE {image} (
-          nid int_unsigned NOT NULL,
-          fid int_unsigned NOT NULL,
-          image_size VARCHAR(32) NOT NULL,
-          PRIMARY KEY (nid, image_size)
-        );
-        CREATE INDEX {image_fid} on {image}(fid);");
-      break;
-  }
+  drupal_install_schema('image');
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function image_uninstall() {
-  db_query('DROP TABLE {image}');
+  drupal_uninstall_schema('image');
 
   variable_del('image_max_upload_size');
   variable_del('image_updated');
@@ -41,33 +52,58 @@ function image_uninstall() {
 }
 
 /**
- * Update 4.5 to 4.6 or later.
+ * Implementation of hook_requirements().
  */
-function image_update_1() {
-  if (db_table_exists('image')) {
-    if ($result = db_query("SELECT * FROM {image}")) {
-      $fields = array('thumb_path' => 'thumbnail',
-                      'preview_path' => 'preview',
-                      'image_path' => '_original');
+function image_requirements($phase) {
+  $requirements = array();
 
-      while ($old_image = db_fetch_object($result)) {
-        foreach ($fields as $old => $new) {
-          $old_file = '';
-          if (file_exists($old_image->$old)) {
-            $old_file = $old_image->$old;
-          }
-          else {
-            $old_file = file_create_path($old_image->$old);
-          }
-          if ($old_file && $old_image->$old != '' && db_num_rows(db_query("SELECT fid FROM {files} WHERE nid=%d and filename='%s'", $old_image->nid, $new)) == 0) {
-            _image_insert($old_image, $new, $old_file);
-          }
-        }
-      }
+  if ($phase == 'runtime') {
+    // Make sure we've got a working toolkit
+    if ($toolkit = image_get_toolkit()) {
+      $requirements['image_toolkit'] = array(
+        'value' => t('The %toolkit-name toolkit is installed', array('%toolkit-name' => $toolkit)),
+        'severity' => REQUIREMENT_OK,
+      ); 
     }
+    else {
+      $requirements['image_toolkit'] = array(
+        'value' => t('Not installed'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => t('No image toolkit is currently enabled. Without one the image module will not be able to resize your images. You can select one from the <a href="!link">image toolkit settings page</a>.', array('!link' => url('admin/settings/image-toolkit'))),
+      );
+    }
+    $requirements['image_toolkit']['title'] = t('Image toolkit');
+
+
+    // File paths
+    $image_path = file_create_path(rtrim(variable_get('image_default_path', 'images')));
+    $temp_path = rtrim($image_path, '/') .'/temp';
+    if (!file_check_directory($image_path, FILE_CREATE_DIRECTORY)) {
+      $requirements['image_dirs'] = array(
+        'value' => t('Missing directory'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => t("The image module's image directory %image-dir is missing.", array('%image-dir' => $image_path)),
+      );
+    }
+    else if (!file_check_directory($temp_path, FILE_CREATE_DIRECTORY)) {
+      $requirements['image_dirs'] = array(
+        'value' => t('Missing temp directory'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => t("The image module's temp directory %temp-dir is missing.", array('%temp-dir' => $temp_path)),
+      );
+    }
+    else {
+      $requirements['image_dirs'] = array(
+        'value' => t('Exists (%path)', array('%path' => $image_path)),
+        'severity' => REQUIREMENT_OK,
+      );
+    }
+    $requirements['image_dirs']['title'] = t('Image module directories');
   }
-  return array();
+
+  return $requirements;
 }
+
 
 /**
  * Upgrade to the new image_sizes variable format.
