@@ -90,7 +90,7 @@ function  image_gallery_views_default_views() {
       'operator' => 'AND',
       'options' => '',
       'value' => array (
-  0 => '1',
+  0 => _image_gallery_get_vid(),
 ),
     ),
   );
