@@ -39,7 +39,7 @@ function image_imagemagick_settings() {
 function _image_imagemagick_build_version($form, $form_element) {
   // Don't check the path when another toolkit is being selected.  
   if (!isset($form['#post']['image_toolkit']) || $form['#post']['image_toolkit'] == 'imagemagick') {
-    $valid = _image_imagemagick_check_path($form_element['image_imagemagick_convert'], 'image_imagemagick_convert');
+    $valid = _image_imagemagick_check_path($form_element['values']['image_imagemagick_convert'], 'image_imagemagick_convert');
     if ($valid) {
       _image_imagemagick_convert_exec('-version', $output, $errors);
       $form['imagemagick_binary']['version'] = array(

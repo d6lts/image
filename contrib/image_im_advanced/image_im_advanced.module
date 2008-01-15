@@ -33,7 +33,7 @@ function image_im_advanced_form_alter(&$form, $form_state, $form_id) {
       '#title' => t('ImageMagick Advanced Options'),
       '#collapsible' => FALSE,
       '#description' => t("These settings let you control some of ImageMagick's more advanced options."),
-      '#validate' => array('image_im_advanced_settings_validate' => array()),
+      '#element_validate' => array('image_im_advanced_settings_validate'),
       '#tree' => TRUE,
     );
     $form['image_im_advanced_options']['jpeg_quality'] = array(
@@ -113,8 +113,8 @@ function image_im_advanced_form_alter(&$form, $form_state, $form_id) {
 /**
  * Validate settings form.
  */
-function image_im_advanced_settings_validate($form) {
-  $options = $form['#post']['image_im_advanced_options'];
+function image_im_advanced_settings_validate($element, &$form_state) {
+  $options = $form_state['values']['image_im_advanced_options'];
   
   // Check that the JPEG quality is a valid number.
   if (!is_numeric($options['jpeg_quality']) || $options['jpeg_quality'] < 1 || $options['jpeg_quality'] > 100) {
