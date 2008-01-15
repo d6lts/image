@@ -887,7 +887,7 @@ function image_get_latest($count = 1, $tid = 0) {
  */
 function _image_check_settings() {
   // File paths
-  $image_path = file_create_path(variable_get('image_default_path', 'images'));
+  $image_path = file_create_path(file_directory_path() .'/'. variable_get('image_default_path', 'images'));
   $temp_path = rtrim($image_path, '/') .'/temp';
 
   if (!file_check_directory($image_path, FILE_CREATE_DIRECTORY, 'image_default_path')) {
