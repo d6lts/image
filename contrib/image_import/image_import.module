@@ -146,10 +146,10 @@ function image_import_form() {
 /**
  * Implementation of hook_theme() registry.
  **/
-function image_import_form_theme() {
+function image_import_theme() {
   return array(
     'image_import_form' => array(
-      'arguments' => array($form),
+      'arguments' => array('form' => NULL),
     ),
   );
 }
