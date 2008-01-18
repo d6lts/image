@@ -68,7 +68,7 @@ function image_import_form() {
       $form['type'] = array('#type' => 'value', '#value' => 'image');
       $form['#node'] = new stdClass();
       $form['#node']->type = 'image';
-      taxonomy_form_alter($form, $form_state, 'image_node_form');
+      taxonomy_form_alter($form, array(), 'image_node_form');
       unset($form['type']);
       unset($form['#node']);
     }
