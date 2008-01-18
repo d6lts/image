@@ -74,7 +74,7 @@ function image_attach_block($op = 'list', $delta = 0, $edit = array()) {
       if ($delta == 0) {
         if (arg(0) == 'node' && is_numeric(arg(1))) {
           $node = node_load(arg(1));
-          if ($node->iid) {
+          if (isset($node->iid) && $node->iid) {
             $image = node_load($node->iid);
             if (node_access('view', $image)) {
               $img = image_display($image, variable_get('image_attach_block_0_size', IMAGE_THUMBNAIL));
