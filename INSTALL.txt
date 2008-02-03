@@ -10,6 +10,12 @@ Image module installation instructions
 4.) Configure cron if you didn't do so already to have your temporary upload
     directory cleaned up. See http://drupal.org/cron for detailed instructions.
 
+5.) To reduce load on your site from robots and to reduce duplicate content 
+    from getting into the search engine, you can add the following line to 
+    your robots.txt file in the root of your Drupal installation:
+        Disallow: /*size=
+    Note: wildcards may not be supported by all search engines. Confirm whether
+    it will work for search engines important to you.
 
 Image Gallery module installation instructions
 
