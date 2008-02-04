@@ -47,6 +47,12 @@ function image_theme() {
     'image_body' => array(
       'arguments' => array('node' => NULL, 'size' => IMAGE_PREVIEW),
     ),
+    'image_block_random' => array(
+      'arguments' => array('images' => NULL, 'size' => IMAGE_THUMBNAIL),
+    ),
+    'image_block_latest' => array(
+      'arguments' => array('images' => NULL, 'size' => IMAGE_THUMBNAIL),
+    ),
     'image_display' => array(
       'arguments' => array(
         'node' => NULL,
@@ -493,12 +499,12 @@ function image_block($op = 'list', $delta = 0) {
           case 0:
             $images = image_get_latest();
             $block['subject'] = t('Latest image');
-            $block['content'] = l(image_display($images[0], IMAGE_THUMBNAIL), 'node/'. $images[0]->nid, array('html' => TRUE));
+            $block['content'] = theme('image_block_latest', IMAGE_THUMBNAIL);
             break;
           case 1:
             $images = image_get_random();
             $block['subject'] = t('Random image');
-            $block['content'] = l(image_display($images[0], IMAGE_THUMBNAIL), 'node/'. $images[0]->nid, array('html' => TRUE));
+            $block['content'] = theme('image_block_random', $images, IMAGE_THUMBNAIL);
             break;
         }
       }
@@ -842,6 +848,19 @@ function theme_image_display($node, $label, $url, $attributes) {
   return theme('image', $url, $node->title, $node->title, $attributes, FALSE);
 }
 
+/**
+ * Theme a random block
+ */
+function theme_image_block_random($images, $size) {
+  return l(image_display($images[0], $size), 'node/'. $images[0]->nid, array('html' => TRUE));
+}
+
+/**
+ * Theme a latest block
+ */
+function theme_image_block_latest($images, $size) {
+  return l(image_display($images[0], $size), 'node/'. $images[0]->nid, array('html' => TRUE));
+}
 
 /**
  * Fetch a random N image(s) - optionally from a given term.
