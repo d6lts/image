@@ -315,7 +315,7 @@ function image_block($op = 'list', $delta = 0) {
           case 0:
             $images = image_get_latest();
             $block['subject'] = t('Latest image');
-            $block['content'] = theme('image_block_latest', IMAGE_THUMBNAIL);
+            $block['content'] = theme('image_block_latest', $images, IMAGE_THUMBNAIL);
             break;
           case 1:
             $images = image_get_random();
