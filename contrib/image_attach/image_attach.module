@@ -313,7 +313,7 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
         $ret[] = array(
           'key' => 'enclosure',
           'attributes' => array(
-            'url' => url("image/view/{$node->iid}/". IMAGE_PREVIEW, NULL, NULL, TRUE),
+            'url' => url("image/view/{$node->iid}/". IMAGE_PREVIEW, array('absolute' => TRUE)),
             'length' => $info['file_size'],
             'type' => $info['mime_type'],
           )
