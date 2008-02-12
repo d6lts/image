@@ -391,7 +391,6 @@ function image_form(&$node, &$param) {
   );
   if ($type->has_body) {
     $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
-    $form['body_filter']['format'] = filter_form($node->format);
   }
 
   return $form;
