@@ -175,16 +175,16 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
     if ($form_id == $type .'_node_form' && variable_get('image_attach_'. $type, 0)) {
       $node = $form['#node'];
       _image_check_settings();
-      $value = ($node->new_image) ? '#value' : '#default_value';
+      $value = !empty($node->new_image) ? '#value' : '#default_value';
       $form['#attributes'] = array("enctype" => "multipart/form-data");
 
       $form['image_attach'] = array(
         '#type' => 'fieldset',
         '#title' => t('Attached Images'),
         '#collapsible' => TRUE,
-        '#collapsed' => !$node->iid
+        '#collapsed' => empty($node->iid),
       );
-      if ($node->iid) {
+      if (!empty($node->iid)) {
         $image = node_load($node->iid);
         $form['image_attach']['image_thumbnail'] = array(
           '#type' => 'item',
@@ -197,7 +197,7 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
           '#type' => 'select',
           '#title' => t('Existing Image'),
           '#options' => _image_attach_get_image_nodes(),
-          $value => $node->iid,
+          $value => empty($node->iid) ? NULL : $node->iid,
           '#description' => t('Choose an image already existing on the server if you do not upload a new one.')
         );
         $form['image_attach'][] = array(
@@ -209,7 +209,7 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
       else {
         $form['image_attach']['iid'] = array(
           '#type' => 'hidden',
-          $value => $node->iid
+          $value => empty($node->iid) ? NULL : $node->iid,
         );
       }
       $form['image_attach']['image'] = array(
@@ -330,10 +330,6 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
 function _image_attach_get_image_nodes() {
   $result = db_query(db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE n.status=1 AND type='image' ORDER BY n.sticky DESC, n.title ASC"));
   $result_count = db_result(db_query("SELECT COUNT(*) FROM {node} n WHERE n.status=1 AND type='image'"));
-  if ($result_count == 0) {
-    return array();
-  }
-
   $rows = array(0 => t('None'));
   while ($node = db_fetch_object($result)) {
     $rows[$node->nid] = $node->title;
