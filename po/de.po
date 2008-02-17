@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: general\n"
 "POT-Creation-Date: 2007-07-07 14:42+0200\n"
-"PO-Revision-Date: 2008-02-17 15:39+0100\n"
+"PO-Revision-Date: 2008-02-17 15:50+0100\n"
 "Last-Translator: Alexander Hass\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -49,7 +49,7 @@ msgstr "Die Datei %file konnte nicht gefunden werden. PHP's <a href='@open-based
 
 #: image.imagemagick.inc:63
 msgid "The specified ImageMagic path %file does not exist."
-msgstr "Der angegebene ImageMagic-Pfad %file ist nicht vorhanden."
+msgstr "Der angegebene ImageMagick-Pfad %file ist nicht vorhanden."
 
 #: image.imagemagick.inc:141
 #, fuzzy
