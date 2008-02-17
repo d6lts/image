@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: general\n"
 "POT-Creation-Date: 2007-07-07 14:42+0200\n"
-"PO-Revision-Date: 2007-11-09 12:15+0200\n"
+"PO-Revision-Date: 2008-02-17 15:39+0100\n"
 "Last-Translator: Alexander Hass\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -161,7 +161,7 @@ msgstr "Bildgrößen"
 
 #: image.module:113
 msgid "The dimensions on the \"Original\" image will be used to resize the images when they are first uploaded. If both dimensions are specified the image will be resized to fit with in that size. If only one dimension is specified the image will be resized to exactly that dimension with the other determined by the image aspect ratio."
-msgstr ""
+msgstr "Die Dimensionen des „Original“-Bildes werden zum Skalieren der Bilder verwendet, wenn sie erstmalig geladen werden. Wenn beide Dimensionen angegeben werden wird das Bild so skaliert, dass es in diese Größe passt. Wenn nur eine Dimension angegeben wird, wird das Bild genau auf diese Größe skaliert, während die andere Dimension dem Seitenverhältnis angepasst wird."
 
 #: image.module:118
 msgid "Hidden"
