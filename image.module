@@ -1010,7 +1010,6 @@ function image_create_node_from($filepath, $title = NULL, $body = '', $taxonomy 
 
   $node->new_file = TRUE;
   $node->images[IMAGE_ORIGINAL] = $filepath;
-  $node->images = _image_build_derivatives($node, TRUE);
 
   // Save the node.
   $node = node_submit($node);
