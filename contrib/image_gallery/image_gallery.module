@@ -1,6 +1,11 @@
 <?php
 // $Id$
 
+define('IMAGE_GALLERY_SORT_CREATE_DESC', 0);
+define('IMAGE_GALLERY_SORT_CREATE_ASC', 1);
+define('IMAGE_GALLERY_SORT_FILENAME', 2);
+define('IMAGE_GALLERY_SORT_TITLE', 3);
+
 function image_gallery_help($path, $arg) {
   switch ($path) {
     case 'admin/image':
@@ -77,6 +82,17 @@ function image_gallery_admin_settings() {
     '#default_value' => variable_get('image_gallery_node_info', 0),
     '#description' => t("Checking this will display the \"Posted by\" node information on the gallery pages."),
   );
+  $form['gallery']['image_gallery_sort_order'] = array(
+    '#type' => 'radios',
+    '#title' => t('Image display sort order'),
+    '#default_value' => variable_get('image_gallery_sort_order', IMAGE_GALLERY_SORT_CREATE_DESC),
+    '#options' => array(
+      IMAGE_GALLERY_SORT_CREATE_DESC => t('Create date, newest first'),
+      IMAGE_GALLERY_SORT_CREATE_ASC  => t('Create date, oldest first'),
+      IMAGE_GALLERY_SORT_FILENAME    => t('File name'),
+      IMAGE_GALLERY_SORT_TITLE       => t('Image title'),
+    ),
+  );
 
   return system_settings_form($form);
 }
@@ -143,7 +159,32 @@ function image_gallery_page($type = NULL, $tid = 0) {
 
   $images = array();
   if ($tid) {
-    $result = pager_query(db_rewrite_sql("SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid=n.nid WHERE n.status=1 AND n.type='image' AND t.tid=%d ORDER BY n.sticky DESC, n.created DESC"), variable_get('image_images_per_page', 6), 0, db_rewrite_sql("SELECT COUNT(DISTINCT(n.nid)) FROM {term_node} t INNER JOIN {node} n ON t.nid=n.nid WHERE n.status=1 AND n.type='image' AND t.tid=%d"), $tid);
+    // Allow images to be sorted in a useful order.
+    $query = "SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid = n.nid WHERE n.status = 1 AND n.type = 'image' AND t.tid = %d ";
+    $count_query = "SELECT COUNT(DISTINCT(n.nid)) FROM {term_node} t INNER JOIN {node} n ON t.nid = n.nid WHERE n.status = 1 AND n.type = 'image' AND t.tid = %d ";
+    $args = array($tid);
+    switch (variable_get('image_gallery_sort_order', IMAGE_GALLERY_SORT_CREATE_DESC)) {
+      case IMAGE_GALLERY_SORT_CREATE_DESC:
+        $query .= 'ORDER BY n.sticky DESC, n.created DESC';
+        break;
+
+      case IMAGE_GALLERY_SORT_CREATE_ASC:
+        $query .= 'ORDER BY n.sticky DESC, n.created ASC';
+        break;
+
+      case IMAGE_GALLERY_SORT_FILENAME:
+        $query = "SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid = n.nid
+          INNER JOIN {image} i ON n.nid = i.nid INNER JOIN {files} f ON i.fid = f.fid
+          WHERE n.status = 1 AND n.type = 'image' AND t.tid = %d AND f.filename = '%s'
+          ORDER BY n.sticky DESC, f.filepath";
+        $args[] = IMAGE_ORIGINAL;
+        break;
+
+      case IMAGE_GALLERY_SORT_TITLE:
+        $query .= 'ORDER BY n.sticky DESC, n.title ASC';
+        break;
+    }
+    $result = pager_query(db_rewrite_sql($query), variable_get('image_images_per_page', 6), 0, db_rewrite_sql($count_query), $args);
     while ($node = db_fetch_object($result)) {
       $images[] = node_load(array('nid' => $node->nid));
     }
