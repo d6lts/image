@@ -13,6 +13,7 @@ function image_gallery_uninstall() {
   variable_del('image_images_per_page');
   variable_del('image_gallery_nav_vocabulary');
   variable_del('image_gallery_node_info');
+  variable_del('image_gallery_sort_order');
 }
 
 function image_gallery_update_1() {
