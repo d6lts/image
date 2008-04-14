@@ -57,7 +57,7 @@ function _image_imagemagick_check_path($path, $attach_error_to = FALSE) {
   }
   if ($attach_error_to) {
     if ($open_basedir = ini_get('open_basedir')) {
-      form_set_error($attach_error_to, t("No file %file could be found. PHP's <a href='!open-basedir'>open_basedir</a> security resriction is set to %open-basedir, which may be interfearing with the attempts to locate ImageMagick.", array('%file' => $path, '%open-basedir' => $open_basedir, '!info-link' => url('http://php.net/features.safe-mode#ini.open-basedir') )));
+      form_set_error($attach_error_to, t("No file %file could be found. PHP's <a href='!open-basedir'>open_basedir</a> security resriction is set to %open-basedir, which may be interfering with the attempts to locate ImageMagick.", array('%file' => $path, '%open-basedir' => $open_basedir, '!info-link' => url('http://php.net/features.safe-mode#ini.open-basedir') )));
     }
     else {
       form_set_error($attach_error_to, t('The specified ImageMagic path %file does not exist.', array('%file' => $path)));
