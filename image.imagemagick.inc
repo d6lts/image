@@ -57,7 +57,7 @@ function _image_imagemagick_check_path($path, $attach_error_to = FALSE) {
   }
   if ($attach_error_to) {
     if ($open_basedir = ini_get('open_basedir')) {
-      form_set_error($attach_error_to, t("No file %file could be found. PHP's <a href='!open-basedir'>open_basedir</a> security resriction is set to %open-basedir, which may be interfearing with the attempts to locate ImageMagick.", array('%file' => $path, '%open-basedir' => $open_basedir, '!info-link' => url('http://php.net/features.safe-mode#ini.open-basedir') )));
+      form_set_error($attach_error_to, t("No file %file could be found. PHP's <a href='!open-basedir'>open_basedir</a> security resriction is set to %open-basedir, which may be interfering with the attempts to locate ImageMagick.", array('%file' => $path, '%open-basedir' => $open_basedir, '!info-link' => url('http://php.net/features.safe-mode#ini.open-basedir') )));
     }
     else {
       form_set_error($attach_error_to, t('The specified ImageMagic path %file does not exist.', array('%file' => $path)));
@@ -147,7 +147,7 @@ function _image_imagemagick_convert_exec($command_args, &$output, &$errors) {
     // http://us3.php.net/manual/en/function.exec.php#56599
     // Use /D to run the command from PHP's current working directory so the
     // file paths don't have to be absolute.
-    $convert_path = 'start "window title" /D'. getcwd() .' /b '. escapeshellarg($convert_path);
+    $convert_path = 'start "window title" /D'. escapeshellarg(getcwd()) .' /B '. escapeshellarg($convert_path);
   }
 
   $descriptors = array(
