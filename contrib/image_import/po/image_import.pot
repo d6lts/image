@@ -3,14 +3,14 @@
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  image_import.module,v 1.1.2.8 2007/07/24 17:34:14 drewish
-#  image_import.info,v 1.1 2007/02/19 03:40:20 walkah
+#  image_import.module,v 1.11 2007/07/24 17:33:42 drewish
+#  image_import.info,v 1.3 2007/07/18 17:04:37 drewish
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2007-11-07 23:04+0200\n"
+"POT-Creation-Date: 2008-04-14 20:04+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
