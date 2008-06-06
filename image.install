@@ -25,6 +25,15 @@ function image_install() {
         );
         CREATE INDEX {image_fid} on {image}(fid);");
       break;
+    case 'oracle10':
+      db_query("CREATE TABLE {image} (
+          nid INTEGER NOT NULL,
+          fid INTEGER NOT NULL,
+          image_size VARCHAR2(32) NOT NULL,
+          CONSTRAINT {image}_pkey PRIMARY KEY (nid, image_size)
+        )");
+      db_query("CREATE INDEX {image_fid} on {image}(fid)");
+      break;
   }
 }
 

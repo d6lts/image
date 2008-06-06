@@ -21,6 +21,15 @@ function image_attach_install() {
       )");
       db_query("CREATE INDEX {image_attach}_iid_idx ON {image_attach}(iid)");
       break;
+
+    case 'oracle10':
+      db_query("CREATE TABLE {image_attach} (
+        nid integer default '0' NOT NULL,
+        iid integer default '0' NOT NULL,
+        CONSTRAINT {image_attach}_pkey PRIMARY KEY (nid)
+      )");
+      db_query("CREATE INDEX {image_attach}_iid_idx ON {image_attach}(iid)");
+      break;
   }
 }
 
