@@ -806,7 +806,7 @@ function _image_build_derivatives($node, $temp = FALSE) {
         break;
 
       case 'scale_crop':
-        $status = image_scale_and_crop($destination, $destination,  $size['width'], $size['height']);
+        $status = image_scale_and_crop($original_path, $destination,  $size['width'], $size['height']);
         break;
     }
 
