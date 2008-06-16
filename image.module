@@ -487,8 +487,8 @@ function image_load(&$node) {
     // If the file is missing or created after the last change to the sizes,
     // rebuild the derivatives.
     if (empty($node->images[$key]) || !file_exists($node->images[$key])) {
-      drupal_set_message(t("%title's %key derivative image %filepath was missing. The derivatives will be rebuilt to regenerate it.", array('%title' => $node->title, '%key' => $key, '%filepath' => $node->images[$key])));
-      $node->rebuild_images = TRUE; 
+      drupal_set_message(t("%title's %key derivative image %filepath was missing. The derivatives will be rebuilt to regenerate it.", array('%title' => $node->title, '%key' => $key, '%filepath' => isset($node->images[$key]) ? $node->images[$key] : '')));
+      $node->rebuild_images = TRUE;
     }
     else if (filemtime($node->images[$key]) < variable_get('image_updated', 0)) {
       drupal_set_message(t("%title's %key derivative image had a timestamp (%filetime) that predates the last changes to the image size settings (%vartime). The derivatives will be rebuilt to regenerate it.", array('%title' => $node->title, '%key' => $key, '%filetime' => format_date(filemtime($node->images[$key])), '%vartime' => format_date(variable_get('image_updated', 0)))));
@@ -532,14 +532,14 @@ function image_insert($node) {
  * rebuilding derivatives.
  */
 function image_update(&$node) {
-  if ($node->new_file || $node->rebuild_images) {
+  if (!empty($node->new_file) || !empty($node->rebuild_images)) {
     // Derivative images that aren't needed are set to the original file. Make
     // note of the current path before calling _image_insert() because if it's
     // in the temp directory it'll be moved. We'll need it later to determine
     // which derivative images need to be saved with _image_insert().
     $original_path = $node->images[IMAGE_ORIGINAL];
 
-    if ($node->new_file) {
+    if (!empty($node->new_file)) {
       // The derivative images were built during image_prepare() or 
       // image_create_node_from() so all we need to do is remove all the old,
       // existing images.
@@ -556,7 +556,7 @@ function image_update(&$node) {
       // placed in the correct directory.
       _image_insert($node, IMAGE_ORIGINAL, $original_path);
     }
-    else if ($node->rebuild_images) {
+    else if (!empty($node->rebuild_images)) {
       // Find the original image.
       $original_file = db_fetch_object(db_query("SELECT i.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d AND image_size = '%s'", $node->nid, IMAGE_ORIGINAL));
 
