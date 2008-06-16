@@ -29,13 +29,13 @@ function image_attach_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
-  $items['admin/settings/image_attach'] = array(
+  $items['admin/settings/image/image_attach'] = array(
     'title' => 'Image attach',
     'description' => 'Enable image attach for content',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('image_attach_admin_settings'),
     'access arguments' => array('administer site configuration'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
   );
   return $items;
 }

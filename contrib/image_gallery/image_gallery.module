@@ -51,12 +51,14 @@ function image_gallery_menu() {
     'access arguments' => array('administer images'),
     'type' => MENU_CALLBACK,
   );
-  $items['admin/settings/image_gallery'] = array(
+
+  $items['admin/settings/image/image_gallery'] = array(
     'title' => 'Image gallery',
     'access arguments' => array('administer site configuration'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('image_gallery_admin_settings'),
     'description' => 'Configure appearance of image galleries.',
+    'type' => MENU_LOCAL_TASK,
   );
 
   return $items;

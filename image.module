@@ -113,13 +113,22 @@ function image_menu() {
     'page callback' => 'image_fetch',
   );
   $items['admin/settings/image'] = array(
-    'title' => 'Image',
-    'description' => 'Image module settings.',
+    'title' => 'Images',
+    'description' => 'Configure the location of image files and image sizes. Also, if enabled, configure image attachments and options for image galleries and image imports.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('image_admin_settings'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'image.admin.inc',
+  );
+  $items['admin/settings/image/nodes'] = array(
+    'title' => 'Files and sizes',
+    'description' => 'Configure the location of image files and image sizes.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('image_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => '-10',
   );
 
   return $items;

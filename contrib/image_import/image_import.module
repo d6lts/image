@@ -40,13 +40,13 @@ function image_import_menu() {
     'description' => 'Import images from the filesystem.',
   
   );
-  $items['admin/settings/image_import'] = array(
+  $items['admin/settings/image/image_import'] = array(
     'title' => 'Image import',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('image_import_admin_settings'),
     'file' => 'image_import.admin.inc',
     'access arguments' => array('administer site configuration'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
     'description' => 'Change settings for the Image Import module.',
   );
 
