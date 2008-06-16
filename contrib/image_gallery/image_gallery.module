@@ -78,8 +78,34 @@ function image_gallery_menu($may_cache) {
   return $items;
 }
 
+/**
+ * Test whether we're using Views to generate galleries or not
+ */
+function image_gallery_is_using_views() {
+  if (module_exists('views')) {
+    // If the variable isn't set then nothing is disabled, if it's set it needs to be enabled.
+    $views_status = variable_get('views_defaults', array());
+    return (!isset($views_status['image_gallery']) || $views_status['image_gallery'] == 'enabled');
+  }
+  return FALSE;
+}
+
 function image_gallery_admin_settings() {
   _image_check_settings();
+
+  if (image_gallery_is_using_views()) {
+	$form['info'] = array(
+      '#type' => 'item',
+      '#title' => t('Image galleries are being provided by the Views module'),
+    );
+    if (module_exists('views_ui')) {
+      $form['info']['#value'] = t('To change the way galleries are displayed, override the default image_gallery view on the <a href="!views-link">Views administration page</a>.', array('!views-link' => url('admin/build/views')));
+    }
+    else {
+      $form['info']['#value'] = t('To change the way galleries are displayed, enable the <strong>Views UI</strong> module on the <a href="!modules-link">Modules administration page</a>, then override the default image_gallery view.', array('!modules-link' => url('admin/build/modules', NULL, 'edit-status-views-ui')));
+    }
+    return $form;    
+  }
 
   $form['gallery'] = array(
     '#type' => 'fieldset',
@@ -180,7 +206,7 @@ function image_gallery_page($type = NULL, $tid = 0) {
      * - Embed a view to show the image gallery, appending it to the themed 
      *   child gallery list.
      */
-    if (module_exists('views')) {
+    if (image_gallery_is_using_views()) {
       $view = views_get_view('image_gallery');
     }
     else {
@@ -423,11 +449,6 @@ function theme_image_gallery($galleries, $images) {
 
   if ($pager = theme('pager', NULL, variable_get('image_images_per_page', 6), 0)) {
     $content .= $pager;
-  }
-
-  // Skip this if using Views, as $images is always empty
-  if (!module_exists('views') && count($images) + count($galleries) == 0) {
-    $content .= '<p class="count">'. format_plural(0, 'There is 1 image in this gallery', 'There are @count images in this gallery') ."</p>\n";
   }
 
   return $content;
