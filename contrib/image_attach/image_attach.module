@@ -184,6 +184,9 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
         '#collapsible' => TRUE,
         '#collapsed' => empty($node->iid),
       );
+      // Add a custom submit handler so we can handle image creation on-the-fly
+      $form['#validate'][] = 'image_attach_validate'; 
+
       if (!empty($node->iid)) {
         $image = node_load($node->iid);
         $form['image_attach']['image_thumbnail'] = array(
@@ -227,6 +230,27 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
+ * Capture node form submission and immediately create an image if one has been
+ * uploaded.
+ * Note that the new image nodes are created even on preview. Taking several
+ * attempts may create trash.
+ */
+function image_attach_validate($form, &$form_state) {
+  $validators = array(
+    'file_validate_is_image' => array(),
+  );
+  if ($file = file_save_upload('image', $validators)) {
+    $image_title = $_POST['image_title'] ? $_POST['image_title'] : basename($file->filepath);
+    // This func now does all the things to initialize an image properly
+    $image = image_create_node_from($file->filepath, $image_title, '');
+    if ($image && !form_get_errors()) {
+      drupal_set_message(t("Created new image to attach to this node. !image_link", array('!image_link' => l($image_title, 'node/'. $image->nid) )));
+      form_set_value($form['image_attach']['iid'], $image->nid, $form_state);
+    }
+  }
+}
+
+/**
  * Implementation of hook_nodeapi().
  */
 function image_attach_nodeapi(&$node, $op, $teaser, $page) {
@@ -242,42 +266,6 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
     return;
   }
   switch ($op) {
-    case 'prepare':
-	  $validators = array(
-	    'file_validate_is_image' => array(),
-	  );
-      if (file_save_upload('image', $validators)) {
-        $image->title = $_POST['image_title'];
-        $image->uid = $node->uid;
-        $image->name = $node->name;
-        $image->created = $node->created;
-        $image->type = 'image';
-        // Set the node's defaults... (copied this from node and comment.module)
-        $node_options = variable_get('node_options_image', array('status', 'promote'));
-        $image->status = in_array('status', $node_options);
-        $image->promote = in_array('promote', $node_options);
-        if (module_exists('comment')) {
-          $image->comment = variable_get('comment_image', COMMENT_NODE_READ_WRITE);
-        }
-        image_prepare($image, 'image');
-        if ($image->images) {
-          if (empty($image->title)) {
-            $image->title = basename($image->images[IMAGE_ORIGINAL]);
-          }
-          node_validate($image);
-          if (!form_get_errors()) {
-            $image = node_submit($image);
-            node_save($image);
-            $node->iid = $image->nid;
-            $node->new_image = TRUE;
-          }
-        }
-      }
-      elseif (!empty($_POST['iid'])) {
-        $node->iid = (int) $_POST['iid'];
-      }
-      break;
-
     case 'insert':
     case 'update':
       if (isset($node->iid)) {
