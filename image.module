@@ -124,8 +124,6 @@ function image_menu() {
   $items['admin/settings/image/nodes'] = array(
     'title' => 'Files and sizes',
     'description' => 'Configure the location of image files and image sizes.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('image_admin_settings'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => '-10',
