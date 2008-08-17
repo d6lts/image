@@ -17,7 +17,7 @@ function  image_gallery_views_default_views() {
 );
   $view->view_args_php = '';
   $view->page = TRUE;
-  $view->page_title = '';
+  $view->page_title = 'Image galleries';
   $view->page_header = '';
   $view->page_header_format = '1';
   $view->page_footer = '';
@@ -25,6 +25,7 @@ function  image_gallery_views_default_views() {
   $view->page_empty = t('There are no images in this gallery.');
   $view->page_empty_format = '1';
   $view->page_type = 'image_gallery';
+  $view->url = 'image';
   $view->use_pager = TRUE;
   $view->nodes_per_page = '6';
   $view->sort = array (
