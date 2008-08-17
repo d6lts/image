@@ -974,7 +974,7 @@ function image_create_node_from($filepath, $title = NULL, $body = '', $taxonomy 
   global $user;
 
   if (!user_access('create images')) {
-    drupal_access_denied();
+    return drupal_access_denied();
   }
   
   // Ensure it's a valid image.
