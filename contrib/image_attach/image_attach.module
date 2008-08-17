@@ -380,9 +380,10 @@ function theme_image_attach_body($node) {
       // If the image is restricted, don't show it as an attachment.
       return NULL;
     }
+    $published = $image->status ? '' : ' image-unpublished';
     $info = image_get_info(file_create_path($image->images[$img_size]));
 
-    $output = '<div style="width: '. $info['width'] .'px" class="image-attach-body">';
+    $output = '<div style="width: '. $info['width'] .'px" class="image-attach-body'. $published .'">';
     $output .= l(image_display($image, $img_size), "node/$node->iid", array('html' => TRUE));
     $output .= '</div>'."\n";
 
