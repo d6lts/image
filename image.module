@@ -1181,3 +1181,13 @@ function image_create_node_from($filepath, $title = NULL, $body = '', $taxonomy 
   return $node;
 }
 
+/**
+ * Implementation of hook_panels_include_directory().
+ */
+function image_panels_include_directory($plugintype) {
+  switch ($plugintype) {
+    case 'content_types':
+      return $plugintype;
+  }
+}
+
