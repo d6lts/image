@@ -169,7 +169,7 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
     );
   }
   // Node edit form.
-  else if (isset($form['type']) && $form['type']['#value'] != 'image') {
+  else if (isset($form['type']['#value']) && $form['type']['#value'] != 'image') {
     $type = $form['type']['#value'];
     // If enabled adjust the form.
     if ($form_id == $type .'_node_form' && variable_get('image_attach_'. $type, 0)) {
