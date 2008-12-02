@@ -728,10 +728,10 @@ function _image_check_settings() {
   $image_path = file_create_path(file_directory_path() .'/'. variable_get('image_default_path', 'images'));
   $temp_path = rtrim($image_path, '/') .'/temp';
 
-  if (!file_check_directory($image_path, FILE_CREATE_DIRECTORY, 'image_default_path')) {
+  if (!file_check_directory($image_path, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS, 'image_default_path')) {
     return false;
   }
-  if (!file_check_directory($temp_path, FILE_CREATE_DIRECTORY, 'image_default_path')) {
+  if (!file_check_directory($temp_path, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS, 'image_default_path')) {
     return false;
   }
 
@@ -1031,5 +1031,15 @@ function image_create_node_from($filepath, $title = NULL, $body = '', $taxonomy 
   file_delete($original_path);
 
   return $node;
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function image_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'image') .'/views',
+  );
 }
 
