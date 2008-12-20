@@ -3,14 +3,14 @@
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  image_attach.module,v 1.9.2.18 2007/10/10 04:57:58 drewish
+#  image_attach.module,v 1.9.2.19 2007/11/18 21:27:40 drewish
 #  image_attach.info,v 1.1 2006/11/20 04:54:28 walkah
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2007-11-07 23:02+0200\n"
+"POT-Creation-Date: 2008-12-20 22:24+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -43,123 +43,131 @@ msgstr ""
 msgid "When enabled, will allow existing image nodes to be attached instead of uploading new images."
 msgstr ""
 
-#: image_attach.module:70
-msgid "<Hidden>"
-msgstr ""
-
-#: image_attach.module:77
-msgid "Image Attach settings"
-msgstr ""
-
-#: image_attach.module:82
-msgid "Attach Images"
-msgstr ""
-
-#: image_attach.module:84
-msgid "Disabled"
-msgstr ""
-
-#: image_attach.module:84
-msgid "Enabled"
-msgstr ""
-
-#: image_attach.module:85
-msgid "Should this node allows users to upload an image?"
-msgstr ""
-
-#: image_attach.module:89
-msgid "Teaser image size"
-msgstr ""
-
-#: image_attach.module:92
-msgid "This determines the size of the image that appears when the node is displayed as a teaser. 'Hidden' will not show the image."
-msgstr ""
-
-#: image_attach.module:96
-msgid "Teaser image weight"
-msgstr ""
-
-#: image_attach.module:98
-msgid "This value determines the order of the image when displayed in the teaser."
-msgstr ""
-
-#: image_attach.module:102
-msgid "Full node image size"
-msgstr ""
-
-#: image_attach.module:105
-msgid "This determines the size of the image that appears when the full node is displayed. 'Hidden' will not show the image."
-msgstr ""
-
-#: image_attach.module:109
-msgid "Full node image weight"
-msgstr ""
-
-#: image_attach.module:111
-msgid "This value determines the order of the image when displayed in the body."
-msgstr ""
-
-#: image_attach.module:126
+#: image_attach.module:69;86;186
 msgid "Attached Images"
 msgstr ""
 
-#: image_attach.module:134
-msgid "Thumbnail"
+#: image_attach.module:103
+msgid "Image size"
 msgstr ""
 
-#: image_attach.module:141
-msgid "Existing Image"
+#: image_attach.module:106
+msgid "This determines the size of the image that appears in the block."
+msgstr ""
+
+#: image_attach.module:130
+msgid "<Hidden>"
+msgstr ""
+
+#: image_attach.module:137
+msgid "Image Attach settings"
+msgstr ""
+
+#: image_attach.module:142
+msgid "Attach Images"
 msgstr ""
 
 #: image_attach.module:144
+msgid "Disabled"
+msgstr ""
+
+#: image_attach.module:144
+msgid "Enabled"
+msgstr ""
+
+#: image_attach.module:145
+msgid "Should this node allows users to upload an image?"
+msgstr ""
+
+#: image_attach.module:149
+msgid "Teaser image size"
+msgstr ""
+
+#: image_attach.module:152
+msgid "This determines the size of the image that appears when the node is displayed as a teaser. 'Hidden' will not show the image."
+msgstr ""
+
+#: image_attach.module:156
+msgid "Teaser image weight"
+msgstr ""
+
+#: image_attach.module:158
+msgid "This value determines the order of the image when displayed in the teaser."
+msgstr ""
+
+#: image_attach.module:162
+msgid "Full node image size"
+msgstr ""
+
+#: image_attach.module:165
+msgid "This determines the size of the image that appears when the full node is displayed. 'Hidden' will not show the image."
+msgstr ""
+
+#: image_attach.module:169
+msgid "Full node image weight"
+msgstr ""
+
+#: image_attach.module:171
+msgid "This value determines the order of the image when displayed in the body."
+msgstr ""
+
+#: image_attach.module:194
+msgid "Thumbnail"
+msgstr ""
+
+#: image_attach.module:201
+msgid "Existing Image"
+msgstr ""
+
+#: image_attach.module:204
 msgid "Choose an image already existing on the server if you do not upload a new one."
 msgstr ""
 
-#: image_attach.module:148
+#: image_attach.module:208
 msgid "-or-"
 msgstr ""
 
-#: image_attach.module:160
+#: image_attach.module:220
 msgid "Upload Image"
 msgstr ""
 
-#: image_attach.module:164
+#: image_attach.module:224
 msgid "Image title"
 msgstr ""
 
-#: image_attach.module:166
+#: image_attach.module:226
 msgid "The title the image will be shown with."
 msgstr ""
 
-#: image_attach.module:276
+#: image_attach.module:336
 msgid "None"
 msgstr ""
 
-#: image_attach.module:300
+#: image_attach.module:360
 msgid "Image Attach: Display Image"
 msgstr ""
 
-#: image_attach.module:302 image_attach.info:0
+#: image_attach.module:362 image_attach.info:0
 msgid "Image"
 msgstr ""
 
-#: image_attach.module:303
+#: image_attach.module:363
 msgid "Image with link to attaching node"
 msgstr ""
 
-#: image_attach.module:304
+#: image_attach.module:364
 msgid "Image with link to attached image"
 msgstr ""
 
-#: image_attach.module:315
+#: image_attach.module:375
 msgid "Image Attach: Attached image"
 msgstr ""
 
-#: image_attach.module:316
+#: image_attach.module:376
 msgid "Exists"
 msgstr ""
 
-#: image_attach.module:320
+#: image_attach.module:380
 msgid "Filter by whether or not the node has an attached image."
 msgstr ""
 

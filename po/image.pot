@@ -3,17 +3,17 @@
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  image.imagemagick.inc,v 1.3.2.14 2007/10/10 03:47:12 drewish
-#  image.info,v 1.2 2006/11/20 04:22:27 walkah
-#  image.module,v 1.209.2.48 2007/09/29 05:19:40 drewish
+#  image.imagemagick.inc,v 1.3.2.17 2008/04/22 20:41:34 drewish
 #  views.inc,v 1.1.2.2 2007/08/27 22:48:27 drewish
+#  image.module,v 1.209.2.54 2008/04/18 00:33:34 drewish
+#  image.info,v 1.2 2006/11/20 04:22:27 walkah
 #  image.install,v 1.1.4.11 2007/08/27 22:48:27 drewish
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2007-11-07 23:07+0200\n"
+"POT-Creation-Date: 2008-12-20 22:38+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -47,7 +47,7 @@ msgid "Checking this option will display the ImageMagick commands and ouput to u
 msgstr ""
 
 #: image.imagemagick.inc:60
-msgid "No file %file could be found. PHP's <a href='!open-basedir'>open_basedir</a> security resriction is set to %open-basedir, which may be interfearing with the attempts to locate ImageMagick."
+msgid "No file %file could be found. PHP's <a href='!open-basedir'>open_basedir</a> security resriction is set to %open-basedir, which may be interfering with the attempts to locate ImageMagick."
 msgstr ""
 
 #: image.imagemagick.inc:63
@@ -70,28 +70,16 @@ msgstr ""
 msgid "ImageMagick reported an error: %error"
 msgstr ""
 
-#: image.info:0;0 image.module:42;261;273;531 views.inc:14
+#: views.inc:12
+msgid "Image: Display Image"
+msgstr ""
+
+#: views.inc:14 image.module:42;261;273;533 image.info:0;0
 msgid "Image"
 msgstr ""
 
-#: image.info:0
-msgid "Allows uploading, resizing and viewing of images."
-msgstr ""
-
-#: image.install:53 image.module:973
-msgid "Original"
-msgstr ""
-
-#: image.install:128
-msgid "The original image size was missing so no changes were made. See this <a href='!link'>image module issue</a> for more information. Include the following:<br /><pre>@old_sizes\n</pre>"
-msgstr ""
-
-#: image.install:135 image.module:975
-msgid "Preview"
-msgstr ""
-
-#: image.install:138 image.module:481;974
-msgid "Thumbnail"
+#: views.inc:15
+msgid "Image with link"
 msgstr ""
 
 #: image.module:22
@@ -182,7 +170,7 @@ msgstr ""
 msgid "Link"
 msgstr ""
 
-#: image.module:266;640;0
+#: image.module:266;642;0
 msgid "image"
 msgstr ""
 
@@ -210,40 +198,52 @@ msgstr ""
 msgid "The image you uploaded was too big. You are only allowed upload files less than %max_size but your file was %file_size."
 msgstr ""
 
-#: image.module:453;462
+#: image.module:455;464
 msgid "Latest image"
 msgstr ""
 
-#: image.module:454;467
+#: image.module:456;469
 msgid "Random image"
 msgstr ""
 
-#: image.module:533
+#: image.module:483;980 image.install:138
+msgid "Thumbnail"
+msgstr ""
+
+#: image.module:535
 msgid "Click \"Browse...\" to select an image to upload."
 msgstr ""
 
-#: image.module:551
+#: image.module:553
 msgid "You must upload an image."
 msgstr ""
 
-#: image.module:640
+#: image.module:642
 msgid "Derivative images were regenerated for %title."
 msgstr ""
 
-#: image.module:640
+#: image.module:642
 msgid "view"
 msgstr ""
 
-#: image.module:714
+#: image.module:716
 msgid "The derivative images for <a href=\"!link\">%title</a> have been regenerated."
 msgstr ""
 
-#: image.module:858
+#: image.module:860
 msgid "No image toolkit is currently enabled. Without one the image module will not be able to resize your images. You can select one from the <a href=\"!link\">image toolkit settings page</a>."
 msgstr ""
 
-#: image.module:922
+#: image.module:924
 msgid "Unable to create scaled %label image"
+msgstr ""
+
+#: image.module:979 image.install:53
+msgid "Original"
+msgstr ""
+
+#: image.module:981 image.install:135
+msgid "Preview"
 msgstr ""
 
 #: image.module:53
@@ -262,11 +262,11 @@ msgstr ""
 msgid "edit images"
 msgstr ""
 
-#: views.inc:12
-msgid "Image: Display Image"
+#: image.install:128
+msgid "The original image size was missing so no changes were made. See this <a href='!link'>image module issue</a> for more information. Include the following:<br /><pre>@old_sizes\n</pre>"
 msgstr ""
 
-#: views.inc:15
-msgid "Image with link"
+#: image.info:0
+msgid "Allows uploading, resizing and viewing of images."
 msgstr ""
 
