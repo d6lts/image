@@ -3,14 +3,16 @@
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  image_import.module,v 1.15 2008/01/18 09:59:13 drewish
+#  image_import.admin.inc,v 1.1 2008/06/13 22:01:09 drewish
+#  image_import.module,v 1.17 2008/06/16 18:30:10 drewish
+#  image_import.install,v 1.5 2008/08/17 08:54:50 drewish
 #  image_import.info,v 1.4 2008/01/06 22:15:25 drewish
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2008-04-14 20:18+0200\n"
+"POT-Creation-Date: 2008-12-21 00:31+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -18,6 +20,70 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: image_import.admin.inc:9
+msgid "You need to configure the import directory on the image import module's <a href='!admin-settings-image_import'>settings page</a>."
+msgstr ""
+
+#: image_import.admin.inc:84;122
+msgid "Import"
+msgstr ""
+
+#: image_import.admin.inc:90
+msgid "No files were found"
+msgstr ""
+
+#: image_import.admin.inc:101
+msgid "Name"
+msgstr ""
+
+#: image_import.admin.inc:101
+msgid "Size"
+msgstr ""
+
+#: image_import.admin.inc:101
+msgid "Dimensions"
+msgstr ""
+
+#: image_import.admin.inc:101
+msgid "Title"
+msgstr ""
+
+#: image_import.admin.inc:101
+msgid "Body"
+msgstr ""
+
+#: image_import.admin.inc:144
+msgid "%filename as <a href=\"!node-link\">@node-title</a> <a href=\"!edit-link\">[edit]</a>"
+msgstr ""
+
+#: image_import.admin.inc:152
+msgid "Error importing %filename."
+msgstr ""
+
+#: image_import.admin.inc:159
+msgid "Successfully imported: "
+msgstr ""
+
+#: image_import.admin.inc:162
+msgid "No image files were imported."
+msgstr ""
+
+#: image_import.admin.inc:171
+msgid "Import path"
+msgstr ""
+
+#: image_import.admin.inc:174
+msgid "The directory to import image nodes from. Drupal will need to have write access to this directory so we can move the file."
+msgstr ""
+
+#: image_import.admin.inc:175
+msgid "<strong>Note:</strong> a path begining with a <kbd>/</kbd> indicates the path is relative to the server's root, not the website's root. One starting without a <kbd>/</kbd> specifies a path relative to Drupal's root. For example: <kbd>/tmp/image</kbd> would be the temp directory off the root while <kbd>tmp/image</kbd> would be inside Drupal's directory."
+msgstr ""
+
+#: image_import.admin.inc:194
+msgid "You can't import from the image module's directory. The import deletes the original files so you would just be asking for trouble."
+msgstr ""
 
 #: image_import.module:10
 msgid "Import multiple image files and save them as image nodes. The files will be moved from their location into the image module's files directory. "
@@ -31,88 +97,44 @@ msgstr ""
 msgid "Configure the image import module's settings."
 msgstr ""
 
-#: image_import.module:58
-msgid "You need to configure the import directory on the image import module's <a href='!admin-settings-image_import'>settings page</a>."
-msgstr ""
-
-#: image_import.module:133;181
-msgid "Import"
-msgstr ""
-
-#: image_import.module:139
-msgid "No files were found"
-msgstr ""
-
-#: image_import.module:160
-msgid "Name"
-msgstr ""
-
-#: image_import.module:160
-msgid "Size"
-msgstr ""
-
-#: image_import.module:160
-msgid "Dimensions"
-msgstr ""
-
-#: image_import.module:160
-msgid "Title"
-msgstr ""
-
-#: image_import.module:160
-msgid "Body"
-msgstr ""
-
-#: image_import.module:203
-msgid "%filename as <a href=\"!node-link\">@node-title</a> <a href=\"!edit-link\">[edit]</a>"
-msgstr ""
-
-#: image_import.module:211
-msgid "Error importing %filename."
-msgstr ""
-
-#: image_import.module:218
-msgid "Successfully imported: "
-msgstr ""
-
-#: image_import.module:221
-msgid "No image files were imported."
-msgstr ""
-
-#: image_import.module:230
-msgid "Import path"
-msgstr ""
-
-#: image_import.module:233
-msgid "The directory to import image nodes from. Drupal will need to have write access to this directory so we can move the file."
-msgstr ""
-
-#: image_import.module:234
-msgid "<strong>Note:</strong> a path begining with a <kbd>/</kbd> indicates the path is relative to the server's root, not the website's root. One starting without a <kbd>/</kbd> specifies a path relative to Drupal's root. For example: <kbd>/tmp/image</kbd> would be the temp directory off the root while <kbd>tmp/image</kbd> would be inside Drupal's directory."
-msgstr ""
-
-#: image_import.module:253
-msgid "You can't import from the image module's directory. The import deletes the original files so you would just be asking for trouble."
-msgstr ""
-
 #: image_import.module:24
 msgid "import images"
 msgstr ""
 
-#: image_import.module:34;42
+#: image_import.module:34;44 image_import.install:10
 msgid "Image import"
 msgstr ""
 
-#: image_import.module:39
+#: image_import.module:40
 msgid "Import images from the filesystem."
 msgstr ""
 
-#: image_import.module:47
+#: image_import.module:50
 msgid "Change settings for the Image Import module."
 msgstr ""
 
 #: image_import.module:0
 msgid "image_import"
+msgstr ""
+
+#: image_import.install:14
+msgid "Import directory has not been configured."
+msgstr ""
+
+#: image_import.install:15
+msgid "The import directory must be <a href=\"@configure\">configured</a> and exist in order for the Image import module to function."
+msgstr ""
+
+#: image_import.install:20
+msgid "Import directory <em>@dirpath</em> does not exist or is not writable."
+msgstr ""
+
+#: image_import.install:21
+msgid "The import directory <em>@dirpath</em> either does not exist or does not grant the web container write permission.  Either <a href=\"@choose\">choose</a> a different directory or create the <em>@dirpath</em> directory and grant write permissions.  The Image import module will not function until this is corrected."
+msgstr ""
+
+#: image_import.install:25
+msgid "Import directory <em>@dirpath</em> exists"
 msgstr ""
 
 #: image_import.info:0

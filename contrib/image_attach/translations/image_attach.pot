@@ -3,7 +3,9 @@
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  image_attach.module,v 1.37 2008/02/12 21:11:43 drewish
+#  image_attach.views.inc,v 1.3 2008/10/20 23:52:48 drewish
+#  image_attach.module,v 1.43 2008/10/20 23:52:48 drewish
+#  image_attach_views_handler_field_iid.inc: n/a
 #  image_attach.info,v 1.4 2008/01/06 22:15:24 drewish
 #  image_attach.install,v 1.12 2008/01/06 22:15:24 drewish
 #
@@ -11,7 +13,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2008-04-14 20:16+0200\n"
+"POT-Creation-Date: 2008-12-21 00:00+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -19,6 +21,38 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: image_attach.views.inc:13 image_attach.module:33
+msgid "Image attach"
+msgstr ""
+
+#: image_attach.views.inc:27
+msgid "Attached image"
+msgstr ""
+
+#: image_attach.views.inc:32
+msgid "An image attached to a node."
+msgstr ""
+
+#: image_attach_views_handler_field_iid.inc:28
+msgid "Image Size"
+msgstr ""
+
+#: image_attach_views_handler_field_iid.inc:35
+msgid "Link"
+msgstr ""
+
+#: image_attach_views_handler_field_iid.inc:36
+msgid "No link"
+msgstr ""
+
+#: image_attach_views_handler_field_iid.inc:36
+msgid "Node"
+msgstr ""
+
+#: image_attach_views_handler_field_iid.inc:36
+msgid "Image Node"
+msgstr ""
 
 #: image_attach.module:16 image_attach.info:0
 msgid "Allows easy attaching of image nodes to other content types."
@@ -100,72 +134,44 @@ msgstr ""
 msgid "This value determines the order of the image when displayed in the body."
 msgstr ""
 
-#: image_attach.module:191
+#: image_attach.module:194
 msgid "Thumbnail"
 msgstr ""
 
-#: image_attach.module:198
+#: image_attach.module:201
 msgid "Existing Image"
 msgstr ""
 
-#: image_attach.module:201
+#: image_attach.module:204
 msgid "Choose an image already existing on the server if you do not upload a new one."
 msgstr ""
 
-#: image_attach.module:205
+#: image_attach.module:208
 msgid "-or-"
 msgstr ""
 
-#: image_attach.module:217
+#: image_attach.module:220
 msgid "Upload Image"
 msgstr ""
 
-#: image_attach.module:221
+#: image_attach.module:224
 msgid "Image title"
 msgstr ""
 
-#: image_attach.module:223
+#: image_attach.module:226
 msgid "The title the image will be shown with."
 msgstr ""
 
-#: image_attach.module:333
+#: image_attach.module:247
+msgid "Created new image to attach to this node. !image_link"
+msgstr ""
+
+#: image_attach.module:321
 msgid "None"
-msgstr ""
-
-#: image_attach.module:357
-msgid "Image Attach: Display Image"
-msgstr ""
-
-#: image_attach.module:359 image_attach.info:0
-msgid "Image"
-msgstr ""
-
-#: image_attach.module:360
-msgid "Image with link to attaching node"
-msgstr ""
-
-#: image_attach.module:361
-msgid "Image with link to attached image"
-msgstr ""
-
-#: image_attach.module:372
-msgid "Image Attach: Attached image"
-msgstr ""
-
-#: image_attach.module:373
-msgid "Exists"
-msgstr ""
-
-#: image_attach.module:377
-msgid "Filter by whether or not the node has an attached image."
 msgstr ""
 
 #: image_attach.module:27
 msgid "Image Attachment View"
-msgstr ""
-
-#: image_attach.module:33
-msgid "Image attach"
 msgstr ""
 
 #: image_attach.module:34
@@ -190,5 +196,9 @@ msgstr ""
 
 #: image_attach.info:0
 msgid "Image Attach"
+msgstr ""
+
+#: image_attach.info:0
+msgid "Image"
 msgstr ""
 

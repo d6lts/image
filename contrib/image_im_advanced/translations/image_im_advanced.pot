@@ -5,12 +5,13 @@
 # Generated from files:
 #  image_im_advanced.module,v 1.5 2008/01/15 22:53:34 drewish
 #  image_im_advanced.info,v 1.2 2008/01/06 22:15:25 drewish
+#  image_im_advanced.install,v 1.1 2008/08/17 08:55:39 drewish
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2008-04-14 20:17+0200\n"
+"POT-Creation-Date: 2008-12-21 00:22+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -137,6 +138,38 @@ msgstr ""
 
 #: image_im_advanced.module:0
 msgid "image_im_advanced"
+msgstr ""
+
+#: image_im_advanced.install:13
+msgid "ImageMagick advanced options"
+msgstr ""
+
+#: image_im_advanced.install:16
+msgid "ImageMagick image toolkit is not properly installed"
+msgstr ""
+
+#: image_im_advanced.install:17
+msgid "The <em>@toolkit_inc/image_imagemagick.inc</em> file must be copied to <em>@inc_dir in order for the ImageMagick image toolkit to function."
+msgstr ""
+
+#: image_im_advanced.install:24
+msgid "ImageMagic image toolkit is not selected"
+msgstr ""
+
+#: image_im_advanced.install:25
+msgid "The ImageMagic image toolkit is not selected.  The advanced options only apply to the ImageMagick toolkit.  Select the image toolkit <a href=\"@toolkit\">here</a>."
+msgstr ""
+
+#: image_im_advanced.install:32
+msgid "ImageMagick convert utility not found."
+msgstr ""
+
+#: image_im_advanced.install:33
+msgid "The ImageMagick image convert utility (@convert) does not exist.  If you have ImageMagick installed, click <a href=\"@toolkit\">here</a> to provide the path to the convert utility."
+msgstr ""
+
+#: image_im_advanced.install:37
+msgid "ImageMagick image toolkit is selected"
 msgstr ""
 
 #: image_im_advanced.info:0
