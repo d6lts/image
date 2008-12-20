@@ -3,17 +3,18 @@
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  image.imagemagick.inc,v 1.18.2.2 2008/04/14 05:14:48 drewish
-#  image.info,v 1.4 2007/07/18 17:04:02 drewish
-#  image.module,v 1.258.2.6 2008/04/13 23:56:10 drewish
+#  image.imagemagick.inc,v 1.18.2.3 2008/04/22 20:42:00 drewish
 #  views.inc,v 1.4.2.1 2008/01/06 23:00:54 drewish
-#  image.install,v 1.14 2007/10/10 04:10:07 drewish
+#  image.module,v 1.258.2.8 2008/08/17 08:44:24 drewish
+#  image.info,v 1.4 2007/07/18 17:04:02 drewish
+#  image.inc,v 1.1.2.1 2008/08/17 08:44:25 drewish
+#  image.install,v 1.14.2.1 2008/06/06 19:09:36 drewish
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2008-04-14 20:01+0200\n"
+"POT-Creation-Date: 2008-12-21 01:18+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -70,28 +71,68 @@ msgstr ""
 msgid "ImageMagick reported an error: %error"
 msgstr ""
 
-#: image.info:0;0 image.module:43;270;282;561 views.inc:14
+#: views.inc:12
+msgid "Image: Display Image"
+msgstr ""
+
+#: views.inc:14 image.module:43;270;282;561 image.info:0;0 content_types/image.inc:9;30
 msgid "Image"
 msgstr ""
 
-#: image.info:0
-msgid "Allows uploading, resizing and viewing of images."
+#: views.inc:15
+msgid "Image with link"
 msgstr ""
 
-#: image.install:78 image.module:1034
-msgid "Original"
+#: views.inc:39
+msgid "Image: File Id"
 msgstr ""
 
-#: image.install:153
-msgid "The original image size was missing so no changes were made. See this <a href='!link'>image module issue</a> for more information. Include the following:<br /><pre>@old_sizes\n</pre>"
+#: views.inc:41
+msgid "File Id which represents the file."
 msgstr ""
 
-#: image.install:160 image.module:1036
-msgid "Preview"
+#: views.inc:58
+msgid "Image: File name"
 msgstr ""
 
-#: image.install:163 image.module:514;1035
-msgid "Thumbnail"
+#: views.inc:60
+msgid "Plain"
+msgstr ""
+
+#: views.inc:61
+msgid "With download link"
+msgstr ""
+
+#: views.inc:66
+msgid "Display file name"
+msgstr ""
+
+#: views.inc:69
+msgid "Image: File path"
+msgstr ""
+
+#: views.inc:71
+msgid "Display Path to File."
+msgstr ""
+
+#: views.inc:74
+msgid "Image: File size"
+msgstr ""
+
+#: views.inc:77
+msgid "Display the file size of the associated file."
+msgstr ""
+
+#: views.inc:80
+msgid "Image: Mime type"
+msgstr ""
+
+#: views.inc:82
+msgid "This filter allows nodes to be filtered by mime type."
+msgstr ""
+
+#: views.inc:120
+msgid "Image: Gallery"
 msgstr ""
 
 #: image.module:23
@@ -198,7 +239,7 @@ msgstr ""
 msgid "Link"
 msgstr ""
 
-#: image.module:275;675;0
+#: image.module:275;0
 msgid "image"
 msgstr ""
 
@@ -228,6 +269,10 @@ msgstr ""
 
 #: image.module:489;502
 msgid "Random image"
+msgstr ""
+
+#: image.module:514;1039 image.install:172
+msgid "Thumbnail"
 msgstr ""
 
 #: image.module:553
@@ -278,6 +323,14 @@ msgstr ""
 msgid "Unable to create scaled %label image"
 msgstr ""
 
+#: image.module:1038 image.install:87
+msgid "Original"
+msgstr ""
+
+#: image.module:1040 image.install:169
+msgid "Preview"
+msgstr ""
+
 #: image.module:54
 msgid "create images"
 msgstr ""
@@ -294,63 +347,63 @@ msgstr ""
 msgid "edit images"
 msgstr ""
 
-#: views.inc:12
-msgid "Image: Display Image"
+#: image.install:162
+msgid "The original image size was missing so no changes were made. See this <a href='!link'>image module issue</a> for more information. Include the following:<br /><pre>@old_sizes\n</pre>"
 msgstr ""
 
-#: views.inc:15
-msgid "Image with link"
+#: image.info:0
+msgid "Allows uploading, resizing and viewing of images."
 msgstr ""
 
-#: views.inc:39
-msgid "Image: File Id"
+#: content_types/image.inc:34
+msgid "Add a image as content."
 msgstr ""
 
-#: views.inc:41
-msgid "File Id which represents the file."
+#: content_types/image.inc:35
+msgid "Images"
 msgstr ""
 
-#: views.inc:58
-msgid "Image: File name"
+#: content_types/image.inc:82
+msgid "Enter the title or NID of an image"
 msgstr ""
 
-#: views.inc:60
-msgid "Plain"
+#: content_types/image.inc:111
+msgid "Image size"
 msgstr ""
 
-#: views.inc:61
-msgid "With download link"
+#: content_types/image.inc:113
+msgid "What size of the image should be inserted?"
 msgstr ""
 
-#: views.inc:66
-msgid "Display file name"
+#: content_types/image.inc:121
+msgid "Image caption"
 msgstr ""
 
-#: views.inc:69
-msgid "Image: File path"
+#: content_types/image.inc:123
+msgid "None"
 msgstr ""
 
-#: views.inc:71
-msgid "Display Path to File."
+#: content_types/image.inc:124
+msgid "Existing caption"
 msgstr ""
 
-#: views.inc:74
-msgid "Image: File size"
+#: content_types/image.inc:125;132
+msgid "Custom caption"
 msgstr ""
 
-#: views.inc:77
-msgid "Display the file size of the associated file."
+#: content_types/image.inc:128
+msgid "Which caption (if any) should be displayed?"
 msgstr ""
 
-#: views.inc:80
-msgid "Image: Mime type"
+#: content_types/image.inc:167
+msgid "Invalid image"
 msgstr ""
 
-#: views.inc:82
-msgid "This filter allows nodes to be filtered by mime type."
+#: content_types/image.inc:177
+msgid "Image:"
 msgstr ""
 
-#: views.inc:120
-msgid "Image: Gallery"
+#: content_types/image.inc:182
+msgid "Deleted/missing node @nid"
 msgstr ""
 
