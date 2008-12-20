@@ -3,15 +3,15 @@
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  views_defaults.inc,v 1.1.2.2 2008/01/09 17:05:15 drewish
-#  image_gallery.module,v 1.20.2.3 2008/04/11 03:29:20 drewish
+#  views_defaults.inc,v 1.1.2.3 2008/08/17 08:19:32 drewish
+#  image_gallery.module,v 1.20.2.5 2008/08/17 09:10:39 drewish
 #  image_gallery.info,v 1.4 2007/07/18 17:04:31 drewish
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2008-04-14 20:02+0200\n"
+"POT-Creation-Date: 2008-12-21 01:24+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -32,7 +32,7 @@ msgstr ""
 msgid "Image galleries can be used to organize and present groups of images. Galleries may be nested. To add a new gallery click the \"add gallery\" tab."
 msgstr ""
 
-#: image_gallery.module:31;38;223
+#: image_gallery.module:31;38;249
 msgid "Image galleries"
 msgstr ""
 
@@ -60,147 +60,159 @@ msgstr ""
 msgid "Edit image gallery"
 msgstr ""
 
-#: image_gallery.module:86
+#: image_gallery.module:99
+msgid "Image galleries are being provided by the Views module"
+msgstr ""
+
+#: image_gallery.module:102
+msgid "To change the way galleries are displayed, override the default image_gallery view on the <a href=\"!views-link\">Views administration page</a>."
+msgstr ""
+
+#: image_gallery.module:105
+msgid "To change the way galleries are displayed, enable the <strong>Views UI</strong> module on the <a href=\"!modules-link\">Modules administration page</a>, then override the default image_gallery view."
+msgstr ""
+
+#: image_gallery.module:112
 msgid "Gallery settings"
 msgstr ""
 
-#: image_gallery.module:90
+#: image_gallery.module:116
 msgid "Images per page"
 msgstr ""
 
-#: image_gallery.module:93
+#: image_gallery.module:119
 msgid "Sets the number of images to be displayed in a gallery page."
 msgstr ""
 
-#: image_gallery.module:97
+#: image_gallery.module:123
 msgid "Display node info"
 msgstr ""
 
-#: image_gallery.module:99
+#: image_gallery.module:125
 msgid "Checking this will display the \"Posted by\" node information on the gallery pages."
 msgstr ""
 
-#: image_gallery.module:103
+#: image_gallery.module:129
 msgid "Image display sort order"
 msgstr ""
 
-#: image_gallery.module:106
+#: image_gallery.module:132
 msgid "Create date, newest first"
 msgstr ""
 
-#: image_gallery.module:107
+#: image_gallery.module:133
 msgid "Create date, oldest first"
 msgstr ""
 
-#: image_gallery.module:108
+#: image_gallery.module:134
 msgid "File name"
 msgstr ""
 
-#: image_gallery.module:109
+#: image_gallery.module:135
 msgid "Image title"
 msgstr ""
 
-#: image_gallery.module:242
+#: image_gallery.module:268
 msgid "Name"
 msgstr ""
 
-#: image_gallery.module:242
+#: image_gallery.module:268
 msgid "Operations"
 msgstr ""
 
-#: image_gallery.module:247
+#: image_gallery.module:273
 msgid "edit gallery"
 msgstr ""
 
-#: image_gallery.module:252
+#: image_gallery.module:278
 msgid "No galleries available"
 msgstr ""
 
-#: image_gallery.module:257;306;340
+#: image_gallery.module:283;332;366
 msgid "Delete"
 msgstr ""
 
-#: image_gallery.module:271
+#: image_gallery.module:297
 msgid "Gallery name"
 msgstr ""
 
-#: image_gallery.module:275
+#: image_gallery.module:301
 msgid "The name is used to identify the gallery."
 msgstr ""
 
-#: image_gallery.module:280
+#: image_gallery.module:306
 msgid "Description"
 msgstr ""
 
-#: image_gallery.module:284
+#: image_gallery.module:310
 msgid "The description can be used to provide more information about the image gallery."
 msgstr ""
 
-#: image_gallery.module:287
+#: image_gallery.module:313
 msgid "Parent"
 msgstr ""
 
-#: image_gallery.module:290
+#: image_gallery.module:316
 msgid "Weight"
 msgstr ""
 
-#: image_gallery.module:293
+#: image_gallery.module:319
 msgid "When listing galleries, those with with light (small) weights get listed before containers with heavier (larger) weights. Galleries with equal weights are sorted alphabetically."
 msgstr ""
 
-#: image_gallery.module:301
+#: image_gallery.module:327
 msgid "Submit"
 msgstr ""
 
-#: image_gallery.module:322
+#: image_gallery.module:348
 msgid "Created new gallery %term."
 msgstr ""
 
-#: image_gallery.module:325
+#: image_gallery.module:351
 msgid "The gallery %term has been updated."
 msgstr ""
 
-#: image_gallery.module:328
+#: image_gallery.module:354
 msgid "The gallery %term has been deleted."
 msgstr ""
 
-#: image_gallery.module:340
+#: image_gallery.module:366
 msgid "Are you sure you want to delete the image gallery %name?"
 msgstr ""
 
-#: image_gallery.module:340
+#: image_gallery.module:366
 msgid "Deleting an image gallery will delete all sub-galleries. This action cannot be undone."
 msgstr ""
 
-#: image_gallery.module:340
+#: image_gallery.module:366
 msgid "Cancel"
 msgstr ""
 
-#: image_gallery.module:345
+#: image_gallery.module:371
 msgid "The image gallery %term and all sub-galleries have been deleted."
 msgstr ""
 
-#: image_gallery.module:370
+#: image_gallery.module:396
 msgid "root"
 msgstr ""
 
-#: image_gallery.module:384
+#: image_gallery.module:410
 msgid "Image galleries may be nested below other galleries."
 msgstr ""
 
-#: image_gallery.module:409
+#: image_gallery.module:435
 msgid "Last updated: %date"
 msgstr ""
 
-#: image_gallery.module:449
+#: image_gallery.module:470
 msgid "Posted by: !name"
 msgstr ""
 
-#: image_gallery.module:468
+#: image_gallery.module:489
 msgid "Image Galleries"
 msgstr ""
 
-#: image_gallery.module:407;430
+#: image_gallery.module:433
 msgid "There is 1 image in this gallery"
 msgid_plural "There are @count images in this gallery"
 msgstr[0] ""
