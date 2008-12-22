@@ -29,39 +29,37 @@ function image_import_perm() {
  */
 function image_import_menu() {
   $items = array();
-  
+
   $items['admin/content/image_import'] = array(
     'title' => 'Image import',
+    'description' => 'Import image from the filesystem.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('image_import_form'),
-    'file' => 'image_import.admin.inc',
+    'file' => 'image_import.pages.inc',
     'access arguments' => array('import images'),
     'type' => MENU_NORMAL_ITEM,
-    'description' => 'Import images from the filesystem.',
-  
   );
   $items['admin/settings/image/image_import'] = array(
     'title' => 'Image import',
+    'description' => 'Change settings for the Image Import module.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('image_import_admin_settings'),
     'file' => 'image_import.admin.inc',
     'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
-    'description' => 'Change settings for the Image Import module.',
   );
 
   return $items;
 }
 
 /**
- * Implementation of hook_theme() registry.
- **/
+ * Implementation of hook_theme
+ */
 function image_import_theme() {
   return array(
     'image_import_form' => array(
-      'arguments' => array('form' => NULL),
+      'arguments' => array('form'),
       'file' => 'image_import.admin.inc',
     ),
   );
 }
-
