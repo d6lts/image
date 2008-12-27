@@ -16,15 +16,15 @@ function image_help($path, $arg) {
   switch ($path) {
     case 'admin/help#image':
       $output = '<p>'. t('The image module is used to create and administer images for your site. Each image is stored as a post, with thumbnails of the original generated automatically. There are two default thumbnail sizes, thumbnail and preview. The thumbnail size is shown as the preview for image posts and when browsing image galleries. The preview is the default size when first displaying an image node.') .'</p>';
-      $output .= '<p>'. t('Image administration allows the image directory and the image sizes to be set.</p><p>
-Image galleries are used to organize and display images in galleries.   The list tab allows users to edit existing image gallery names, descriptions, parents and relative position, known as a weight.  The add galleries tab allows you to create a new image gallery defining name, description, parent and weight.') .'</p>';
-      $output .= t('<p>You can</p>
-<ul>
-<li>view image handling messages in <a href="!admin-settings">administer &gt;&gt; settings</a>.</li>
-<li>configure image sizes and file directories at <a href="!admin-settings-image">administer &gt;&gt; settings &gt;&gt; image</a>.</li>
-<li>use the <a href="!external-http-drupal-org-project-img_assist">image assist module</a> to upload and insert images into posts.</li>
-', array('!admin-settings' => url('admin/settings'), '!admin-image-galleries' => url('admin/image/galleries'), '!admin-settings-image' => url('admin/settings/image'), '!external-http-drupal-org-project-img_assist' => 'http://drupal.org/project/img_assist')) .'</ul>';
-      $output .= '<p>'. t('For more information please read the configuration and customization handbook <a href="!image">Image page</a>.', array('!image' => 'http://www.drupal.org/handbook/modules/image/')) .'</p>';
+      $output .= '<p>'. t('Image administration allows the image directory and the image sizes to be set.') .'</p>';
+      $output .= '<p>'. t('Image galleries are used to organize and display images in galleries. The list tab allows users to edit existing image gallery names, descriptions, parents and relative position, known as a weight. The add galleries tab allows you to create a new image gallery defining name, description, parent and weight.') .'</p>';
+      $output .= '<p>'. t('You are able to:') .'</p>';
+      $output .= '<ul>';
+      $output .= '<li>'. t('View image handling messages in <a href="@admin_settings">administer &gt;&gt; settings</a>.', array('@admin_settings' => url('admin/settings'))) .'</li>';
+      $output .= '<li>'. t('Configure image sizes and file directories at <a href="@admin_settings_image">administer &gt;&gt; settings &gt;&gt; image</a>.', array('@admin_settings_image' => url('admin/settings/image'))) .'</li>';
+      $output .= '<li>'. t('Use the <a href="@external_http_drupal_org_project_img_assist">image assist module</a> to upload and insert images into posts.', array('@external_http_drupal_org_project_img_assist' => 'http://drupal.org/project/img_assist')) .'</li>';
+      $output .= '</ul>';
+      $output .= '<p>'. t('For more information, see the online handbook entry for <a href="@image">Image module</a>.', array('@image' => 'http://www.drupal.org/handbook/modules/image/')) .'</p>';
       return $output;
   }
 }
@@ -580,7 +580,7 @@ function image_update(&$node) {
       // Display a message to the user if they're be able to modify the node
       // (this might have been called as part of a rebuild by a visitor).
       if (image_access('update', $node)) {
-        drupal_set_message(t('The derivative images for <a href="!link">%title</a> have been regenerated.', array('!link' => url('node/'. $node->nid), '%title' => $node->title)));
+        drupal_set_message(t('The derivative images for <a href="@link">@title</a> have been regenerated.', array('@link' => url('node/'. $node->nid), '@title' => $node->title)));
       }
 
       // Clear the flag so that we don't some how rebuild the images twice.
@@ -738,7 +738,7 @@ function _image_check_settings() {
 
   // Sanity check : make sure we've got a working toolkit
   if (!image_get_toolkit()) {
-    drupal_set_message(t('No image toolkit is currently enabled. Without one the image module will not be able to resize your images. You can select one from the <a href="!link">image toolkit settings page</a>.', array('!link' => url('admin/settings/image-toolkit'))), 'error');
+    drupal_set_message(t('No image toolkit is currently enabled. Without one the image module will not be able to resize your images. You can select one from the <a href="@link">image toolkit settings page</a>.', array('@link' => url('admin/settings/image-toolkit'))), 'error');
     return false;
   }
   return true;
@@ -821,7 +821,7 @@ function _image_build_derivatives($node, $temp = FALSE) {
     }
 
     if (!$status) {
-      drupal_set_message(t('Unable to create scaled %label image', array('%label' => $size['label'])), 'error');
+      drupal_set_message(t('Unable to create scaled %label image.', array('%label' => $size['label'])), 'error');
       return FALSE;
     }
     // Set standard file permissions for webserver-generated files

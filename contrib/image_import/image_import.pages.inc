@@ -118,7 +118,7 @@ function image_import_form() {
   else {
     $form['none_found'] = array(
       '#type' => 'item',
-      '#value' => t('<em>No files were found.</em>'),
+      '#value' => '<em>' . t('No files were found.') . '</em>',
     );
   }
 
@@ -189,7 +189,7 @@ function _image_import_batch_op($args, &$context) {
     // Remove the original image now that the import has completed.
     file_delete($args['filepath']);
 
-    $context['results']['good'][] = t('Imported %origname as <a href="!node-link">@node-title</a> @status <a href="!edit-link">[edit]</a>', array(
+    $context['results']['good'][] = t('Imported %origname as <a href="!node-link">@node-title</a> @status <a href="!edit-link">[edit]</a>.', array(
       '%origname' => $args['origname'],
       '!node-link' => url('node/'. $node->nid),
       '@node-title' => $node->title,

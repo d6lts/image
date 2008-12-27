@@ -16,7 +16,7 @@ function image_imagemagick_settings() {
 
   $form['imagemagick_binary'] = array(
     '#type' => 'fieldset',
-    '#title' => t('ImageMagick Binary'),
+    '#title' => t('ImageMagick binary'),
     '#collapsible' => FALSE,
     '#description' => t('ImageMagick is a standalone program used to manipulate images. To use it, it must be installed on your server and you need to know where it is located. If you are unsure of the exact path consult your ISP or server administrator.'),
   );
@@ -25,7 +25,7 @@ function image_imagemagick_settings() {
     '#title' => t('Path to the "convert" binary'),
     '#default_value' => variable_get('image_imagemagick_convert', '/usr/bin/convert'),
     '#required' => TRUE,
-    '#description' => t('Specify the complete path to the ImageMagic <kbd>convert</kbd> binary. For example: <kbd>/usr/bin/convert</kbd> or <kbd>C:\Program Files\ImageMagick-6.3.4-Q16\convert.exe</kbd>'),
+    '#description' => t('Specify the complete path to the ImageMagic <kbd>convert</kbd> binary. For example: <kbd>/usr/bin/convert</kbd> or <kbd>C:\Program Files\ImageMagick-6.3.4-Q16\convert.exe</kbd>.'),
   );
   $form['imagemagick_binary']['image_imagemagick_debugging'] = array(
     '#type' => 'checkbox',
@@ -57,7 +57,7 @@ function _image_imagemagick_check_path($path, $attach_error_to = FALSE) {
   }
   if ($attach_error_to) {
     if ($open_basedir = ini_get('open_basedir')) {
-      form_set_error($attach_error_to, t("No file %file could be found. PHP's <a href='!open-basedir'>open_basedir</a> security resriction is set to %open-basedir, which may be interfering with the attempts to locate ImageMagick.", array('%file' => $path, '%open-basedir' => $open_basedir, '!info-link' => url('http://php.net/features.safe-mode#ini.open-basedir') )));
+      form_set_error($attach_error_to, t("No file %file could be found. PHP's <a href='@open_basedir'>open_basedir</a> security restriction is set to %open_basedir, which may be interfering with the attempts to locate ImageMagick.", array('%file' => $path, '%open_basedir' => $open_basedir, '@open_basedir' => 'http://php.net/features.safe-mode#ini.open-basedir')));
     }
     else {
       form_set_error($attach_error_to, t('The specified ImageMagic path %file does not exist.', array('%file' => $path)));
@@ -168,12 +168,12 @@ function _image_imagemagick_convert_exec($command_args, &$output, &$errors) {
 
     // Display debugging information to authorized users.
     if (variable_get('image_imagemagick_debugging', FALSE) && user_access('administer site configuration')) {
-      drupal_set_message(t("ImageMagick command: @command", array('@command' => $convert_path .' '. $command_args)));
-      drupal_set_message(t("ImageMagick output: @output", array('@output' => $output)));
+      drupal_set_message(t('ImageMagick command: @command', array('@command' => $convert_path .' '. $command_args)));
+      drupal_set_message(t('ImageMagick output: @output', array('@output' => $output)));
     }
 
     if ($errors) {
-      drupal_set_message(t("ImageMagick reported an error: %error", array('%error' => $errors)), 'error');
+      drupal_set_message(t('ImageMagick reported an error: %error.', array('%error' => $errors)), 'error');
     }
 
     fclose($pipes[0]);

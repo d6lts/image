@@ -7,9 +7,7 @@
 function image_import_help($path, $arg) {
   switch ($path) {
     case 'admin/content/image_import':
-      $output = '<p>'. t("Import multiple image files and save them as image nodes. The files will be moved from their location into the image module's files directory. ")
-        . t("Searching for image files in %dirpath.", array('%dirpath' => realpath(variable_get('image_import_path', '')))) .'</p>';
-      return $output;
+      return '<p>'. t("Import multiple image files and save them as image nodes. The files will be moved from their location into the image module's files directory. Searching for image files in %dirpath.", array('%dirpath' => realpath(variable_get('image_import_path', '')))) .'</p>';
     case 'admin/settings/image_import':
       return t("Configure the image import module's settings.");
     default:
