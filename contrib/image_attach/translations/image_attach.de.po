@@ -5,181 +5,187 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: general\n"
-"POT-Creation-Date: 2007-07-07 14:42+0200\n"
-"PO-Revision-Date: 2007-11-15 14:35+0100\n"
-"Last-Translator: Alexander Hass\n"
+"Project-Id-Version: image_attach\n"
+"POT-Creation-Date: 2008-12-27 12:04+0100\n"
+"PO-Revision-Date: 2008-12-27 12:44+0100\n"
+"Last-Translator: Alexander Haß\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: GERMANY\n"
+"X-Poedit-Language: German\n"
 
-#: image_attach.module:16
-#: image_attach.info:0
-msgid "Allows easy attaching of image nodes to other content types."
-msgstr "Ermöglicht das einfache Anhängen von Bildbeiträgen zu anderen Inhaltstypen."
-
-#: image_attach.module:29
-#, fuzzy
-msgid "Image Attachment View"
-msgstr "Ansicht des Bildanhang"
-
-#: image_attach.module:36
+#: contrib/image_attach/image_attach.views.inc:13
+#: contrib/image_attach/image_attach.module:33
 #, fuzzy
 msgid "Image attach"
 msgstr "Bildanhang"
 
-#: image_attach.module:37
-msgid "Enable image attach for content"
+#: contrib/image_attach/image_attach.views.inc:27
+msgid "Attached image"
+msgstr "Angehängtes Bild"
+
+#: contrib/image_attach/image_attach.views.inc:32
+#, fuzzy
+msgid "An image attached to a node."
 msgstr "Bildanhang für den Inhalt aktivieren"
 
-#: image_attach.module:53
+#: contrib/image_attach/image_attach_views_handler_field_iid.inc:28
+#: contrib/image_attach/image_attach.module:102
+msgid "Image size"
+msgstr "Bildgröße"
+
+#: contrib/image_attach/image_attach_views_handler_field_iid.inc:36
+msgid "No link"
+msgstr "Keine Verlinkung"
+
+#: contrib/image_attach/image_attach_views_handler_field_iid.inc:36
+msgid "Node"
+msgstr "Beitrag"
+
+#: contrib/image_attach/image_attach_views_handler_field_iid.inc:36
+msgid "Image node"
+msgstr "Bildbeitrag"
+
+#: contrib/image_attach/image_attach.module:16
+#: contrib/image_attach/image_attach.info:0
+msgid "Allows easy attaching of image nodes to other content types."
+msgstr "Ermöglicht das einfache Anhängen von Bildbeiträgen zu anderen Inhaltstypen."
+
+#: contrib/image_attach/image_attach.module:49
 msgid "Attach existing images"
 msgstr "Vorhandene Bilder anhängen"
 
-#: image_attach.module:56
+#: contrib/image_attach/image_attach.module:52;144
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+#: contrib/image_attach/image_attach.module:53;144
+msgid "Enabled"
+msgstr "Aktiviert"
+
+#: contrib/image_attach/image_attach.module:55
 #, fuzzy
 msgid "When enabled, will allow existing image nodes to be attached instead of uploading new images."
 msgstr "Sobald aktiviert, können vorhandene Bildbeiträge angehängt werden anstatt neue Bilder hochzuladen."
 
-#: image_attach.module:70
+#: contrib/image_attach/image_attach.module:68;85;186
+msgid "Attached images"
+msgstr "Angehängte Bilder"
+
+#: contrib/image_attach/image_attach.module:105
+msgid "This determines the size of the image that appears in the block."
+msgstr "Dies bestimmt die Größe des Bildes das im Block erscheint."
+
+#: contrib/image_attach/image_attach.module:129
 msgid "<Hidden>"
 msgstr "<Versteckt>"
 
-#: image_attach.module:77
+#: contrib/image_attach/image_attach.module:136
 #, fuzzy
 msgid "Image Attach settings"
 msgstr "Einstellungen für Bildanhang"
 
-#: image_attach.module:82
-msgid "Attach Images"
+#: contrib/image_attach/image_attach.module:142
+msgid "Attach images"
 msgstr "Bilder anhängen"
 
-#: image_attach.module:84
-msgid "Disabled"
-msgstr "Deaktiviert"
-
-#: image_attach.module:84
-msgid "Enabled"
-msgstr "Aktiviert"
-
-#: image_attach.module:85
+#: contrib/image_attach/image_attach.module:145
 #, fuzzy
 msgid "Should this node allows users to upload an image?"
 msgstr "Soll dieser Beitrag den Benutzern erlauben ein Bild hochzuladen?"
 
-#: image_attach.module:89
+#: contrib/image_attach/image_attach.module:149
 #, fuzzy
 msgid "Teaser image size"
 msgstr "Bildgröße im Anrisstext"
 
-#: image_attach.module:92
+#: contrib/image_attach/image_attach.module:152
 msgid "This determines the size of the image that appears when the node is displayed as a teaser. 'Hidden' will not show the image."
-msgstr ""
+msgstr "Dieser Wert bestimmt die Größe des Bildes, dass bei der Anrisstextanzeige des Beitrages erscheint. Bei ‚Versteckt‘ wird das Bild nicht angezeigt."
 
-#: image_attach.module:96
+#: contrib/image_attach/image_attach.module:156
 #, fuzzy
 msgid "Teaser image weight"
 msgstr "Bildreihenfolge im Anrisstext"
 
-#: image_attach.module:98
+#: contrib/image_attach/image_attach.module:158
 msgid "This value determines the order of the image when displayed in the teaser."
-msgstr ""
+msgstr "Dieser Wert bestimmt die Reihenfolge des Bildes, wenn es im Anrisstext angezeigt wird."
 
-#: image_attach.module:102
+#: contrib/image_attach/image_attach.module:162
 msgid "Full node image size"
 msgstr "Bildgröße im vollständigen Beitrag"
 
-#: image_attach.module:105
+#: contrib/image_attach/image_attach.module:165
 msgid "This determines the size of the image that appears when the full node is displayed. 'Hidden' will not show the image."
-msgstr ""
+msgstr "Dieser Wert bestimmt die Größe des Bildes, dass bei der vollständigen Beitragsanzeige erscheint. Bei ‚Versteckt‘ wird das Bild nicht angezeigt."
 
-#: image_attach.module:109
+#: contrib/image_attach/image_attach.module:169
 #, fuzzy
 msgid "Full node image weight"
 msgstr "Bildreihenfolge im vollständigen Beitrag"
 
-#: image_attach.module:111
+#: contrib/image_attach/image_attach.module:171
 msgid "This value determines the order of the image when displayed in the body."
-msgstr ""
+msgstr "Dieser Wert bestimmt die Reihenfolge des Bildes, wenn es im Textkörper angezeigt wird."
 
-#: image_attach.module:126
-msgid "Attached Images"
-msgstr "Angehängte Bilder"
-
-#: image_attach.module:134
-msgid "Thumbnail"
-msgstr "Miniaturansicht"
-
-#: image_attach.module:141
-msgid "Existing Image"
+#: contrib/image_attach/image_attach.module:204
+msgid "Existing image"
 msgstr "Vorhandenes Bild"
 
-#: image_attach.module:144
+#: contrib/image_attach/image_attach.module:207
 msgid "Choose an image already existing on the server if you do not upload a new one."
 msgstr "Ein auf dem Server vorhandenes Bild auswählen, wenn kein neues Bild hochgeladen wird."
 
-#: image_attach.module:148
+#: contrib/image_attach/image_attach.module:211
 msgid "-or-"
 msgstr "-oder-"
 
-#: image_attach.module:160
-msgid "Upload Image"
+#: contrib/image_attach/image_attach.module:223
+msgid "Upload image"
 msgstr "Bild hochladen"
 
-#: image_attach.module:164
-msgid "Image title"
-msgstr "Bildtitel"
-
-#: image_attach.module:166
+#: contrib/image_attach/image_attach.module:229
 msgid "The title the image will be shown with."
 msgstr "Der Titel mit dem das Bild angezeigt wird."
 
-#: image_attach.module:276
-#, fuzzy
+#: contrib/image_attach/image_attach.module:250
+msgid "Created new image to attach to this node. !image_link"
+msgstr "Neues Bild wurde erstellt, um es an diesen Beitrag anzuhängen. !image_link"
+
+#: contrib/image_attach/image_attach.module:324
 msgid "None"
 msgstr "Keine"
 
-#: image_attach.module:300
+#: contrib/image_attach/image_attach.module:27
 #, fuzzy
-msgid "Image Attach: Display Image"
-msgstr "Bildanhang: Bild anzeigen"
+msgid "Image attachment view"
+msgstr "Ansicht des Bildanhang"
 
-#: image_attach.module:302
-#: image_attach.info:0
-msgid "Image"
-msgstr "Bild"
+#: contrib/image_attach/image_attach.module:34
+msgid "Enable image attach for content."
+msgstr "Bildanhang für den Inhalt aktivieren."
 
-#: image_attach.module:303
-#, fuzzy
-msgid "Image with link to attaching node"
-msgstr "Bild mit Link zu anhängendem Beitrag"
-
-#: image_attach.module:304
-msgid "Image with link to attached image"
-msgstr "Bild mit Link zu angehängtem Bild"
-
-#: image_attach.module:315
-#, fuzzy
-msgid "Image Attach: Attached image"
-msgstr "Bildanhang: angehängtes Bild"
-
-#: image_attach.module:316
-msgid "Exists"
-msgstr "Vorhanden"
-
-#: image_attach.module:320
-#, fuzzy
-msgid "Filter by whether or not the node has an attached image."
-msgstr "Nach Beiträgen mit oder ohne angehängtem Bild filtern."
-
-#: image_attach.module:0
+#: contrib/image_attach/image_attach.module:0
 msgid "image_attach"
 msgstr "image_attach"
 
-#: image_attach.info:0
+#: contrib/image_attach/image_attach.install:9
+msgid "Stores the image/node relationship."
+msgstr ""
+
+#: contrib/image_attach/image_attach.install:12
+msgid "Primary Key: The {node}.nid of the node."
+msgstr ""
+
+#: contrib/image_attach/image_attach.install:18
+msgid "TODO"
+msgstr ""
+
+#: contrib/image_attach/image_attach.info:0
 #, fuzzy
 msgid "Image Attach"
 msgstr "Bildanhang"
