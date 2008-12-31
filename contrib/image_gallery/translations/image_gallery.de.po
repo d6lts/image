@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: image_gallery\n"
 "POT-Creation-Date: 2008-12-27 12:04+0100\n"
-"PO-Revision-Date: 2008-12-27 13:29+0100\n"
+"PO-Revision-Date: 2008-12-31 13:11+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +29,7 @@ msgstr "Bilder pro Seite"
 
 #: contrib/image_gallery/image_gallery.module:79
 msgid "Sets the number of images to be displayed in a gallery page."
-msgstr "Legt die Anzahl der Bilder fest, die auf einer Galerie-Seite dargestellt werden."
+msgstr "Legt die Anzahl der Bilder fest, die auf einer Galerie-Seite angezeigt werden."
 
 #: contrib/image_gallery/image_gallery.module:83
 msgid "Display node info"
@@ -37,7 +37,7 @@ msgstr "Beitragsinformation anzeigen"
 
 #: contrib/image_gallery/image_gallery.module:85
 msgid "Checking this will display the \"Posted by\" node information on the gallery pages."
-msgstr "Die Aktivierung wird die „Verfasst von“-Beitragsinformation auf den Galerieseiten anzeigen."
+msgstr "Nach der Aktivierung wird die „Verfasst von“-Beitragsinformation auf den Galerieseiten angezeigt."
 
 #: contrib/image_gallery/image_gallery.module:89
 msgid "Image display sort order"
@@ -71,9 +71,10 @@ msgstr "Operationen"
 msgid "edit gallery"
 msgstr "Galerie bearbeiten"
 
+# English: missing period
 #: contrib/image_gallery/image_gallery.module:224
 msgid "No galleries available"
-msgstr "Keine Galerien vorhanden"
+msgstr "Keine Galerien vorhanden."
 
 #: contrib/image_gallery/image_gallery.module:229;286;320
 msgid "Delete"
@@ -105,7 +106,7 @@ msgstr "Reihenfolge"
 
 #: contrib/image_gallery/image_gallery.module:273
 msgid "When listing galleries, those with with light (small) weights get listed before containers with heavier (larger) weights. Galleries with equal weights are sorted alphabetically."
-msgstr "Bei der Anzeige von Galerien, werden diese mit einer leichten (niedrigen) Reihenfolge oberhalb Containern mit einem schweren (größeren) Reihenfolge angezeigt. Gallerien mit der gleichen Reihenfolge werden alphabetisch sortiert."
+msgstr "Bei der Anzeige von Galerien, werden diese mit einer leichten (niedrigen) Reihenfolge oberhalb von Containern mit einer schweren (größeren) Reihenfolge angezeigt. Gallerien mit der gleichen Reihenfolge werden alphabetisch sortiert."
 
 #: contrib/image_gallery/image_gallery.module:281
 msgid "Submit"
@@ -113,7 +114,7 @@ msgstr "Speichern"
 
 #: contrib/image_gallery/image_gallery.module:302
 msgid "Created new gallery %term."
-msgstr "Die Galerie %term wurde neu angelegt."
+msgstr "Die neue Galerie %term wurde erstellt."
 
 #: contrib/image_gallery/image_gallery.module:305
 msgid "The gallery %term has been updated."

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: image_import\n"
 "POT-Creation-Date: 2008-12-27 12:04+0100\n"
-"PO-Revision-Date: 2008-12-27 14:29+0100\n"
+"PO-Revision-Date: 2008-12-31 14:04+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -32,7 +32,7 @@ msgstr "<strong>Hinweis:</strong> Ein Pfad der mit einem <kbd>/</kbd> beginnt, b
 
 #: contrib/image_import/image_import.admin.inc:29
 msgid "You can't import from the image module's directory. The import deletes the original files so you would just be asking for trouble."
-msgstr "Aus dem Verzeichnis des Bild-Moduls kann nicht importiert werden. Der Import löscht Orginaldateien und könnte große Probleme verursachen."
+msgstr "Aus dem Verzeichnis des Bild-Moduls kann nicht importiert werden. Der Import löscht Originaldateien und könnte große Probleme verursachen."
 
 #: contrib/image_import/image_import.admin.inc:32
 msgid "Your settings are configured correctly, you can import images <a href='!image_import_page'>here</a>."
@@ -105,7 +105,7 @@ msgstr "Bildimport wurde abgeschlossen."
 
 #: contrib/image_import/image_import.module:10
 msgid "Import multiple image files and save them as image nodes. The files will be moved from their location into the image module's files directory. Searching for image files in %dirpath."
-msgstr "Mehrere Bilddateien importieren und als Bildbeiträge speichern. Diese Dateien werden von ihrem Ablageort in das Standardverzeichnis für Bilder des Bild-Moduls verschoben. Suche nach Bilddateien in %dirpath."
+msgstr "Mehrere Bilddateien importieren und als Bildbeiträge speichern. Diese Dateien werden von ihrem Ablageort in das Standardverzeichnis für Bilder des Bild-Moduls verschoben. Bilddateien in %dirpath werden gesucht."
 
 #: contrib/image_import/image_import.module:12
 msgid "Configure the image import module's settings."

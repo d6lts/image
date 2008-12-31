@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: image_im_advanced\n"
 "POT-Creation-Date: 2008-12-27 12:04+0100\n"
-"PO-Revision-Date: 2008-12-27 14:00+0100\n"
+"PO-Revision-Date: 2008-12-31 13:59+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -63,9 +63,10 @@ msgstr "RGB"
 msgid "Gray"
 msgstr "Grau"
 
+# not literally
 #: contrib/image_im_advanced/image_im_advanced.module:59
 msgid "This option lets you convert images to the specified colorspace. This will be overridden by the Color profile option, if used. <a href=\"@link\">More information on -colorspace</a>."
-msgstr "Diese Option ermöglicht die Konvertierung von Bildern zu einem angegebenen Farbraum. Dies wird von der Farbprofil-Option übersteuert, soweit diese genutzt wird. <a href=\"@link\">Weitere Information zu „-colorspace“</a>."
+msgstr "Diese Option ermöglicht die Konvertierung von Bildern zu dem festgelegten Farbraum. Dies Einstellung wird bei Verwendung der Farbprofil-Option übersteuert. <a href=\"@link\">Weitere Information zu „-colorspace“</a>."
 
 #: contrib/image_im_advanced/image_im_advanced.module:63
 msgid "Change image resolution to 72 ppi"
@@ -73,7 +74,7 @@ msgstr "Bildauflösung in 72ppi ändern"
 
 #: contrib/image_im_advanced/image_im_advanced.module:65
 msgid "If checked, this option will set the print resolution of the image to 72 pixels per inch, which is suitable for web use. This does not affect the pixel size or quality of the image. <a href=\"@link\">More information on -density</a>."
-msgstr "Sobald aktiviert, wird diese Option die Druckauflösung von dem Bild auf 72 Pixel pro Zoll setzen, was für die Verwendung im Web angemessen ist. Dies beeinflusst die Pixelgröße und Qualität der Bilder nicht. <a href=\"@link\">Weitere Information zu „-density“</a>."
+msgstr "Sobald aktiviert, wird diese Option die Druckauflösung des Bildes auf 72 Pixel pro Zoll einstellen, was für die Verwendung im Web angemessen ist. Dies beeinflusst die Pixelgröße und Qualität der Bilder nicht. <a href=\"@link\">Weitere Information zu „-density“</a>."
 
 #: contrib/image_im_advanced/image_im_advanced.module:70
 msgid "Sharpening filter"
@@ -89,7 +90,7 @@ msgstr "Stärke des Schärfefilters"
 
 #: contrib/image_im_advanced/image_im_advanced.module:82
 msgid "Apply this percentage of sharpness when scaling. 90 is recommended, although values higher than 100 are also valid. Set to 0 to disable this feature."
-msgstr "Bei der Skalierung diesen Prozentwert für die Schärfung anwenden. Empfohlen wird 90, aber Werte über 100 sind auch zulässig. Um dieses Feature zu deaktivieren kann eine 0 eingeben werden."
+msgstr "Bei der Skalierung diesen Prozentwert für die Schärfung verwenden. Empfohlen wird 90, aber Werte über 100 sind auch zulässig. Um diese Funktion zu deaktivieren kann eine 0 eingeben werden."
 
 #: contrib/image_im_advanced/image_im_advanced.module:86
 msgid "Sharpness filter radius"
@@ -97,7 +98,7 @@ msgstr "Radius des Schärfefilters"
 
 #: contrib/image_im_advanced/image_im_advanced.module:90
 msgid "Use this pixel radius for the sharpness filter. 0.9 is recommended."
-msgstr "Verwende den Pixelradius für den Schärfefilter. Der Wert 0.9 wird empfohlen."
+msgstr "Diesen Pixelradius für den Schärfefilter verwenden. Der Wert 0.9 wird empfohlen."
 
 #: contrib/image_im_advanced/image_im_advanced.module:95
 msgid "Color profile"
@@ -111,10 +112,10 @@ msgstr ""
 msgid "Path to color profile"
 msgstr "Pfad zum Farbprofil"
 
+# not literally
 #: contrib/image_im_advanced/image_im_advanced.module:104
-#, fuzzy
 msgid "The path to a color profile file that all scaled down images will be converted to. Leave empty to disable."
-msgstr "Der Pfad zu einer Farbprofildatei mit der alle herunterskalierten Bilder konvertiert werden. Leerlassen, um es zu deaktivieren."
+msgstr "Der Pfad zu einer Farbprofildatei mit der alle herunterskalierten Bilder konvertiert werden. Leerlassen, um die Funktion zu deaktivieren."
 
 #: contrib/image_im_advanced/image_im_advanced.module:121
 msgid "The JPEG quality must be a positive number between 1 and 100."

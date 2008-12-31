@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: image\n"
 "POT-Creation-Date: 2008-12-27 12:04+0100\n"
-"PO-Revision-Date: 2008-12-27 15:08+0100\n"
+"PO-Revision-Date: 2008-12-31 14:08+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +28,7 @@ msgstr "Standardverzeichnis für Bilder"
 # include > append
 #: image.admin.inc:24
 msgid "Subdirectory in the directory %dir where pictures will be stored. Do not include trailing slash."
-msgstr "Unterverzeichnis im Ordner %dir, in dem Bilder gespeichert werden. Keinen abschließenden Schrägstrich anhängen."
+msgstr "Das Unterverzeichnis im %dir-Ordner, in dem Bilder gespeichert werden. Keinen abschließenden Schrägstrich anhängen."
 
 #: image.admin.inc:29
 msgid "Maximum upload size"
@@ -40,7 +40,7 @@ msgstr "KB"
 
 #: image.admin.inc:33
 msgid "Maximum file size for image uploads. When a maximum image dimensions is specified for original images the size is checked after resizing."
-msgstr "Maximale zulässige Dateigröße zum Hochladen von Bildern. Sollten die maximalen Abmessungen für orginal Bilder angegeben sein, wird die Größe nach der Skalierung überprüft."
+msgstr "Maximale zulässige Dateigröße zum Hochladen von Bildern. Sollten die maximalen Abmessungen für Originalbilder angegeben sein, wird die Größe nach der Skalierung überprüft."
 
 #: image.admin.inc:38
 msgid "Image sizes"
@@ -120,7 +120,7 @@ msgstr "Debugging-Information anzeigen"
 
 #: image.imagemagick.inc:34
 msgid "Checking this option will display the ImageMagick commands and ouput to users with the <em>administer site configuration</em> permission."
-msgstr "Die Aktivierung dieser Option wird den Benutzern mit der <em>Website-Einstellungen bearbeiten</em> Berechtigung die ImageMagick-Kommandos und Ausgaben anzeigen."
+msgstr "Nach Aktivierung dieser Option werden, den Benutzern mit der <em>Website-Einstellungen bearbeiten</em>-Berechtigung, die ImageMagick-Kommandos und Ausgaben angezeigt."
 
 #: image.imagemagick.inc:60
 msgid "No file %file could be found. PHP's <a href='@open_basedir'>open_basedir</a> security restriction is set to %open_basedir, which may be interfering with the attempts to locate ImageMagick."
@@ -196,9 +196,8 @@ msgid "Rebuild image thumbnails"
 msgstr "Miniaturansichten neu erstellen"
 
 #: image.module:203
-#, fuzzy
 msgid "The original image was resized to fit within the maximum allowed resolution of %width x %height pixels."
-msgstr "Das orginal Bild wurde auf die maximal zulässige Größe von %width x %height Pixel neu skaliert."
+msgstr "Das Originalbild wurde auf die maximal zulässige Größe von %width x %height Pixel neu skaliert."
 
 #: image.module:209
 msgid "The image you uploaded was too big. You are only allowed upload files less than %max_size but your file was %file_size."
@@ -221,7 +220,6 @@ msgid "Check this to rebuild the derivative images for this node."
 msgstr ""
 
 #: image.module:392
-#, fuzzy
 msgid "Click \"Browse...\" to select an image to upload."
 msgstr "Ein Bild zum Hochladen auswählen."
 
@@ -282,7 +280,7 @@ msgstr "Bilder erstellen"
 
 #: image.module:80
 msgid "view original images"
-msgstr "Original-Bilder betrachten"
+msgstr "Originalbilder betrachten"
 
 #: image.module:80
 msgid "edit own images"
@@ -365,7 +363,7 @@ msgid ""
 "The original image size was missing so no changes were made. See this <a href='@link'>image module issue</a> for more information. Include the following:<br /><pre>@old_sizes\n"
 "</pre>"
 msgstr ""
-"Die orginale Bildgröße war nicht vorhanden und deshalb wurden keine Änderungen vorgenommen. Weitere Information befinden sich unter <a href='@link'>Bild-Modul-Probleme</a>. Folgendes sollte angegeben werden:<br /><pre>@old_sizes\n"
+"Die originale Bildgröße war nicht vorhanden und deshalb wurden keine Änderungen vorgenommen. Weitere Information befinden sich unter <a href='@link'>Bild-Modul-Probleme</a>. Folgendes sollte angegeben werden:<br /><pre>@old_sizes\n"
 "</pre>"
 
 #: image.info:0

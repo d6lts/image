@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: image_attach\n"
 "POT-Creation-Date: 2008-12-27 12:04+0100\n"
-"PO-Revision-Date: 2008-12-27 12:44+0100\n"
+"PO-Revision-Date: 2008-12-31 13:04+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -67,9 +67,8 @@ msgid "Enabled"
 msgstr "Aktiviert"
 
 #: contrib/image_attach/image_attach.module:55
-#, fuzzy
 msgid "When enabled, will allow existing image nodes to be attached instead of uploading new images."
-msgstr "Sobald aktiviert, können vorhandene Bildbeiträge angehängt werden anstatt neue Bilder hochzuladen."
+msgstr "Sobald aktiviert, können auch vorhandene Bildbeiträge angehängt werden, anstatt neue Bilder hochzuladen."
 
 #: contrib/image_attach/image_attach.module:68;85;186
 msgid "Attached images"
