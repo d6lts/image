@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: image\n"
 "POT-Creation-Date: 2008-12-27 12:04+0100\n"
-"PO-Revision-Date: 2008-12-31 14:14+0100\n"
+"PO-Revision-Date: 2008-12-31 15:04+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -52,7 +52,7 @@ msgstr ""
 
 #: image.admin.inc:42
 msgid "Note: 'Original' dimensions will only be used to resize images when they are first uploaded. Existing originals will not be modified."
-msgstr ""
+msgstr "Hinweis: ‚Original‘-Abmessungen werden nur verwendet, um Bilder beim ersten Hochladen zu skalieren. Vorhandende Originale werden nicht angepasst."
 
 #: image.admin.inc:47
 msgid "Hidden"
@@ -80,7 +80,7 @@ msgstr "Die Breite, Höhe oder beide Abmessungen müssen angegeben werden."
 
 #: image.admin.inc:167
 msgid "Changes to the images sizes mean that the derivative images will need to be regenerated."
-msgstr ""
+msgstr "Änderungen an den Bildgrößen bedeutet, dass die abgeleiteten Bilder neu generiert werden müssen."
 
 #: image.admin.inc:173
 msgid "Label"
@@ -152,7 +152,7 @@ msgstr ""
 
 #: image.module:19
 msgid "Image administration allows the image directory and the image sizes to be set."
-msgstr ""
+msgstr "Die Bildverwaltung ermöglicht die Einstellung des Bildverzeichnisses und der Bildgrößen."
 
 #: image.module:20
 msgid "Image galleries are used to organize and display images in galleries. The list tab allows users to edit existing image gallery names, descriptions, parents and relative position, known as a weight. The add galleries tab allows you to create a new image gallery defining name, description, parent and weight."
@@ -164,11 +164,11 @@ msgstr "Hier kann:"
 
 #: image.module:23
 msgid "View image handling messages in <a href=\"@admin_settings\">administer &gt;&gt; settings</a>."
-msgstr ""
+msgstr "Bildbehandlungsnachrichten in <a href=\"@admin_settings\">Verwalten &gt;&gt; Einstellungen</a> anzeigen."
 
 #: image.module:24
 msgid "Configure image sizes and file directories at <a href=\"@admin_settings_image\">administer &gt;&gt; settings &gt;&gt; image</a>."
-msgstr ""
+msgstr "Die Bildgrößen und Dateiverzeichnisse unter <a href=\"@admin_settings_image\">Verwalten &gt;&gt; Einstellungen &gt;&gt; Bild</a> konfigurieren."
 
 #: image.module:25
 msgid "Use the <a href=\"@external_http_drupal_org_project_img_assist\">image assist module</a> to upload and insert images into posts."
@@ -213,11 +213,11 @@ msgstr "Zufälliges Bild"
 
 #: image.module:382
 msgid "Rebuild derivative images."
-msgstr ""
+msgstr "Abgeleitete Bilder neu erstellen."
 
 #: image.module:384
 msgid "Check this to rebuild the derivative images for this node."
-msgstr ""
+msgstr "Aktivieren, damit die abgeleiteten Bilder für diesen Beitrag neu erstellt werden."
 
 #: image.module:392
 msgid "Click \"Browse...\" to select an image to upload."
@@ -227,17 +227,21 @@ msgstr "Ein Bild zum Hochladen auswählen."
 msgid "You must upload an image."
 msgstr "Ein Bild muss hochgeladen werden."
 
+# not literally, English: images -> image
 #: image.module:479
+#, fuzzy
 msgid "%title's has an unneeded %key derivative images. The derivatives will be rebuilt to remove it."
-msgstr ""
+msgstr "%title enthält ein unbenutztes abgeleitetes %key-Bild. Die abgeleiteten Bilder werden erneuert, um es zu entfernen."
 
 #: image.module:491
+#, fuzzy
 msgid "%title's %key derivative image %filepath was missing. The derivatives will be rebuilt to regenerate it."
-msgstr ""
+msgstr "Das abgeleitete %key-Bild von %title ist in %filepath nicht vorhanden. Die abgeleiteten Bilder werden erneuert."
 
 #: image.module:497
+#, fuzzy
 msgid "%title's %key derivative image had a timestamp (%filetime) that predates the last changes to the image size settings (%vartime). The derivatives will be rebuilt to regenerate it."
-msgstr ""
+msgstr "Das abgeleitete %key-Bild von %title wies einen Zeitstempel (%filetime) auf, der vor der letzten Änderungen an der Bildgrößeneinstellung (%vartime) lag. Die abgeleiteten Bilder werden erneuert."
 
 #: image.module:506
 msgid "view"
@@ -245,7 +249,7 @@ msgstr "Anzeigen"
 
 #: image.module:583
 msgid "The derivative images for <a href=\"@link\">@title</a> have been regenerated."
-msgstr ""
+msgstr "Die abgeleiteten Bilder für <a href=\"@link\">@title</a> wurden neu generiert."
 
 #: image.module:741
 #: image.install:72
@@ -272,7 +276,7 @@ msgstr "Bild"
 
 #: image.module:506
 msgid "Derivative images were regenerated for %title."
-msgstr ""
+msgstr "Die abgeleiteten Bilder für %title wurden neu generiert."
 
 #: image.module:80
 msgid "create images"
