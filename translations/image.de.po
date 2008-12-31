@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: image\n"
 "POT-Creation-Date: 2008-12-27 12:04+0100\n"
-"PO-Revision-Date: 2008-12-31 14:08+0100\n"
+"PO-Revision-Date: 2008-12-31 14:14+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -108,11 +108,11 @@ msgstr "ImageMagick ist ein eigenständiges Program zur Manipulation von Bildern
 
 #: image.imagemagick.inc:25
 msgid "Path to the \"convert\" binary"
-msgstr "Pfad zur „convert“ Binärdatei"
+msgstr "Pfad zur „convert“-Binärdatei"
 
 #: image.imagemagick.inc:28
 msgid "Specify the complete path to the ImageMagic <kbd>convert</kbd> binary. For example: <kbd>/usr/bin/convert</kbd> or <kbd>C:\\Program Files\\ImageMagick-6.3.4-Q16\\convert.exe</kbd>."
-msgstr "Den vollständigen Pfad zur ImageMagick <kbd>convert</kbd> Binärdatei angeben. Beispielsweise: <kbd>/usr/bin/convert</kbd> oder <kbd>C:\\Programme\\ImageMagick-6.3.4-Q16\\convert.exe</kbd>."
+msgstr "Den vollständigen Pfad zur ImageMagick <kbd>convert</kbd>-Binärdatei angeben. Beispielsweise: <kbd>/usr/bin/convert</kbd> oder <kbd>C:\\Programme\\ImageMagick-6.3.4-Q16\\convert.exe</kbd>."
 
 #: image.imagemagick.inc:32
 msgid "Display debugging information"
