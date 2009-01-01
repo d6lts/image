@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: image\n"
 "POT-Creation-Date: 2008-12-27 12:04+0100\n"
-"PO-Revision-Date: 2008-12-31 15:04+0100\n"
+"PO-Revision-Date: 2009-01-01 18:13+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -48,7 +48,7 @@ msgstr "Bildgrößen"
 
 #: image.admin.inc:41
 msgid "The <em>Scale image</em> operation resizes images so that they fit with in the given dimensions. If only one dimension is specified the other dimension will be computed based on the image's aspect ratio. The <em>Scale and crop image</em> operation resizes images to be exactly the given dimensions. If only one dimension is specified the image will not be cropped, making this is equivalent to <em>Scale image</em>."
-msgstr ""
+msgstr "Die <em>Bild skalieren</em>-Operation ändert Bilder in der Größe, damit diese in die vorgegebenen Abmessungen passen. Sollte nur eine Abmessung angegeben sein, wird die andere basierend auf dem Seitenverhältnis des Bildes berechnet. Die <em>Bild skalieren und abschneiden</em>-Operation ändert Bilder in der Größe, damit diese genau den vorgegebenen Abmessungen entsprechen. Sollte nur eine Abmessung angegeben sein, wird das Bild nicht abgeschnitten, womit dies <em>Bild skalieren</em> entspricht."
 
 #: image.admin.inc:42
 msgid "Note: 'Original' dimensions will only be used to resize images when they are first uploaded. Existing originals will not be modified."
@@ -148,7 +148,7 @@ msgstr "ImageMagick hat einen Fehler zurückgegeben: %error."
 
 #: image.module:18
 msgid "The image module is used to create and administer images for your site. Each image is stored as a post, with thumbnails of the original generated automatically. There are two default thumbnail sizes, thumbnail and preview. The thumbnail size is shown as the preview for image posts and when browsing image galleries. The preview is the default size when first displaying an image node."
-msgstr ""
+msgstr "Das Bild-Modul wird zum Erstellen und Verwalten von Bildern für die Website verwendet. Jedes Bild wird als ein Beitrag mit automatisch generierten Miniaturansichten des Originals gespeichert. Es gibt zwei standardmäßige Miniaturansichtsgrößen, die Miniaturansicht und Vorschau. Die Miniaturansichtsgröße wird als Vorschau für Bildbeiträge und beim Blättern in Bildgalerien angezeigt. Die Vorschau ist die Standardgröße, wenn ein Bildbeitrag das erste Mal angezeigt wird."
 
 #: image.module:19
 msgid "Image administration allows the image directory and the image sizes to be set."
@@ -156,7 +156,7 @@ msgstr "Die Bildverwaltung ermöglicht die Einstellung des Bildverzeichnisses un
 
 #: image.module:20
 msgid "Image galleries are used to organize and display images in galleries. The list tab allows users to edit existing image gallery names, descriptions, parents and relative position, known as a weight. The add galleries tab allows you to create a new image gallery defining name, description, parent and weight."
-msgstr ""
+msgstr "Bildgalerien werden für die Organisation und Anzeige von Bildern in Gallerien verwendet. Der Anzeigen-Reiter ermöglicht Benutzern vorhandene Bildgalerienamen und -beschreibungen, sowie die übergeordnete und relative Position (als Reihenfolge bekannt) zu bearbeiten. Der „Bildgalerie hinzufügen“-Reiter ermöglicht die Erstellung einer neuen Bildgalerie durch Angabe von Name, Beschreibung, übergeordnetem Eintrag und Reihenfolge."
 
 #: image.module:21
 msgid "You are able to:"

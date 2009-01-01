@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: image_import\n"
 "POT-Creation-Date: 2008-12-27 12:04+0100\n"
-"PO-Revision-Date: 2008-12-31 14:04+0100\n"
+"PO-Revision-Date: 2009-01-01 18:17+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +28,7 @@ msgstr "Das Verzeichnis aus dem Bildbeiträge importiert werden sollen. Drupal b
 #: contrib/image_import/image_import.admin.inc:11
 #, fuzzy
 msgid "<strong>Note:</strong> a path begining with a <kbd>/</kbd> indicates the path is relative to the server's root, one starting without specifies a path relative to Drupal's root. I.e. <kbd>/tmp/image</kbd> would be the temp directory off the root while <kbd>tmp/image</kbd> would be inside Drupal's directory."
-msgstr "<strong>Hinweis:</strong> Ein Pfad der mit einem <kbd>/</kbd> beginnt, besagt das der Pfad relativ zur Server-Hauptebene und nicht zur Website-Hauptebene ist. Einer der ohne <kbd>/</kbd> anfängt gibt einen Pfad relativ zur Drupal-Hauptebene an. Beispielsweise: wäre <kbd>/tmp/bild</kbd> das Temporärverzeichnis der Hauptebene, wobei <kbd>tmp/bild</kbd> innerhalb des Drupal-Verzeichnisses wäre."
+msgstr "<strong>Hinweis:</strong> Ein Pfad der mit einem <kbd>/</kbd> beginnt, besagt das der Pfad relativ zur Server-Hauptebene und nicht zur Website-Hauptebene ist. Einer der ohne <kbd>/</kbd> anfängt gibt einen Pfad relativ zur Drupal-Hauptebene an. Beispielsweise: wäre <kbd>/tmp/bild</kbd> das Temporärverzeichnis der Server-Hauptebene, wobei <kbd>tmp/bild</kbd> innerhalb des Drupal-Verzeichnisses wäre."
 
 #: contrib/image_import/image_import.admin.inc:29
 msgid "You can't import from the image module's directory. The import deletes the original files so you would just be asking for trouble."

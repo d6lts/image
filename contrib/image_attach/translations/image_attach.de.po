@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: image_attach\n"
 "POT-Creation-Date: 2008-12-27 12:04+0100\n"
-"PO-Revision-Date: 2008-12-31 13:04+0100\n"
+"PO-Revision-Date: 2009-01-01 18:16+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,6 @@ msgstr ""
 
 #: contrib/image_attach/image_attach.views.inc:13
 #: contrib/image_attach/image_attach.module:33
-#, fuzzy
 msgid "Image attach"
 msgstr "Bildanhang"
 
@@ -28,9 +27,8 @@ msgid "Attached image"
 msgstr "Angehängtes Bild"
 
 #: contrib/image_attach/image_attach.views.inc:32
-#, fuzzy
 msgid "An image attached to a node."
-msgstr "Bildanhang für den Inhalt aktivieren"
+msgstr "Ein Bild das an einen Beitrag angehängt ist."
 
 #: contrib/image_attach/image_attach_views_handler_field_iid.inc:28
 #: contrib/image_attach/image_attach.module:102
@@ -83,7 +81,6 @@ msgid "<Hidden>"
 msgstr "<Versteckt>"
 
 #: contrib/image_attach/image_attach.module:136
-#, fuzzy
 msgid "Image Attach settings"
 msgstr "Einstellungen für Bildanhang"
 
@@ -92,12 +89,10 @@ msgid "Attach images"
 msgstr "Bilder anhängen"
 
 #: contrib/image_attach/image_attach.module:145
-#, fuzzy
 msgid "Should this node allows users to upload an image?"
 msgstr "Soll dieser Beitrag den Benutzern erlauben ein Bild hochzuladen?"
 
 #: contrib/image_attach/image_attach.module:149
-#, fuzzy
 msgid "Teaser image size"
 msgstr "Bildgröße im Anrisstext"
 
@@ -106,7 +101,6 @@ msgid "This determines the size of the image that appears when the node is displ
 msgstr "Dieser Wert bestimmt die Größe des Bildes, dass bei der Anrisstextanzeige des Beitrages erscheint. Bei ‚Versteckt‘ wird das Bild nicht angezeigt."
 
 #: contrib/image_attach/image_attach.module:156
-#, fuzzy
 msgid "Teaser image weight"
 msgstr "Bildreihenfolge im Anrisstext"
 
@@ -123,7 +117,6 @@ msgid "This determines the size of the image that appears when the full node is 
 msgstr "Dieser Wert bestimmt die Größe des Bildes, dass bei der vollständigen Beitragsanzeige erscheint. Bei ‚Versteckt‘ wird das Bild nicht angezeigt."
 
 #: contrib/image_attach/image_attach.module:169
-#, fuzzy
 msgid "Full node image weight"
 msgstr "Bildreihenfolge im vollständigen Beitrag"
 
@@ -160,7 +153,6 @@ msgid "None"
 msgstr "Keine"
 
 #: contrib/image_attach/image_attach.module:27
-#, fuzzy
 msgid "Image attachment view"
 msgstr "Ansicht des Bildanhang"
 
@@ -185,7 +177,6 @@ msgid "TODO"
 msgstr ""
 
 #: contrib/image_attach/image_attach.info:0
-#, fuzzy
 msgid "Image Attach"
 msgstr "Bildanhang"
 

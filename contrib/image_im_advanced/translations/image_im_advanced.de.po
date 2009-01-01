@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: image_im_advanced\n"
 "POT-Creation-Date: 2008-12-27 12:04+0100\n"
-"PO-Revision-Date: 2008-12-31 13:59+0100\n"
+"PO-Revision-Date: 2009-01-01 19:09+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -44,7 +44,7 @@ msgstr "Die Metadaten von Bildern bei dieser Größe oder darunter abschneiden"
 
 #: contrib/image_im_advanced/image_im_advanced.module:52
 msgid "You may choose to strip all metadata, such as camera information and color profiles, from the processed images in order to reduce their file size. Please choose at what maximum size you want images to be stripped of their metadata. Example: \"150x150\". Enter \"0x0\" to disable this feature. This option requires ImageMagick 6.0.0 or higher. <a href=\"@link\">More information on -strip</a>."
-msgstr ""
+msgstr "Hier kann ausgewählt werden, ob bei den verarbeiteten Bildern alle Metadaten (wie Kamera-Information und Farbprofile) abgeschnitten werden, damit sich deren Dateigröße reduziert. Dabei muss die Maximalgröße ausgewählt werden, bei welcher die Metadaten der Bilder abgeschnitten werden. Beispiel: „150x150“. Diese Funktion kann mit „0x0“ deaktiviert werden. Diese Option erfordert ImageMagick 6.0.0 oder höher. <a href=\"@link\">Weitere Information zu „-strip“</a>."
 
 # colorspace?
 #: contrib/image_im_advanced/image_im_advanced.module:56
@@ -104,9 +104,11 @@ msgstr "Diesen Pixelradius für den Schärfefilter verwenden. Der Wert 0.9 wird 
 msgid "Color profile"
 msgstr "Farbprofil"
 
+# not literally; wide-gamut color profile  = große Farbprofilskala?
 #: contrib/image_im_advanced/image_im_advanced.module:98
+#, fuzzy
 msgid "Processed images may be converted to a color profile specified here. This is especially important when working with images that use a wide-gamut color profile such as ColorMatch or Adobe RGB, which is often the case with professional photography. sRGB (which may be downloaded from <a href=\"http://www.color.org/profiles.html\">ICC</a>) is recommended since it is likely to look good on most displays.<br />Note that this conversion is still useful even if you choose to strip all metadata from your images (see above). This is because the conversion happens first and changes the actual image data before the profile is stripped."
-msgstr ""
+msgstr "Verarbeitete Bilder können zu einem hier angegebenen Farbprofil konvertiert werden. Dies ist besonders wichtig, wenn mit Bildern gearbeitet wird, die eine große Farbprofilskala wie ColorMatch oder Adobe RGB verwenden, was bei professioneller Photografie oft der Fall ist. sRGB (welches bei <a href=\"http://www.color.org/profiles.html\">ICC</a> heruntergeladen werden kann) wird empfohlen, da es auf den meisten Bildschirmen gut aussieht.<br />Diese Konvertierung ist auch Sinnvoll, wenn alle Metadaten aus den Bildern abgeschnitten werden (siehe oben). Dies liegt daran, dass die Konvertierung zuerst stattfindet und die eigentlichen Bilddaten vor dem Abschneiden des Profils ändert."
 
 #: contrib/image_im_advanced/image_im_advanced.module:102
 msgid "Path to color profile"
@@ -143,7 +145,6 @@ msgstr "image_im_advanced"
 
 # Englisch needs work.
 #: contrib/image_im_advanced/image_im_advanced.install:16
-#, fuzzy
 msgid "ImageMagick image toolkit is not properly installed"
 msgstr "ImageMagick-Bild-Toolkit ist nicht richtig installiert."
 
