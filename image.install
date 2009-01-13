@@ -6,22 +6,22 @@
  */
 function image_schema() {
   $schema['image'] = array(
-    'description' => t('Stores image files information.'),
+    'description' => 'Stores image files information.',
     'fields' => array(
       'nid' => array(
-        'description' => t('Primary Key: The {node}.nid of the image node.'),
+        'description' => 'Primary Key: The {node}.nid of the image node.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
       ),
       'fid' => array(
-        'description' => t('Index: The {files}.fid of the image file.'),
+        'description' => 'Index: The {files}.fid of the image file.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
       ),
       'image_size' => array(
-        'description' => t('Primary Key: The {files}.filename of the image file. For image module this indicates the file size.'),
+        'description' => 'Primary Key: The {files}.filename of the image file. For image module this indicates the file size.',
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
