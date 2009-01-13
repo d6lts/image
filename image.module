@@ -407,7 +407,6 @@ function image_validate($node) {
 }
 
 function image_submit($node) {
-dsm("image_submit...");
   $nid = ($node->nid) ? $node->nid : 'new_node';
   if (isset($_SESSION['image_new_files'][$nid])) {
     $node->new_file = TRUE;
