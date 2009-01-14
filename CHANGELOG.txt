@@ -1,0 +1,10 @@
+// $Id$
+
+Image x.x-x.x, xxxx-xx-xx
+-------------------------
+
+
+Image 6.x-1.x, xxxx-xx-xx
+-------------------------
+#247433 by greenmother: Added Russian translation.
+
