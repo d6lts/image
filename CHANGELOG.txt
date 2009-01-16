@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#310391 by pcorbett, sun: Fixed SQL server/PostGreSQL support for Image Attach.
 #309872 by brenda003, sun: Fixed link to Image Import settings page.
 #247433 by greenmother: Added Russian translation.
 
