@@ -694,7 +694,7 @@ function image_get_random($count = 1, $tid = 0) {
     $result = db_query_range(db_rewrite_sql("SELECT DISTINCT(n.nid), RAND() AS rand FROM {term_node} tn LEFT JOIN {node} n ON n.nid = tn.nid WHERE n.type='image' AND n.status = 1 AND tn.tid = %d ORDER BY rand"), $tid, 0, $count);
   }
   else {
-    $result = db_query_range(db_rewrite_sql("SELECT DISTINCT(n.nid), RAND() AS rand FROM {node} n WHERE n.type = 'image' AND n.status = 1 ORDER BY rand"), 0, $count);
+    $result = db_query_range(db_rewrite_sql("SELECT DISTINCT(n.nid), RAND() AS rand FROM {node} n WHERE n.type = 'image' AND n.status = 1 ORDER BY rand"), array(), 0, $count);
   }
   $output = array();
   while ($nid = db_fetch_object($result)) {
