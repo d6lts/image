@@ -382,6 +382,7 @@ function image_form(&$node, &$param) {
     '#title' => t('Rebuild derivative images.'),
     '#default_value' => FALSE,
     '#description' => t('Check this to rebuild the derivative images for this node.'),
+    '#access' => (!isset($node->nid) ? FALSE : TRUE),
   );
 
   $form['#attributes'] = array("enctype" => "multipart/form-data");
