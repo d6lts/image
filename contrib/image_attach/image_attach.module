@@ -328,7 +328,7 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
  * Fetch an array of all candidate referenced nodes, for use in presenting the selection form to the user.
  */
 function _image_attach_get_image_nodes() {
-  $result = db_query(db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE n.status=1 AND type='image' ORDER BY n.sticky DESC, n.title ASC"));
+  $result = db_query(db_rewrite_sql("SELECT n.nid, n.title, n.sticky FROM {node} n WHERE n.status = 1 AND n.type = 'image' ORDER BY n.sticky DESC, n.title ASC"));
   if (db_num_rows($result) == 0) {
     return array();
   }
