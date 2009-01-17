@@ -81,20 +81,18 @@ function image_perm() {
 }
 
 /**
- * Implementation of hook_access
+ * Implementation of hook_access().
  */
-function image_access($op, $node) {
-  global $user;
-
-  if ($op == 'create' && user_access('create images')) {
+function image_access($op, $node, $account = NULL) {
+  if ($op == 'create' && user_access('create images', $account)) {
     return TRUE;
   }
 
   if ($op == 'update' || $op == 'delete') {
-    if (user_access('edit images')) {
+    if (user_access('edit images', $account)) {
       return TRUE;
     }
-    if (user_access('edit own images') && ($user->uid == $node->uid)) {
+    if (user_access('edit own images', $account) && ($account->uid == $node->uid)) {
       return TRUE;
     }
   }

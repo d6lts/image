@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#310693 by sun: Updated image_access() for 6.x.
 #351552 by hass, sun: Changed Image Gallery's form submit button to "Save".
 #196823 by sun: Removed "Rebuild derivatives" option from node/add form.
 #310391 by pcorbett, sun: Fixed SQL server/PostGreSQL support for Image Attach.
