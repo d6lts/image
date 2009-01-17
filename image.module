@@ -83,7 +83,7 @@ function image_perm() {
 /**
  * Implementation of hook_access().
  */
-function image_access($op, $node, $account = NULL) {
+function image_access($op, $node, $account) {
   if ($op == 'create' && user_access('create images', $account)) {
     return TRUE;
   }
