@@ -278,7 +278,7 @@ function image_gallery_admin_form(&$form_state, $edit = array()) {
   );
   $form['submit' ] = array(
     '#type' => 'submit',
-    '#value' => t('Submit'),
+    '#value' => t('Save'),
   );
   if ($edit['tid']) {
     $form['delete'] = array(

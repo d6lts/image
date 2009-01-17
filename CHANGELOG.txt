@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#351552 by hass, sun: Changed Image Gallery's form submit button to "Save".
 #354523 by vitrex, drewish, sun: Fixed image_get_random() does not return
   distinct images.
 #196823 by sun: Removed "Rebuild derivatives" option from node/add form.
