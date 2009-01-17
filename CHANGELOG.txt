@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#288378 by smk-ka, mustafau, sun: Added primary key and index to image table.
 #70396 by bibo, sun: Fixed node image size links are not localized.
 #310693 by sun: Updated image_access() for 6.x.
 #351552 by hass, sun: Changed Image Gallery's form submit button to "Save".
