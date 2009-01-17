@@ -275,14 +275,14 @@ function image_link($type, $node, $main = 0) {
         if (isset($node->images[$key]) && $node->images[$key] != $node->images[$request]) {
           if ($size['link'] == IMAGE_LINK_NEW) {
             $links['image_size_'. $key] = array(
-              'title' => $size['label'],
+              'title' => t($size['label']),
               'href' => "image/view/{$node->nid}/$key",
               'attributes' => array('target' => '_blank'),
             );
           }
           else {
             $links['image_size_'. $key] = array(
-              'title' => $size['label'],
+              'title' => t($size['label']),
               'href' => 'node/'. $node->nid,
               'query' => 'size='. urlencode($key)
             );
