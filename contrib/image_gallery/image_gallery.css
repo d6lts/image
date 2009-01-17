@@ -46,4 +46,5 @@ ul.images li {
   float : left;
   margin : 1em;
   background: transparent;
+  list-style: none;
 }

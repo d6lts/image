@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#134395 by sun: Fixed default list bullet style for image gallery images.
 #234983 by sun: Performance: Improved image_gallery_page().
 #288378 by smk-ka, mustafau, sun: Added primary key and index to image table.
 #70396 by bibo, sun: Fixed node image size links are not localized.
