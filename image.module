@@ -478,7 +478,7 @@ function image_link($type, $node, $main = 0) {
  * Offers 2 blocks: latest image and random image. Skip if Views module is 
  * enabled.
  */
-function image_block($op = 'list', $delta = 0) {
+function image_block($op = 'list', $delta = 0, $edit = array()) {
   if (module_exists('views')) {
     return;
   }
@@ -487,24 +487,38 @@ function image_block($op = 'list', $delta = 0) {
     case 'list':
       $block[0]['info'] = t('Latest image');
       $block[1]['info'] = t('Random image');
-
       return $block;
+
+    case 'configure':
+      $form['number_images'] = array(
+        '#type' => 'select', 
+        '#title' => t('Number of images to display'),
+        '#options' => drupal_map_assoc(range(1, 99)),
+        '#default_value' => variable_get("image_block_$delta_number_images", 1),
+      );
+      return $form;
+
     case 'view':
       if (user_access('access content')) {
         switch ($delta) {
           case 0:
-            $images = image_get_latest();
+            $images = image_get_latest(variable_get("image_block_$delta_number_images", 1));
             $block['subject'] = t('Latest image');
-            $block['content'] = l(image_display($images[0], IMAGE_THUMBNAIL), 'node/'. $images[0]->nid, array(), NULL, NULL, FALSE, TRUE);
+            $block['content'] = theme('image_block_latest', $images, IMAGE_THUMBNAIL);
             break;
+
           case 1:
-            $images = image_get_random();
+            $images = image_get_random(variable_get("image_block_$delta_number_images", 1));
             $block['subject'] = t('Random image');
-            $block['content'] = l(image_display($images[0], IMAGE_THUMBNAIL), 'node/'. $images[0]->nid, array(), NULL, NULL, FALSE, TRUE);
+            $block['content'] = theme('image_block_random', $images, IMAGE_THUMBNAIL);
             break;
         }
       }
       return $block;
+
+    case 'save':
+      variable_set("image_block_$delta_number_images", $edit['number_images']);
+      break;
   }
 }
 
@@ -841,6 +855,27 @@ function theme_image_display($node, $label, $url, $attributes) {
   return theme('image', $url, $node->title, $node->title, $attributes, FALSE);
 }
 
+/**
+ * Theme a random block
+ */
+function theme_image_block_random($images, $size) {
+  $output = '';
+  foreach ($images as $image) {
+    $output .= l(image_display($image, $size), 'node/'. $image->nid, array(), NULL, NULL, FALSE, TRUE);
+  }
+  return $output;
+}
+
+/**
+ * Theme a latest block
+ */
+function theme_image_block_latest($images, $size) {
+  $output = '';
+  foreach ($images as $image) {
+    $output .= l(image_display($image, $size), 'node/'. $image->nid, array(), NULL, NULL, FALSE, TRUE);
+  }
+  return $output;
+}
 
 /**
  * Fetch a random N image(s) - optionally from a given term.
