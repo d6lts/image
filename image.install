@@ -298,3 +298,15 @@ function image_update_6100() {
   return $ret;
 }
 
+/**
+ * Ensure that 'image_default_path' variable contains no trailing slash.
+ */
+function image_update_6101() {
+  $ret = array();
+  $path = variable_get('image_default_path', NULL);
+  if (!empty($path)) {
+    variable_set('image_default_path', rtrim($path, '/'));
+  }
+  return $ret;
+}
+

@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#280197 by sun: Fixed 'image_default_path' variable must not have a trailing
+  slash.
 #299250 by sun: Changed file upload description in image form.
 #346289 by sun: Fixed missing primary key and index on image_attach table.
 #105739 by sun: Removed colors from default style for image gallery images.
