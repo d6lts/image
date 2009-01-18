@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#350511 by simon.males, sun: Added option to configure number of images for
+  latest/random image blocks.
 #280197 by sun: Fixed 'image_default_path' variable must not have a trailing
   slash.
 #299250 by sun: Changed file upload description in image form.
