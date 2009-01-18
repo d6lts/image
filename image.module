@@ -388,7 +388,7 @@ function image_form(&$node, &$param) {
     '#type' => 'file',
     '#title' => t('Image'),
     '#size' => 40,
-    '#description' => t('Click "Browse..." to select an image to upload.'),
+    '#description' => t('Select an image to upload.'),
     '#weight' => -3,
   );
   if ($type->has_body) {
