@@ -630,8 +630,15 @@ function image_display(&$node, $label = IMAGE_PREVIEW, $attributes = array()) {
 
   $image_info = image_get_info(file_create_path($node->images[$label]));
   $attributes['class'] = "image image-$label ". (isset($attributes['class']) ? $attributes['class'] : "");
-  $attributes['width'] = $image_info['width'];
-  $attributes['height'] = $image_info['height'];
+  // Only output width/height attributes if image_get_info() was able to detect
+  // the image dimensions, since certain browsers interpret an empty attribute
+  // value as zero.
+  if (!empty($image_info['width'])) {
+    $attributes['width'] = $image_info['width'];
+  }
+  if (!empty($image_info['height'])) {
+    $attributes['height'] = $image_info['height'];
+  }
 
   return theme('image_display', $node, $label, file_create_url($node->images[$label]), $attributes);
 }
