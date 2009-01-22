@@ -32,7 +32,7 @@ function image_gallery_requirements($phase) {
 
 function image_gallery_uninstall() {
   if ($vid = variable_get('image_gallery_nav_vocabulary', FALSE)) {
-    taxonomy_del_vocabulary($vid);
+    module_invoke('taxonomy', 'del_vocabulary', $vid);
   }
 
   variable_del('image_images_per_page');

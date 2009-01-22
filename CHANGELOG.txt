@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#361874 by sun: Fixed Image Gallery uninstall fails if Taxonomy was disabled at
+  the same time.
 #220281 by sun: Fixed empty width/height attributes in image tags if image size
   detection failed.
 #350511 by simon.males, sun: Added option to configure number of images for
