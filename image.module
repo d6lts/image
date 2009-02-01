@@ -419,16 +419,6 @@ function image_validate($node) {
   }
 }
 
-function image_submit($node) {
-  $nid = ($node->nid) ? $node->nid : 'new_node';
-  if (isset($_SESSION['image_new_files'][$nid])) {
-    $node->new_file = TRUE;
-    $node->rebuild_images = FALSE;
-    $node->images = $_SESSION['image_new_files'][$nid];
-    unset($_SESSION['image_new_files'][$nid]);
-  }
-}
-
 /**
  * Implementation of hook_view
  */
