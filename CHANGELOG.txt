@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#298644 by smk-ka, sun: Updated tests for SimpleTest 2.x.
 #247738 by sun: Removed unused image_submit() function.
 #360691 by sun: Fixed image/image_attach table index creation errors when
   upgrading from 5.x-2.x.
