@@ -23,7 +23,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Image 6.x\n"
 "POT-Creation-Date: 2008-12-27 12:04+0100\n"
-"PO-Revision-Date: 2009-02-07 03:35+0100\n"
+"PO-Revision-Date: 2009-02-07 05:30+0100\n"
 "Last-Translator: Magnus Gunnarsson <seals@passagen.se>\n"
 "Language-Team: drupalsverige.se\n"
 "MIME-Version: 1.0\n"
@@ -44,7 +44,7 @@ msgstr "Standardsökväg för bilder"
 
 #: image.admin.inc:24
 msgid "Subdirectory in the directory %dir where pictures will be stored. Do not include trailing slash."
-msgstr "Underkatalog till katalogen %dir där bilderna kommer att lagras. Lägg inte till ett inledande snedstreck."
+msgstr "Underkatalog till katalogen %dir där bilderna kommer att lagras. Lägg inte till ett avslutande snedstreck."
 
 #: image.admin.inc:29
 msgid "Maximum upload size"
@@ -184,7 +184,7 @@ msgstr "Visa bildhanteringsmeddelanden på <a href=\"@admin_settings\">Administr
 
 #: image.module:24
 msgid "Configure image sizes and file directories at <a href=\"@admin_settings_image\">administer &gt;&gt; settings &gt;&gt; image</a>."
-msgstr "Ställ in bildstorlekar och filkataloger på <a href=\"@admin_settings_image\">Administrera &gt;&gt; Inställningar &gt;&gt; Image</a>."
+msgstr "Ställ in bildstorlekar och filkataloger på <a href=\"@admin_settings_image\">Administrera &gt;&gt; Inställningar &gt;&gt; Bilder</a>."
 
 #: image.module:25
 msgid "Use the <a href=\"@external_http_drupal_org_project_img_assist\">image assist module</a> to upload and insert images into posts."
@@ -225,7 +225,7 @@ msgstr "Senaste bild"
 
 #: image.module:312;325
 msgid "Random image"
-msgstr "Slumpmässigt vald bild"
+msgstr "Slumpmässig bild"
 
 #: image.module:382
 msgid "Rebuild derivative images."
@@ -237,7 +237,7 @@ msgstr "Kryssa i detta för att återbygga härledda bilder för denna nod."
 
 #: image.module:392
 msgid "Click \"Browse...\" to select an image to upload."
-msgstr "Klicka på  \"Bläddra...\" för att välja bild för uppladdning."
+msgstr "Klicka på  \"Bläddra...\" för att välja en bild att ladda upp."
 
 #: image.module:405
 msgid "You must upload an image."
@@ -249,11 +249,11 @@ msgstr "%title har en onödig %key härledd till bilder. Härledningen kommer at
 
 #: image.module:491
 msgid "%title's %key derivative image %filepath was missing. The derivatives will be rebuilt to regenerate it."
-msgstr "%title %key härledda bild %filepath saknades. Härledningen kommer att återbyggas för att återskapa den."
+msgstr "%title %key härledd bild %filepath saknades. Härledningen kommer att återbyggas för att återskapa den."
 
 #: image.module:497
 msgid "%title's %key derivative image had a timestamp (%filetime) that predates the last changes to the image size settings (%vartime). The derivatives will be rebuilt to regenerate it."
-msgstr "%title %key härledda bild hade en tidsstämpel (%filetime) som fördaterad den senaste ändringen till inställningarna för bildstorleken (%vartime). Härledningarna kommer att återbyggas för att återskapa det."
+msgstr "%title %key härledd bild hade en tidsstämpel (%filetime) som fördaterar den senaste ändringen till inställningarna för bildstorleken (%vartime). Härledningarna kommer att återbyggas för att återskapa den."
 
 #: image.module:506
 msgid "view"
@@ -372,14 +372,14 @@ msgstr "Existerar (%path)."
 
 #: image.install:101
 msgid "Image module directories"
-msgstr "Kataloger för modulen Bild"
+msgstr "Kataloger för modulen Image"
 
 #: image.install:189
 msgid ""
 "The original image size was missing so no changes were made. See this <a href='@link'>image module issue</a> for more information. Include the following:<br /><pre>@old_sizes\n"
 "</pre>"
 msgstr ""
-"Bildens originalstorlek saknades så inga ändringar gjordes. Läs mer på denna utgåva av <a href='@link'>bildmodulen</a> för mer information. Inkludera följande: <br /><pre>@old_sizes\n"
+"Bildens originalstorlek saknades så inga ändringar gjordes. Läs mer på denna utgåva av <a href='@link'>modulen Image</a> för mer information. Inkludera följande: <br /><pre>@old_sizes\n"
 "</pre>"
 
 #: image.info:0
