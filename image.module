@@ -745,7 +745,7 @@ function image_update(&$node) {
     }
     else if ($node->rebuild_images) {
       // Find the original image.
-      $original_file = db_fetch_object(db_query("SELECT i.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d AND image_size = '%s'", $node->nid, IMAGE_ORIGINAL));
+      $original_file = db_fetch_object(db_query("SELECT i.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d AND i.image_size = '%s'", $node->nid, IMAGE_ORIGINAL));
 
       // Delete all but the original image.
       $result = db_query("SELECT i.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d AND f.fid <> %d", $node->nid, $original_file->fid);
@@ -909,7 +909,7 @@ function image_get_latest($count = 1, $tid = 0) {
     $result = db_query_range(db_rewrite_sql("SELECT n.nid FROM {term_node} tn LEFT JOIN {node} n ON n.nid=tn.nid WHERE n.type='image' AND n.status=1 AND tn.tid=%d ORDER BY n.changed DESC"), $tid, 0, $count);
   }
   else {
-    $result = db_query_range(db_rewrite_sql("SELECT n.nid FROM {node} n WHERE n.type='image' AND n.status=1 ORDER BY changed DESC"), 0, $count);
+    $result = db_query_range(db_rewrite_sql("SELECT n.nid FROM {node} n WHERE n.type = 'image' AND n.status = 1 ORDER BY n.changed DESC"), 0, $count);
   }
   $output = array();
   while ($nid = db_fetch_object($result)) {
