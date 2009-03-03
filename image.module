@@ -310,7 +310,7 @@ function image_cron() {
 function image_node_operations() {
   $operations = array(
     'rebuild_thumbs' => array(
-      'label' => t('Rebuild image thumbnails'),
+      'label' => t('Rebuild derivative images'),
       'callback' => 'image_operations_rebuild',
     ),
   );
@@ -564,7 +564,7 @@ function image_form(&$node, &$param) {
 
   $form['rebuild_images'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Rebuild derivative images.'),
+    '#title' => t('Rebuild derivative images'),
     '#default_value' => FALSE,
     '#description' => t('Check this to rebuild the derivative images for this node.'),
   );
