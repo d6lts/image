@@ -52,7 +52,7 @@ function _image_imagemagick_build_version($form, $form_element) {
 }
 
 function _image_imagemagick_check_path($path, $attach_error_to = FALSE) {
-  if (is_file($path)) {
+  if (file_exists($path)) {
     return TRUE;
   }
   if ($attach_error_to) {

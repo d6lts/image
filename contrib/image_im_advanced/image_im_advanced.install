@@ -28,7 +28,7 @@ function image_im_advanced_requirements($phase) {
     }
     // If the imagemagick convert utility does not exist, indicate an error.
     $convert_path = variable_get('image_imagemagick_convert', '/usr/bin/convert');
-    if (!is_file($convert_path)) {
+    if (!file_exists($convert_path)) {
       $requirements['imagemagick']['value'] = t('ImageMagick convert utility not found.');
       $requirements['imagemagick']['description'] = t('The ImageMagick image convert utility (@convert) does not exist. If you have ImageMagick installed, click <a href="@toolkit">here</a> to provide the path to the convert utility.', array('@convert' => $convert_path, '@toolkit' => url('admin/settings/image-toolkit')));
       $requirements['imagemagick']['severity'] = REQUIREMENT_ERROR;

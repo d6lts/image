@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#243895 by Hetta: Fixed "selected file could not be copied" errors with
+  ImageMagick on some platforms.
 #196844 by Hetta, sun: Fixed Image module help text.
 #363211 by sun: Fixed help for image import settings not displayed.
 #390008 by joachim, sun: Fixed inconsistent node mass-operation title.
