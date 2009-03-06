@@ -451,7 +451,7 @@ function image_view($node, $teaser = 0, $page = 0) {
 }
 
 /**
- * Implementation of hook_load
+ * Implementation of hook_load().
  */
 function image_load(&$node) {
   $result = db_query("SELECT i.image_size, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d", $node->nid);
@@ -460,7 +460,7 @@ function image_load(&$node) {
     $node->images[$file->image_size] = file_create_path($file->filepath);
   }
 
-  $original_path = $node->images[IMAGE_ORIGINAL];
+  $original_path = (isset($node->images[IMAGE_ORIGINAL]) ? $node->images[IMAGE_ORIGINAL] : NULL);
   if (empty($original_path)) {
     // There's no original image, we're in trouble...
     return;
