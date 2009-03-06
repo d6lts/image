@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#360170 by TwoD: Fixed hard-coded field name in Image attach views handler.
 #243895 by Hetta: Fixed "selected file could not be copied" errors with
   ImageMagick on some platforms.
 #196844 by Hetta, sun: Fixed Image module help text.
