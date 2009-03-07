@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 5.x-2.x, xxxx-xx-xx
 -------------------------
+#357890 by Robbie Sternenberg: Added dynamic expansion of image preset
+  configuration form to allow for more than 6 sizes.
 #390008 by joachim, sun: Fixed inconsistent node mass-operation title.
 #338159 by sun: Fixed improper table aliases in db queries for db_rewrite_sql().
 #361874 by sun: Fixed Image Gallery uninstall fails if Taxonomy was disabled at
