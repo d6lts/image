@@ -49,8 +49,10 @@ function image_admin_settings() {
   );
 
   $sizes = image_get_sizes();
+
   // Add some empty rows for user defined sizes.
-  for ($i = count($sizes); $i < 6; $i++) {
+  $num_sizes = count($sizes);
+  for ($i = $num_sizes; $i < ($num_sizes + 3); $i++) {
     $sizes['new'. $i] = array(
       'label' => '',
       'operation' => 'scale',

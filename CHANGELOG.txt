@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#357890 by Robbie Sternenberg: Added dynamic expansion of image preset
+  configuration form to allow for more than 6 sizes.
 #257743 by jandd, sun: Fixed upgrade error: Unknown column 'f.nid' query.
 #361230 by justinrandell, sun: Fixed PHP notice if no original image exists.
 #360170 by TwoD: Fixed hard-coded field name in Image attach views handler.
