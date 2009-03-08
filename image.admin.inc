@@ -20,7 +20,7 @@ function image_admin_settings() {
     '#type' => 'textfield',
     '#title' => t('Default image path'),
     '#default_value' => variable_get('image_default_path', 'images'),
-    '#description' => t('Subdirectory in the directory %dir where pictures will be stored. Do not include trailing slash.', array('%dir' => variable_get('file_directory_path', 'files'))),
+    '#description' => t('Subdirectory in the directory %dir where pictures will be stored. Do not include trailing slash.', array('%dir' => file_directory_path())),
   );
 
   $form['files']['image_max_upload_size'] = array(

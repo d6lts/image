@@ -138,7 +138,7 @@ function image_menu() {
  * Implements hook_cron. (deletes old temp images)
  */
 function image_cron() {
-  $path = variable_get('image_default_path', 'images') .'/temp';
+  $path = file_directory_path() .'/'. variable_get('image_default_path', 'images') .'/temp';
   $files = file_scan_directory(file_create_path($path), '.*');
   foreach ($files as $file => $info) {
     if (time() - filemtime($file) > 60*60*6) {
@@ -861,9 +861,9 @@ function _image_build_derivatives($node, $temp = FALSE) {
  * Creates an image filename.
  */
 function _image_filename($filename, $label = IMAGE_ORIGINAL, $temp = FALSE) {
-  $path = variable_get('image_default_path', 'images') .'/';
+  $path = file_directory_path() .'/'. variable_get('image_default_path', 'images');
   if ($temp) {
-    $path .= 'temp/';
+    $path .= '/temp';
   }
 
   $filename = basename($filename);
@@ -874,7 +874,7 @@ function _image_filename($filename, $label = IMAGE_ORIGINAL, $temp = FALSE) {
     if ($pos === false) {
       // The file had no extension - which happens in really old image.module
       // versions, so figure out the extension.
-      $image_info = image_get_info(file_create_path($path . $filename));
+      $image_info = image_get_info(file_create_path($path .'/'. $filename));
       $filename = $filename .'.'. $label .'.'. $image_info['extension'];
     }
     else {
@@ -882,7 +882,7 @@ function _image_filename($filename, $label = IMAGE_ORIGINAL, $temp = FALSE) {
     }
   }
 
-  return file_create_path($path . $filename);
+  return file_create_path($path .'/'. $filename);
 }
 
 /**

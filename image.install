@@ -84,8 +84,8 @@ function image_requirements($phase) {
 
 
     // File paths
-    $image_path = file_create_path(rtrim(variable_get('image_default_path', 'images')));
-    $temp_path = rtrim($image_path, '/') .'/temp';
+    $image_path = file_create_path(file_directory_path() .'/'. variable_get('image_default_path', 'images'));
+    $temp_path = $image_path . '/temp';
     if (!file_check_directory($image_path, FILE_CREATE_DIRECTORY)) {
       $requirements['image_dirs'] = array(
         'value' => t('Missing directory.'),

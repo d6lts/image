@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#225024 by sun: Fixed filepaths not always prefixed with file_directory_path().
 #185081 by sun: Fixed image_file_download tries to transfer non-existing files.
 #357890 by Robbie Sternenberg: Added dynamic expansion of image preset
   configuration form to allow for more than 6 sizes.
