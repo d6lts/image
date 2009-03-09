@@ -8,12 +8,6 @@ function image_import_help($path, $arg) {
   switch ($path) {
     case 'admin/content/image_import':
       return '<p>'. t("Import multiple image files and save them as image nodes. The files will be moved from their location into the image module's files directory. Searching for image files in %dirpath.", array('%dirpath' => realpath(variable_get('image_import_path', '')))) .'</p>';
-
-    case 'admin/settings/image/image_import':
-      return t("Configure the image import module's settings.");
-
-    default:
-      return null;
   }
 }
 
@@ -28,8 +22,6 @@ function image_import_perm() {
  * Implementation of hook_menu().
  */
 function image_import_menu() {
-  $items = array();
-
   $items['admin/content/image_import'] = array(
     'title' => 'Image import',
     'description' => 'Import image from the filesystem.',
@@ -48,12 +40,11 @@ function image_import_menu() {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
   );
-
   return $items;
 }
 
 /**
- * Implementation of hook_theme
+ * Implementation of hook_theme().
  */
 function image_import_theme() {
   return array(
@@ -63,3 +54,4 @@ function image_import_theme() {
     ),
   );
 }
+
