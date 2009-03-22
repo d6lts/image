@@ -449,9 +449,10 @@ function theme_image_attach_teaser($node) {
       // If the image is restricted, don't show it as an attachment.
       return NULL;
     }
+    $class = 'image-attach-teaser'. ($image->status ? '' : ' image-unpublished');
     $info = image_get_info(file_create_path($image->images[$img_size]));
 
-    $output = '<div style="width: '. $info['width'] .'px" class="image-attach-teaser">';
+    $output = '<div style="width: '. $info['width'] .'px" class="'. $class .'">';
     $output .= l(image_display($image, $img_size), "node/$node->nid", array(), NULL, NULL, FALSE, TRUE);
     $output .= '</div>'."\n";
 
@@ -473,9 +474,10 @@ function theme_image_attach_body($node) {
       // If the image is restricted, don't show it as an attachment.
       return NULL;
     }
+    $class = 'image-attach-body'. ($image->status ? '' : ' image-unpublished');
     $info = image_get_info(file_create_path($image->images[$img_size]));
 
-    $output = '<div style="width: '. $info['width'] .'px" class="image-attach-body">';
+    $output = '<div style="width: '. $info['width'] .'px" class="'. $class .'">';
     $output .= l(image_display($image, $img_size), "node/$node->iid", array(), NULL, NULL, FALSE, TRUE);
     $output .= '</div>'."\n";
 
