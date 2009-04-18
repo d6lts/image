@@ -328,17 +328,28 @@ function image_form(&$node, $form_state) {
     );
   }
 
-  $form['thumbnail'] = array(
-    '#type' => 'item',
-    '#weight' => -10,
-    '#after_build' => array('image_form_add_thumbnail'),
-  );
-
   $form['new_file'] = array(
     '#type' => 'value',
     '#default_value' => isset($node->new_file) ? $node->new_file : FALSE,
   );
-  $form['rebuild_images'] = array(
+
+  $form['#attributes'] = array('enctype' => 'multipart/form-data');
+
+  $form['image'] = array(
+    '#prefix' => '<div class="image-field-wrapper">',
+    '#suffix' => '</div>',
+  );
+  $form['image']['thumbnail'] = array(
+    '#type' => 'item',
+    '#after_build' => array('image_form_add_thumbnail'),
+  );
+  $form['image']['image'] = array(
+    '#type' => 'file',
+    '#title' => t('Image'),
+    '#size' => 40,
+    '#description' => t('Select an image to upload.'),
+  );
+  $form['image']['rebuild_images'] = array(
     '#type' => 'checkbox',
     '#title' => t('Rebuild derivative images'),
     '#default_value' => FALSE,
@@ -346,14 +357,6 @@ function image_form(&$node, $form_state) {
     '#access' => (!isset($node->nid) ? FALSE : TRUE),
   );
 
-  $form['#attributes'] = array('enctype' => 'multipart/form-data');
-  $form['image'] = array(
-    '#type' => 'file',
-    '#title' => t('Image'),
-    '#size' => 40,
-    '#description' => t('Select an image to upload.'),
-    '#weight' => -3,
-  );
   if ($type->has_body) {
     $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
   }
@@ -1068,3 +1071,18 @@ function image_views_api() {
   );
 }
 
+/**
+ * Implementation of hook_content_extra_fields().
+ *
+ * Lets CCK expose the image weight in the node content.
+ */
+function image_content_extra_fields($type_name) {
+  if ($type_name == 'image') {
+    $extra['image'] = array(
+      'label' => t('Image'),
+      'description' => t('Image display.'),
+      'weight' => 0,
+    );
+    return $extra;
+  }
+}
