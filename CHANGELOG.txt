@@ -2,10 +2,11 @@
 
 Image x.x-x.x, xxxx-xx-xx
 -------------------------
-
+@todo Remove obsolete views include files (and this note) before creating new release.
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#220295 by joachim: Added Views 2 support.
 #368505 by joachim: Added exposure of Image field to CCK.
 #228886 by joachim: Fixed missing CSS class on unpublished attached images.
 #256195 by dman, sun: Added invocation of hook_file_metadata() to Image Import.
