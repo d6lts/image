@@ -54,12 +54,13 @@ function image_gallery_menu($may_cache) {
       'type' => MENU_LOCAL_TASK,
     );
     $items[] = array(
-      'path' => 'admin/settings/image_gallery',
+      'path' => 'admin/settings/image/image_gallery',
       'title' => t('Image gallery'),
       'access' => user_access('administer site configuration'),
       'callback' => 'drupal_get_form',
       'callback arguments' => array('image_gallery_admin_settings'),
       'description' => t('Configure appearance of image galleries.'),
+      'type' => MENU_LOCAL_TASK,
     );
   }
   elseif (is_numeric(arg(4))) {

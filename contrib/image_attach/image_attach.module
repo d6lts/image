@@ -32,13 +32,13 @@ function image_attach_menu($may_cache) {
         'type' => MENU_CALLBACK,
       );
       $items[] = array(
-        'path' => 'admin/settings/image_attach',
+        'path' => 'admin/settings/image/image_attach',
         'title' => t('Image attach'),
         'description' => t('Enable image attach for content'),
         'callback' => 'drupal_get_form',
         'callback arguments' => array('image_attach_admin_settings'),
         'access' => user_access('administer site configuration'),
-        'type' => MENU_NORMAL_ITEM,
+        'type' => MENU_LOCAL_TASK,
       );
   }
   return $items;

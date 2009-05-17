@@ -281,12 +281,20 @@ function image_menu($may_cache) {
     );
     $items[] = array(
       'path' => 'admin/settings/image',
-      'title' => t('Image'),
+      'title' => t('Images'),
+      'description' => t('Configure the location of image files and image sizes. Also, if enabled, configure image attachments and options for image galleries.'),
       'callback' => 'drupal_get_form',
       'callback arguments' => array('image_admin_settings'),
       'access' => user_access('administer site configuration'),
       'type' => MENU_NORMAL_ITEM,
-      'description' => t('Image module settings.'),
+    );
+    $items[] = array(
+      'path' => 'admin/settings/image/nodes',
+      'title' => t('Files and sizes'),
+      'description' => t('Configure the location of image files and image sizes.'),
+      'access' => user_access('administer site configuration'),
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'weight' => '-10',
     );
   }
 
