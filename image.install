@@ -255,6 +255,7 @@ function image_update_5200() {
       break;
   }
   // Copy image files records into the new table.
+  drupal_load('module', 'image');
   $args = array_map('db_escape_string', array_keys(image_get_sizes()));
   $cond = " IN ('". implode("', '",  $args) ."')";
 
@@ -276,7 +277,8 @@ function image_update_5200() {
  * Updating image size settings to use scaling as the default operation.
  */
 function image_update_5201() {
-  $sizes = _image_get_sizes();
+  drupal_load('module', 'image');
+  $sizes = image_get_sizes();
   foreach ($sizes as $key => $size) {
     $sizes[$key]['operation'] = 'scale';
   }
