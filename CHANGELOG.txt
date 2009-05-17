@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#458882 by sun: Fixed image nodes are promoted to front page by default.
 #455768 by sun: Fixed image_get_sizes() called but not loaded in .install file.
 #220295 by joachim: Added Views 2 support.
 #368505 by joachim: Added exposure of Image field to CCK.

@@ -43,6 +43,8 @@ function image_schema() {
  */
 function image_install() {
   drupal_install_schema('image');
+  // Set reasonable default node options (not promoted to front page).
+  variable_set('node_options_image', array('status'));
 }
 
 /**
@@ -320,6 +322,15 @@ function image_update_6101() {
   if (!empty($path)) {
     variable_set('image_default_path', rtrim($path, '/'));
   }
+  return $ret;
+}
+
+/**
+ * Set reasonable default node options (not promoted to front page).
+ */
+function image_update_6102() {
+  $ret = array();
+  variable_set('node_options_image', variable_get('node_options_image', array('status')));
   return $ret;
 }
 
