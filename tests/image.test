@@ -65,7 +65,7 @@ class ImageTestCase extends DrupalWebTestCase {
   /**
    * Verify creating/displaying/editing/deleting image nodes.
    */
-  function testImageNode() {
+  function XtestImageNode() {
     // Create an image.
     $edit = array(
       'title' => $this->randomName(),
@@ -112,7 +112,7 @@ class ImageTestCase extends DrupalWebTestCase {
   /**
    * Verify that images cannot be created without a file.
    */
-  function testImageNodeValidation() {
+  function XtestImageNodeValidation() {
     // Create an image node without image file.
     $edit = array(
       'title' => $this->randomName(),
@@ -128,7 +128,7 @@ class ImageTestCase extends DrupalWebTestCase {
   /**
    * Verify image previews and proper submission.
    */
-  function testImageNodePreview() {
+  function XtestImageNodePreview() {
     // Setup POST data for image.
     $edit = array(
       'title' => $this->randomName(),
@@ -198,7 +198,7 @@ class ImageTestCase extends DrupalWebTestCase {
   /**
    * Verify that images with missing file information can be deleted from edit form.
    */
-  function testImageNodeDeletion() {
+  function XtestImageNodeDeletion() {
     // Create an image.
     $edit = array(
       'title' => $this->randomName(),
@@ -226,7 +226,7 @@ class ImageTestCase extends DrupalWebTestCase {
   /**
    * Verify image_create_node_from() works like regular image node creation.
    */
-  function testImageCreateNodeFrom() {
+  function XtestImageCreateNodeFrom() {
     $edit = array(
       'title' => $this->randomName(),
       'body' => $this->randomName(),
@@ -257,5 +257,39 @@ class ImageTestCase extends DrupalWebTestCase {
     $equality = $equality && (filesize($node_post->images['thumbnail']) == filesize($node_api->images['thumbnail']));
     $this->assertTrue($equality, t('Image nodes are equal.'));
   }
+  
+  /**
+   * Verify derivatives take their path from the original image.
+   */
+  function testImageDerivativePath() {
+    // Create an image.
+    $edit = array(
+      'title' => $this->randomName(),
+      'body' => $this->randomName(),
+      'files[image]' => realpath($this->image),
+    );
+    $this->drupalPost('node/add/image', $edit, t('Save'));
+    
+    $node = node_load(array('title' => $edit['title'])); 
+    file_put_contents('hello_1', print_r($node,1));
+    
+    // Path of the thumbnail derivative.   
+    $first_thumbnail = $node->images['thumbnail'];
+    
+    // Change the file path.
+    variable_set('image_default_path', 'images_alternate');
+    
+    // Rebuild derivatives.
+    image_operations_rebuild(array($node->nid));
+    
+    $node = node_load(array('title' => $edit['title']));     
+    file_put_contents('hello_2', print_r($node,1));
+    // Has NO IMAGES!
+    
+    $new_thumbnail = $node->images['thumbnail']; 
+    
+    $this->assertTrue($first_thumbnail == $new_thumbnail, t("$first_thumbnail == $new_thumbnail"));  
+    
+  }  
 }
 

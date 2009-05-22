@@ -833,7 +833,7 @@ function _image_build_derivatives($node, $temp = FALSE) {
   // Resize for the necessary sizes.
   $image_info = image_get_info($original_path);
   foreach ($needed_sizes as $key => $size) {
-    $destination = _image_filename($original_path, $key, $temp);
+    $destination = _image_filename($node, $original_path, $key, $temp);
 
     $status = FALSE;
     switch ($size['operation']) {
@@ -863,14 +863,30 @@ function _image_build_derivatives($node, $temp = FALSE) {
 
 /**
  * Creates an image filename.
+ * @param $node
+ *   The node object for the file. This is used for token support. May be NULL when $temp is TRUE.
+ * @param $filename
+ *   The incoming filename?? Just the name or a path? Don't know! Please document code you write!
+ * @param $label
+ *   The derivative size for the image.
+ * @param $temp
+ *   Don't know.
  */
-function _image_filename($filename, $label = IMAGE_ORIGINAL, $temp = FALSE) {
+function _image_filename($node, $filename, $label = IMAGE_ORIGINAL, $temp = FALSE) {
   $path = file_directory_path() .'/'. variable_get('image_default_path', 'images');
   if ($temp) {
     $path .= '/temp';
   }
 
   $filename = basename($filename);
+  
+  if (!$temp && module_exists('token') && isset($node)) {
+    $filename_pattern = variable_get('image_filename_pattern', '[filename]');
+    // also replace the original filename token ourselves
+    $filename_pattern = preg_replace('@\[filename\]@', $filename, $filename_pattern);
+    dsm($filename_pattern);
+    $filename = token_replace($filename_pattern, 'node', $node);    
+  }
 
   // Insert the resized name in non-original images
   if ($label && ($label != IMAGE_ORIGINAL)) {
@@ -963,7 +979,7 @@ function _image_is_required_size($size) {
  */
 function _image_insert(&$node, $size, $image_path) {
   $original_path = $node->images[IMAGE_ORIGINAL];
-  if (file_move($image_path, _image_filename($original_path, $size))) {
+  if (file_move($image_path, _image_filename($node, $original_path, $size))) {
     // Update the node to reflect the actual filename, it may have been changed
     // if a file of the same name already existed.
     $node->images[$size] = $image_path;
@@ -1018,7 +1034,7 @@ function image_create_node_from($filepath, $title = NULL, $body = '', $taxonomy 
 
   // Make sure we can copy the file into our temp directory.
   $original_path = $filepath;
-  if (!file_copy($filepath, _image_filename($filepath, IMAGE_ORIGINAL, TRUE))) {
+  if (!file_copy($filepath, _image_filename(NULL, $filepath, IMAGE_ORIGINAL, TRUE))) {
     return FALSE;
   }
 

@@ -23,6 +23,30 @@ function image_admin_settings() {
     '#description' => t('Subdirectory in the directory %dir where pictures will be stored. Do not include trailing slash.', array('%dir' => file_directory_path())),
   );
 
+
+  # joachim patch
+  // If token module is installed, show the possible replacement patterns for the filepath.
+  if (module_exists('token')) {
+    $form['files']['image_filename_pattern'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Image filename pattern'),
+      '#default_value' => variable_get('image_filename_pattern', '[filename]'),
+      '#description' => t('Pattern to use for renaming files on upload.  You may use subdirectories. The file derivative label and file extension are appended to this. Use the special token [filename] for the original upload filename. '),
+    );
+    
+    $form['files']['token_help'] = array(
+      '#title' => t('Replacement patterns'),
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+
+    $form['files']['token_help']['help'] = array(
+      '#value' => theme('token_help', 'node'),
+    );
+  }
+  # end patch
+    
   $form['files']['image_max_upload_size'] = array(
     '#type' => 'textfield',
     '#title' => t('Maximum upload size'),
