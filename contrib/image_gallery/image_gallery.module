@@ -374,19 +374,6 @@ function image_gallery_theme() {
     'image_gallery' => array(
       'arguments' => array('galleries' => NULL, 'images' => NULL),
     ),
-    # joachim
-    'image_gallery_count' => array(
-      'arguments' => array('count' => 0),
-    ),
-    'image_gallery_updated' => array(
-      'arguments' => array('timestamp' => 0),
-    ),
-    'image_gallery_count' => array(
-      'arguments' => array('count' => 0),
-    ),
-    'image_gallery_updated' => array(
-      'arguments' => array('timestamp' => 0),
-    ),
     'image_gallery_img' => array(
       'arguments' => array('image' => NULL, 'size' => NULL),
     ),
@@ -479,29 +466,4 @@ function _image_gallery_get_vid() {
   }
 
   return $vid;
-}
-
-/**
- * Implementation of hook_views_api().
- */
-function image_gallery_views_api() {
-  return array(
-    'api' => 2,
-    'path' => drupal_get_path('module', 'image_gallery') .'/views',
-  );
-}
-
-### joachim
-/**
- * Theme the count of gallery items.
- */
-function theme_image_gallery_count($count) {
-  return "There are $count images in this gallery.";
-}
-
-/**
- * Theme the gallery last updated line.
- */
-function theme_image_gallery_updated($timestamp) {
-  return '<p class="last">'. t('%date', array('%date' => format_date($timestamp))) ."</p>\n";
 }
