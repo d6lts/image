@@ -4,8 +4,10 @@ Image x.x-x.x, xxxx-xx-xx
 -------------------------
 @todo Remove obsolete views include files (and this note) before creating new release.
 
+
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#496076 by pebosi: Removed unused database query in image_attach.
 #458882 by sun: Fixed image nodes are promoted to front page by default.
 #455768 by sun: Fixed image_get_sizes() called but not loaded in .install file.
 #220295 by joachim: Added Views 2 support.
