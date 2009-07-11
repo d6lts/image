@@ -9,7 +9,7 @@ Image 6.x-1.x, xxxx-xx-xx
 -------------------------
 
 
-Image 6.x-1.0-alpha5, 2009-07-11
+Image 6.x-1.0-ALPHA5, 2009-07-11
 --------------------------------
 #496076 by pebosi: Removed unused database query in image_attach.
 #458882 by sun: Fixed image nodes are promoted to front page by default.
