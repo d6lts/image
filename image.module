@@ -485,9 +485,6 @@ function image_load(&$node) {
     }
     else {
       // Need to remove an extra derivative image in the database.
-      if (image_access('update', $node, $GLOBALS['user'])) {
-        drupal_set_message(t("%title's has an unneeded %key derivative images. The derivatives will be rebuilt to remove it.", array('%title' => $node->title, '%key' => $key)));
-      }
       $node->rebuild_images = TRUE;
     }
   }
@@ -497,15 +494,11 @@ function image_load(&$node) {
     // If the file is missing or created after the last change to the sizes,
     // rebuild the derivatives.
     if (empty($node->images[$key]) || !file_exists($node->images[$key])) {
-      if (image_access('update', $node, $GLOBALS['user'])) {
-        drupal_set_message(t("%title's %key derivative image %filepath was missing. The derivatives will be rebuilt to regenerate it.", array('%title' => $node->title, '%key' => $key, '%filepath' => isset($node->images[$key]) ? $node->images[$key] : '')));
-      }
       $node->rebuild_images = TRUE;
     }
-    else if (filemtime($node->images[$key]) < variable_get('image_updated', 0)) {
-      if (image_access('update', $node, $GLOBALS['user'])) {
-        drupal_set_message(t("%title's %key derivative image had a timestamp (%filetime) that predates the last changes to the image size settings (%vartime). The derivatives will be rebuilt to regenerate it.", array('%title' => $node->title, '%key' => $key, '%filetime' => format_date(filemtime($node->images[$key])), '%vartime' => format_date(variable_get('image_updated', 0)))));
-      }
+    // Derivative image had a timestamp that predates last changes to image
+    // size settings, so it needs to be rebuilt.
+    elseif (filemtime($node->images[$key]) < variable_get('image_updated', 0)) {
       $node->rebuild_images = TRUE;
     }
   }
@@ -513,7 +506,7 @@ function image_load(&$node) {
   // Correct any problems with the derivative images.
   if ($node->rebuild_images) {
     image_update($node);
-    watchdog('image', 'Derivative images were regenerated for %title.', array('%title' => $node->title), WATCHDOG_NOTICE, l(t('view'), 'node/'. $node->nid));
+    watchdog('image', 'Derivative images were regenerated for %title.', array('%title' => $node->title), WATCHDOG_INFO, l(t('view'), 'node/'. $node->nid));
   }
 }
 
@@ -587,13 +580,7 @@ function image_update(&$node) {
 
       $node->images = _image_build_derivatives($node, FALSE);
 
-      // Display a message to the user if they're be able to modify the node
-      // (this might have been called as part of a rebuild by a visitor).
-      if (image_access('update', $node, $GLOBALS['user'])) {
-        drupal_set_message(t('The derivative images for <a href="@link">@title</a> have been regenerated.', array('@link' => url('node/'. $node->nid), '@title' => $node->title)));
-      }
-
-      // Clear the flag so that we don't some how rebuild the images twice.
+      // Prevent multiple rebuilds.
       $node->rebuild_images = FALSE;
     }
 
