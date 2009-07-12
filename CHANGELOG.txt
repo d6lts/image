@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 5.x-2.x, xxxx-xx-xx
 -------------------------
+#158805 by sun: Removed derivative image size rebuild messages.
 #403044 by sun: Fixed PHP notice in image gallery when gallery is empty.
 #295293 by joachim: Removed $view->url of image_gallery default view.
 #207340 by joachim, sun: Changed location of module administration pages.
