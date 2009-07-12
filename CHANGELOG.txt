@@ -7,6 +7,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#403044 by sun: Fixed PHP notice in image gallery when gallery is empty.
 
 
 Image 6.x-1.0-ALPHA5, 2009-07-11
