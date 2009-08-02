@@ -146,6 +146,30 @@ function image_gallery_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
  * Image gallery callback, displays an image gallery
  */
 function image_gallery_page($type = NULL, $tid = 0) {
+  // Determine sort order.
+  $join = $where = $order = '';
+  $args = array();
+  switch (variable_get('image_gallery_sort_order', IMAGE_GALLERY_SORT_CREATE_DESC)) {
+    case IMAGE_GALLERY_SORT_CREATE_DESC:
+      $order = 'ORDER BY n.sticky DESC, n.created DESC';
+      break;
+
+    case IMAGE_GALLERY_SORT_CREATE_ASC:
+      $order = 'ORDER BY n.sticky DESC, n.created ASC';
+      break;
+
+    case IMAGE_GALLERY_SORT_FILENAME:
+      $join = "INNER JOIN {image} i ON n.nid = i.nid INNER JOIN {files} f ON i.fid = f.fid";
+      $where = "AND f.filename = '%s'";
+      $args[] = IMAGE_ORIGINAL;
+      $order = "ORDER BY n.sticky DESC, f.filepath ASC";
+      break;
+
+    case IMAGE_GALLERY_SORT_TITLE:
+      $order = 'ORDER BY n.sticky DESC, n.title ASC';
+      break;
+  }
+
   $vid = _image_gallery_get_vid();
   $galleries = taxonomy_get_tree($vid, $tid, -1, 1);
   for ($i=0; $i < count($galleries); $i++) {
@@ -154,8 +178,8 @@ function image_gallery_page($type = NULL, $tid = 0) {
     $descendant_tids = array_merge(array($galleries[$i]->tid), array_map('_taxonomy_get_tid_from_term', $tree));
     // The values of $descendant_tids should be safe for raw inclusion in the
     // SQL since they're all loaded from integer fields in the database.
-    $sql = "SELECT n.nid FROM {node} n INNER JOIN {term_node} tn ON n.nid = tn.nid WHERE tn.tid IN (". implode(',', $descendant_tids) .") AND n.type = 'image' AND n.status = 1 ORDER BY n.sticky DESC, n.created DESC";
-    if ($nid = db_result(db_query(db_rewrite_sql($sql)))) {
+    $sql = "SELECT n.nid FROM {node} n INNER JOIN {term_node} tn ON n.nid = tn.nid $join WHERE tn.tid IN (". implode(',', $descendant_tids) .") AND n.type = 'image' AND n.status = 1 $where $order";
+    if ($nid = db_result(db_query(db_rewrite_sql($sql), $args))) {
       $galleries[$i]->latest = node_load(array('nid' => $nid));
     }
   }
@@ -163,30 +187,9 @@ function image_gallery_page($type = NULL, $tid = 0) {
   $images = array();
   if ($tid) {
     // Allow images to be sorted in a useful order.
-    $query = "SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid = n.nid WHERE n.status = 1 AND n.type = 'image' AND t.tid = %d ";
+    $query = "SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid = n.nid $join WHERE n.status = 1 AND n.type = 'image' AND t.tid = %d $where $order";
     $count_query = "SELECT COUNT(DISTINCT(n.nid)) FROM {term_node} t INNER JOIN {node} n ON t.nid = n.nid WHERE n.status = 1 AND n.type = 'image' AND t.tid = %d ";
-    $args = array($tid);
-    switch (variable_get('image_gallery_sort_order', IMAGE_GALLERY_SORT_CREATE_DESC)) {
-      case IMAGE_GALLERY_SORT_CREATE_DESC:
-        $query .= 'ORDER BY n.sticky DESC, n.created DESC';
-        break;
-
-      case IMAGE_GALLERY_SORT_CREATE_ASC:
-        $query .= 'ORDER BY n.sticky DESC, n.created ASC';
-        break;
-
-      case IMAGE_GALLERY_SORT_FILENAME:
-        $query = "SELECT n.nid FROM {term_node} t INNER JOIN {node} n ON t.nid = n.nid
-          INNER JOIN {image} i ON n.nid = i.nid INNER JOIN {files} f ON i.fid = f.fid
-          WHERE n.status = 1 AND n.type = 'image' AND t.tid = %d AND f.filename = '%s'
-          ORDER BY n.sticky DESC, f.filepath";
-        $args[] = IMAGE_ORIGINAL;
-        break;
-
-      case IMAGE_GALLERY_SORT_TITLE:
-        $query .= 'ORDER BY n.sticky DESC, n.title ASC';
-        break;
-    }
+    $args = array_merge(array($tid), $args);
     $result = pager_query(db_rewrite_sql($query), variable_get('image_images_per_page', 6), 0, db_rewrite_sql($count_query), $args);
     while ($node = db_fetch_object($result)) {
       $images[] = node_load(array('nid' => $node->nid));
@@ -206,8 +209,7 @@ function image_gallery_page($type = NULL, $tid = 0) {
     drupal_set_title($gallery->name);
   }
 
-  $content = theme('image_gallery', $galleries, $images);
-  return $content;
+  return theme('image_gallery', $galleries, $images);
 }
 
 function image_gallery_admin() {

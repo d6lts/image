@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#357488 by sun: Fixed gallery front image does not respect sort order.
 #158805 by sun: Removed derivative image size rebuild messages.
 #403044 by sun: Fixed PHP notice in image gallery when gallery is empty.
 
