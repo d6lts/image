@@ -511,9 +511,16 @@ function image_load(&$node) {
 }
 
 /**
- * Implementation of hook_insert
+ * Implementation of hook_insert().
  */
 function image_insert($node) {
+  // If a new image node contains no new file, but has a translation source,
+  // insert all images from the source for this node.
+  if (empty($node->new_file) && !empty($node->translation_source)) {
+    db_query("INSERT INTO {image} (nid, fid, image_size) SELECT %d, fid, image_size FROM {image} WHERE nid = %d", $node->nid, $node->translation_source->nid);
+    return;
+  }    
+
   // Derivative images that aren't needed are set to the original file. Make
   // note of the current path before calling _image_insert() because if it's
   // in the temp directory it'll be moved. We'll need it later to determine
@@ -533,7 +540,7 @@ function image_insert($node) {
 }
 
 /**
- * Implementation of hook_update
+ * Implementation of hook_update().
  *
  * Take $node by reference so we can use this to save the node after
  * rebuilding derivatives.
@@ -554,10 +561,9 @@ function image_update(&$node) {
       // Remove all the existing images.
       $result = db_query("SELECT f.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d", $node->nid);
       while ($file = db_fetch_object($result)) {
-        file_delete(file_create_path($file->filepath));
-        db_query("DELETE FROM {files} WHERE fid = %d", $file->fid);
+        db_query("DELETE FROM {image} WHERE nid = %d AND fid = %d", $node->nid, $file->fid);
+        _image_file_remove($file);
       }
-      db_query("DELETE FROM {image} WHERE nid = %d", $node->nid);
 
       // Save the original first so that it if it's moved the derivatives are
       // placed in the correct directory.
@@ -570,12 +576,11 @@ function image_update(&$node) {
       // Delete all but the original image.
       $result = db_query("SELECT i.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d AND f.fid <> %d", $node->nid, $original_file->fid);
       while ($file = db_fetch_object($result)) {
+        db_query("DELETE FROM {image} WHERE nid = %d AND fid = %d", $node->nid, $file->fid);
         // Beware of derivative images that have the same path as the original.
         if ($file->filepath != $original_file->filepath) {
-          file_delete(file_create_path($file->filepath));
+          _image_file_remove($file);
         }
-        db_query("DELETE FROM {files} WHERE fid = %d", $file->fid);
-        db_query("DELETE FROM {image} WHERE fid = %d", $file->fid);
       }
 
       $node->images = _image_build_derivatives($node, FALSE);
@@ -594,15 +599,14 @@ function image_update(&$node) {
 }
 
 /**
- * Implementation of hook_delete.
+ * Implementation of hook_delete().
  */
 function image_delete($node) {
   $result = db_query('SELECT i.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d', $node->nid);
   while ($file = db_fetch_object($result)) {
-    file_delete(file_create_path($file->filepath));
-    db_query('DELETE FROM {files} WHERE fid = %d', $file->fid);
-  }
-  db_query("DELETE FROM {image} WHERE nid = %d", $node->nid);
+    db_query("DELETE FROM {image} WHERE nid = %d AND fid = %d", $node->nid, $file->fid);  
+    _image_file_remove($file);
+  }  
 }
 
 /**
@@ -972,6 +976,19 @@ function _image_insert(&$node, $size, $image_path) {
       'image_size' => $size,
     );
     drupal_write_record('image', $image);
+  }
+}
+
+/**
+ * Remove image file if no other node references it.
+ *
+ * @param $file
+ *   An object representing a table row from {files}.
+ */
+function _image_file_remove($file) {
+  if (!db_result(db_query("SELECT COUNT(*) FROM {image} WHERE fid = %d", $file->fid))) {
+    file_delete(file_create_path($file->filepath));
+    db_query('DELETE FROM {files} WHERE fid = %d', $file->fid);
   }
 }
 
