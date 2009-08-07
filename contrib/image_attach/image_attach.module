@@ -422,5 +422,17 @@ function theme_image_attach_body($node) {
   }
 }
 
-
+/**
+ * Implementation of hook_content_extra_fields().
+ */
+function image_attach_content_extra_fields($type_name) {
+  if (variable_get('image_attach_' . $type_name, 0)) {
+    $extra['image_attach'] = array(
+      'label' => t('Image Attach'),
+      'description' => t('Image Attach settings.'),
+      'weight' => 0,
+    );
+    return $extra;
+  }
+}
 

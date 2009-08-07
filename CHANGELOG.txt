@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#524646 by sun: Added hook_content_extra_fields() for Image Attach.
 #360643 by Jose Reyero, sun: Added i18n support for sharing images between
   translations.
 #357488 by sun: Fixed gallery front image does not respect sort order.
