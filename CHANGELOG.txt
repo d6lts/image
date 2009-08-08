@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#518804 by joachim: Fixed image_attach field not linking to attaching node
+  or working with relationships.
 #524646 by joachim: Changed hook_content_extra_fields() for Image Attach.
 #44057  by pebosi: Changed permissions in Image module to match those in core.
 #409974 by pebosi: Changed gallery permission from 'administer images' to 
