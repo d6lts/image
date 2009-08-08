@@ -8,7 +8,7 @@ define('IMAGE_GALLERY_SORT_TITLE', 3);
 
 function image_gallery_help($path, $arg) {
   switch ($path) {
-    case 'admin/image':
+    case 'admin/content/image':
       return '<p>'. t('Image galleries can be used to organize and present groups of images. Galleries may be nested. To add a new gallery click the "add gallery" tab.') .'</p>';
   }
 }
