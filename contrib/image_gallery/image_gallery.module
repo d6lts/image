@@ -31,7 +31,7 @@ function image_gallery_help($path, $arg) {
  * Implementation of hook_perm().
  */
 function image_gallery_perm() {
-  return array('administer images');
+  return array('administer image galleries');
 }
 
 /**
@@ -48,19 +48,19 @@ function image_gallery_menu() {
   );
   $items['admin/content/image'] = array(
     'title' => 'Image galleries',
-    'access arguments' => array('administer images'),
+    'access arguments' => array('administer image galleries'),
     'page callback' => 'image_gallery_admin',
     'description' => 'Create and manage image galleries.',
   );
   $items['admin/content/image/list'] = array(
     'title' => 'List',
-    'access arguments' => array('administer images'),
+    'access arguments' => array('administer image galleries'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
   $items['admin/content/image/add'] = array(
     'title' => 'Add gallery',
-    'access arguments' => array('administer images'),
+    'access arguments' => array('administer image galleries'),
     'page callback' => 'image_gallery_admin_edit',
     'type' => MENU_LOCAL_TASK,
   );
@@ -68,7 +68,7 @@ function image_gallery_menu() {
     'title' => 'Edit image gallery',
     'page callback' => 'image_gallery_admin_edit',
     'page arguments' => array(4),
-    'access arguments' => array('administer images'),
+    'access arguments' => array('administer image galleries'),
     'type' => MENU_CALLBACK,
   );
 

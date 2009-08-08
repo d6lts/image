@@ -52,3 +52,18 @@ function image_gallery_update_1() {
   }
   return $ret;
 }
+
+/**
+ * Rename permission "administer images" to "administer image galleries".
+ */
+function image_gallery_update_6100() {
+  $ret = array();
+  $result = db_query("SELECT rid, perm FROM {permission} ORDER BY rid");
+  while ($role = db_fetch_object($result)) {
+    $renamed_permission = strtr($role->perm, array('administer images' => 'administer image galleries'));
+    if ($renamed_permission != $role->perm) {
+      $ret[] = update_sql("UPDATE {permission} SET perm = '$renamed_permission' WHERE rid = $role->rid");
+    }
+  }
+  return $ret;
+}

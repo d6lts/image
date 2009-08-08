@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#409974 by pebosi: Changed gallery permission from 'administer images' to 
+  'administer image galleries'.
         by joachim: Added PHPdoc headers to hooks in Image gallery module.
 #539388 by joachim: Fixed lack of documentation in Image gallery module.
 #543490 by joachim: Fixed wrong path in image_gallery_help().
