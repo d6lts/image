@@ -428,8 +428,8 @@ function theme_image_attach_body($node) {
 function image_attach_content_extra_fields($type_name) {
   if (variable_get('image_attach_' . $type_name, 0)) {
     $extra['image_attach'] = array(
-      'label' => t('Image Attach'),
-      'description' => t('Image Attach settings.'),
+      'label' => t('Attached image'),
+      'description' => t('Image Attach module form.'),
       'weight' => 0,
     );
     return $extra;
