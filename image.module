@@ -81,24 +81,23 @@ function image_node_info() {
  * Implementation of hook_perm
  */
 function image_perm() {
-  return array('create images', 'view original images', 'edit own images', 'edit images');
+  return array('create images', 'delete own images', 'delete any images', 'edit own images', 'edit any images', 'view original images');
 }
 
 /**
  * Implementation of hook_access().
  */
 function image_access($op, $node, $account) {
-  if ($op == 'create' && user_access('create images', $account)) {
-    return TRUE;
-  }
-
-  if ($op == 'update' || $op == 'delete') {
-    if (user_access('edit images', $account)) {
-      return TRUE;
-    }
-    if (user_access('edit own images', $account) && ($account->uid == $node->uid)) {
-      return TRUE;
-    }
+  switch ($op) {
+    case 'create':
+        return user_access('create images', $account);
+      break;
+    case 'update':
+      return (user_access('edit any images', $account) || user_access('edit own images', $account) && ($account->uid == $node->uid));
+      break;
+    case 'delete':
+      return (user_access('delete any images', $account) || user_access('delete own images', $account) && ($account->uid == $node->uid));
+      break;      
   }
 }
 
