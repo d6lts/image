@@ -96,13 +96,13 @@ function image_access($op, $node, $account) {
       break;
 
     case 'update':
-      if (user_access('edit any images', $account) || user_access('edit own images', $account) && ($account->uid == $node->uid)) {
+      if (user_access('edit any images', $account) || ($account->uid == $node->uid && user_access('edit own images', $account))) {
         return TRUE;
       }
       break;
 
     case 'delete':
-      if (user_access('delete any images', $account) || user_access('delete own images', $account) && ($account->uid == $node->uid)) {
+      if (user_access('delete any images', $account) || ($account->uid == $node->uid && user_access('delete own images', $account))) {
         return TRUE;
       }
       break;
