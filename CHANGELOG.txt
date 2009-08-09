@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+        by joachim: Added PHPdoc headers to functions in Image gallery module.
 #44057  by sun: Fixed earlier patch for permissions in Image module.
 #518804 by joachim: Fixed image_attach field not linking to attaching node
   or working with relationships.

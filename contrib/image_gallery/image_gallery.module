@@ -84,6 +84,9 @@ function image_gallery_menu() {
   return $items;
 }
 
+/**
+ * Menu callback for settings page.
+ */
 function image_gallery_admin_settings() {
   _image_check_settings();
 
@@ -238,6 +241,9 @@ function image_gallery_page($type = NULL, $tid = 0) {
   return theme('image_gallery', $galleries, $images);
 }
 
+/**
+ * Menu callback for gallery admin.
+ */
 function image_gallery_admin() {
   _image_check_settings();
 
@@ -254,6 +260,9 @@ function image_gallery_admin() {
   }
 }
 
+/**
+ * Menu callback for editing or adding a gallery.
+ */
 function image_gallery_admin_edit($tid = NULL) {
   if ((isset($_POST['op']) && $_POST['op'] == t('Delete')) || isset($_POST['confirm'])) {
     return drupal_get_form('image_gallery_confirm_delete_form', $tid);
@@ -274,6 +283,9 @@ function image_gallery_admin_edit($tid = NULL) {
   return drupal_get_form('image_gallery_admin_form', $edit);
 }
 
+/**
+ * Form for editing or adding a gallery.
+ */
 function image_gallery_admin_form(&$form_state, $edit = array()) {
   $form['name'] = array(
     '#type' => 'textfield',
@@ -324,6 +336,9 @@ function image_gallery_admin_form(&$form_state, $edit = array()) {
   return $form;
 }
 
+/**
+ * Form submit handler.
+ */
 function image_gallery_admin_submit($form, &$form_state) {
   $status = taxonomy_save_term($form_state['values']);
   switch ($status) {
@@ -340,6 +355,9 @@ function image_gallery_admin_submit($form, &$form_state) {
   return 'admin/content/image';
 }
 
+/**
+ * Form for confirmation for deleting a gallery.
+ */
 function image_gallery_confirm_delete_form(&$form_state, $tid) {
   $term = taxonomy_get_term($tid);
 
@@ -349,6 +367,9 @@ function image_gallery_confirm_delete_form(&$form_state, $tid) {
   return confirm_form($form, t('Are you sure you want to delete the image gallery %name?', array('%name' => $term->name)), 'admin/content/image', t('Deleting an image gallery will delete all sub-galleries. This action cannot be undone.'), t('Delete'), t('Cancel'));
 }
 
+/**
+ * Form submit handler.
+ */
 function image_gallery_confirm_delete_form_submit($form, &$form_state) {
   taxonomy_del_term($form_state['values']['tid']);
   drupal_set_message(t('The image gallery %term and all sub-galleries have been deleted.', array('%term' => $form_state['values']['name'])));
@@ -454,6 +475,9 @@ function theme_image_gallery($galleries, $images) {
   return $content;
 }
 
+/**
+ * Theme a gallery image.
+ */
 function theme_image_gallery_img($image, $size) {
   $width = $size['width'];
   // We'll add height to keep thumbnails lined up.

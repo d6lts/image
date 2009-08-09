@@ -1,6 +1,9 @@
 <?php
 // $Id$
 
+/**
+ * Implementation of hook_install().
+ */
 function image_gallery_install() {
   // Notify the user of the existence of the suggested menu item.
   drupal_set_message(st('Image gallery has been installed. You may want to enable the <a href="@navigation-menu-url">Image galleries menu item</a>.', array('@navigation-menu-url' => url('admin/build/menu-customize/navigation'))));
@@ -30,7 +33,9 @@ function image_gallery_requirements($phase) {
   return $requirements;
 }
 
-
+/**
+ * Implementation of hook_uninstall().
+ */
 function image_gallery_uninstall() {
   if ($vid = variable_get('image_gallery_nav_vocabulary', FALSE)) {
     module_invoke('taxonomy', 'del_vocabulary', $vid);
@@ -42,6 +47,9 @@ function image_gallery_uninstall() {
   variable_del('image_gallery_sort_order');
 }
 
+/**
+ * Re-assign image vocabularies to image_gallery module.
+ */
 function image_gallery_update_1() {
   $ret = array();
   if ($vid = variable_get('image_nav_vocabulary', '')) {
