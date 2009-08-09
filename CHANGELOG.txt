@@ -6,7 +6,9 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
-#374423 by joachim: Fixed image_create_node_from not checking image filesize.
+#470720 by joachim, sun: Fixed Image Gallery vocabulary broken after re-enabling
+  the module.
+#374423 by joachim: Fixed image_create_node_from() not checking image filesize.
 #44057 by sun: Fixed return values of image_access().
 by joachim: Code clean-up in Image gallery module.
 by joachim: Added PHPdoc headers to functions in Image gallery module.

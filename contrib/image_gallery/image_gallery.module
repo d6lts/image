@@ -505,12 +505,34 @@ function theme_image_gallery_img($image, $size) {
  * Returns (and possibly creates) a new vocabulary for Image galleries.
  */
 function _image_gallery_get_vid() {
-  $vid = variable_get('image_gallery_nav_vocabulary', '');
-  if (empty($vid) || is_null(taxonomy_vocabulary_load($vid))) {
-    // Check to see if an image gallery vocabulary exists
-    $vid = db_result(db_query("SELECT vid FROM {vocabulary} WHERE module='image_gallery'"));
-    if (!$vid) {
-      $vocabulary = array('name' => t('Image Galleries'), 'multiple' => '0', 'required' => '0', 'hierarchy' => '1', 'relations' => '0', 'module' => 'image_gallery', 'nodes' => array('image' => 1));
+  $vid = variable_get('image_gallery_nav_vocabulary', NULL);
+  // This is invoked from many locations and only D7 ensures that required
+  // modules are installed/enabled first.
+  // @todo Perhaps also disable image_gallery module and report an error?
+  if (!module_exists('taxonomy')) {
+    return $vid;
+  }
+  if (empty($vid) || !($vocabulary = taxonomy_vocabulary_load($vid))) {
+    // Check to see if an image gallery vocabulary exists.
+    $vid = db_result(db_query("SELECT vid FROM {vocabulary} WHERE module = 'image_gallery'"));
+    if (!$vid && !$vocabulary) {
+      $vocabulary = array(
+        'name' => t('Image Galleries'),
+        'multiple' => 0,
+        'required' => 0,
+        'hierarchy' => 1,
+        'relations' => 0,
+        'module' => 'image_gallery',
+        'nodes' => array('image' => 1),
+      );
+      taxonomy_save_vocabulary($vocabulary);
+      $vid = $vocabulary['vid'];
+    }
+    elseif ($vocabulary) {
+      // Existing install; ensure that image node type is still assigned.
+      // Keep all other node types intact there.
+      $vocabulary = (array) $vocabulary;
+      $vocabulary['nodes']['image'] = 1;
       taxonomy_save_vocabulary($vocabulary);
       $vid = $vocabulary['vid'];
     }
