@@ -21,7 +21,8 @@ class ImageTestCase extends DrupalWebTestCase {
     parent::setUp('image');
 
     // User to create images.
-    $this->web_user = $this->drupalCreateUser(array('create images', 'view original images', 'edit own images', 'edit any images'));
+    $this->web_user = $this->drupalCreateUser(array('create images', 'view original images', 'edit own images', 'edit any images',
+      'delete own images', 'delete any images', 'administer site configuration'));    
     $this->drupalLogin($this->web_user);
 
     // Uploadable image.

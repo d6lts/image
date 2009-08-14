@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#44057 by sp3boy: Fixed tests broken by earlier #44057 commits.
 #470720 by joachim, sun: Fixed Image Gallery vocabulary broken after re-enabling
   the module.
 #374423 by joachim: Fixed image_create_node_from() not checking image filesize.
