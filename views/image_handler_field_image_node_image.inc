@@ -107,9 +107,14 @@ class image_handler_field_image_node_image extends views_handler_field_node {
     $node = $this->build_image_display_node($values);
 
     // image_load() will load the files for all derivatives. Derivatives larger
-    // than the original fall back to the original. Stale derivatives will be
-    // regenerated.
+    // than the original fall back to the original.
     image_load($node);
+
+    // Rebuild derivatives if needed.
+    if (!empty($node->rebuild_images)) {
+      image_update($node);
+      watchdog('image', 'Derivative images were regenerated for %title.', array('%title' => $node->title), WATCHDOG_INFO, l(t('view'), 'node/' . $node->nid));
+    }    
 
     return image_display($node, $derivative);
   }
