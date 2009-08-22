@@ -107,3 +107,16 @@ function image_attach_update_6100() {
   return $ret;
 }
 
+/**
+ * Delete bad entry in {blocks} table due to old bug.
+ * Next visit to blocks admin page will rehash and show the block.
+ * @see <http://drupal.org/node/426724>
+ */
+function image_attach_update_6101() {
+  $ret = array();
+  $ret[] = update_sql("DELETE FROM {blocks} WHERE blocks.module = 'image_attach' AND blocks.delta = 0");
+
+  return $ret;  
+}
+
+

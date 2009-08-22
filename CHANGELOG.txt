@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#426724 by joachim: Fixed image attach block not showing in block admin.
 #226121 by joachim: Fixed derivative sizes should not be rebuilt in hook_load().
 #44057 by sp3boy: Fixed tests broken by earlier #44057 commits.
 #470720 by joachim, sun: Fixed Image Gallery vocabulary broken after re-enabling

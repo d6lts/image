@@ -66,7 +66,6 @@ function image_attach_block($op = 'list', $delta = 0, $edit = array()) {
     case 'list':
       $blocks[0] = array(
         'info'       => t('Attached images'),
-        'status'     => TRUE,
         'weight'     => 0,
         'visibility' => 1,
         'pages'      => 'node/*',
