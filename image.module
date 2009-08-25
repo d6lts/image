@@ -868,17 +868,30 @@ function _image_build_derivatives($node, $temp = FALSE) {
 
 /**
  * Creates an image filename.
+ *
+ * @param $filepath
+ *   The full path and filename of the original image file,relative to Drupal
+ *   root, eg 'sites/default/files/images/myimage.jpg'.
+ * @return
+ *   A full path and filename with derivative image label inserted if required.
  */
-function _image_filename($filename, $label = IMAGE_ORIGINAL, $temp = FALSE) {
+function _image_filename($filepath, $label = IMAGE_ORIGINAL, $temp = FALSE) {
+  // Get default path for a new file.
   $path = file_directory_path() .'/'. variable_get('image_default_path', 'images');
   if ($temp) {
     $path .= '/temp';
   }
 
-  $filename = basename($filename);
+  $original_path = dirname($filepath);
+  $filename = basename($filepath);
 
-  // Insert the resized name in non-original images
   if ($label && ($label != IMAGE_ORIGINAL)) {
+    // Keep resized images in the same path, where original is (does not
+    // apply to temporary files, these still use the default path).
+    if (!$temp && $original_path != '.') {
+      $path = $original_path;
+    }
+    // Insert the resized name in non-original images.
     $pos = strrpos($filename, '.');
     if ($pos === false) {
       // The file had no extension - which happens in really old image.module
