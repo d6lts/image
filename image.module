@@ -1044,7 +1044,7 @@ function image_create_node_from($filepath, $title = NULL, $body = '', $taxonomy 
 
   // Ensure the file is within our size bounds.
   if ($image_info['file_size'] > variable_get('image_max_upload_size', 800) * 1024) {
-    form_set_error('', t('The image you uploaded was too big. You are only allowed upload files less than %max_size but your file was %file_size.', array('%max_size' => format_size(variable_get('image_max_upload_size', 800) * 1024), '%file_size' => format_size($file->filesize))), 'warning');
+    form_set_error('', t('The image you uploaded was too big. You are only allowed upload files less than %max_size but your file was %file_size.', array('%max_size' => format_size(variable_get('image_max_upload_size', 800) * 1024), '%file_size' => format_size($image_info['file_size']))), 'warning');
     return FALSE;
   }
 
