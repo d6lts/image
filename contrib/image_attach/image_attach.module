@@ -385,10 +385,6 @@ function theme_image_attach_teaser($node) {
       // If the image is restricted, don't show it as an attachment.
       return NULL;
     }
-    if (!empty($image->rebuild_images)) {
-      image_update($image);
-    }
-
     $class = 'image-attach-teaser' . ($image->status ? '' : ' image-unpublished');
     $info = image_get_info(file_create_path($image->images[$img_size]));
 
@@ -414,10 +410,6 @@ function theme_image_attach_body($node) {
       // If the image is restricted, don't show it as an attachment.
       return NULL;
     }
-    if (!empty($image->rebuild_images)) {
-      image_update($image);
-    }
-
     $class = 'image-attach-body' . ($image->status ? '' : ' image-unpublished');
     $info = image_get_info(file_create_path($image->images[$img_size]));
 
