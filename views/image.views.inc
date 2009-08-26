@@ -118,6 +118,11 @@ function image_views_data_alter(&$data) {
       'help' => t('The rendered image of an Image node, shown at a chosen size. This field can be added without a relationship.'),
       'handler' => 'image_handler_field_image_node_image',
     ),
+    'argument' => array(
+      'title' => t('Image size'),
+      'help' => t('Allows the size of the Image node image field to be set with the argument.'),
+      'handler' => 'image_handler_argument_image_node_image_size',
+    ),
   );
 }
 
@@ -137,6 +142,9 @@ function image_views_handlers() {
         'parent' => 'views_handler_field',
       ),
       'image_handler_argument_image_size' => array(
+        'parent' => 'views_handler_argument_string',
+      ),
+      'image_handler_argument_image_node_image_size' => array(
         'parent' => 'views_handler_argument_string',
       ),
       'image_handler_filter_image_size' => array(
@@ -160,6 +168,14 @@ function image_views_plugins() {
         'title' => t('Image size'),
         'handler' => 'image_plugin_argument_validate_image_size',
         'path' => drupal_get_path('module', 'image') . '/views',
+      ),
+    ),
+    'argument default' => array(
+      'image_size' => array(
+        'title' => t('Image size'),
+        'handler' => 'image_plugin_argument_default_image_size',
+        'path' => drupal_get_path('module', 'image') . '/views',
+        'parent' => 'fixed', // so that the parent class is included
       ),
     ),
   );
