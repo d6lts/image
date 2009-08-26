@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#81102 by maulwuff, greg.harvey, sp3boy, et al: Changed image attach to allow
+  attaching of multiple images.
 #411568 by sp3boy: Fixed paths for derivatives to come from the original, 
   rather than default.
 #426724 by joachim: Fixed image attach block not showing in block admin.

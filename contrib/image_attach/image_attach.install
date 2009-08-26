@@ -22,8 +22,14 @@ function image_attach_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'weight' => array(
+        'description' => 'The display order of attached images.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
     ),
-    'primary key' => array('nid'),
+    'primary key' => array('nid', 'iid'),
     'indexes' => array(
       'iid' => array('iid'),
     ),
@@ -119,4 +125,18 @@ function image_attach_update_6101() {
   return $ret;  
 }
 
+/**
+ * Adjust primary key on {image_attach} to allow multiple attachments.
+ */
+function image_attach_update_6102() {
+  $ret = array();
+  db_drop_primary_key($ret, 'image_attach');
+  db_add_primary_key($ret, 'image_attach', array('nid', 'iid'));
+  db_add_field($ret, 'image_attach', 'weight', array(
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+  return $ret;
+}
 
