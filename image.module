@@ -435,19 +435,9 @@ function image_form_submit($form, &$form_state) {
 }
 
 /**
- * Implementation of hook_view().
- *
- * Shows the image node with the requested derivative, if allowed.
- * Also rebuilds image derivatives if $node->rebuild_images was set by
- * image_load().
+ * Implementation of hook_view
  */
 function image_view($node, $teaser = 0, $page = 0) {
-  // Correct any problems with the derivative images.
-  if (!empty($node->rebuild_images)) {
-    image_update($node);
-    watchdog('image', 'Derivative images were regenerated for %title.', array('%title' => $node->title), WATCHDOG_INFO, l(t('view'), 'node/' . $node->nid));
-  }
-
   $sizes = image_get_sizes();
   $size = IMAGE_PREVIEW;
   if (isset($_GET['size'])) {
@@ -473,9 +463,6 @@ function image_view($node, $teaser = 0, $page = 0) {
 
 /**
  * Implementation of hook_load().
- *
- * Loads image data from the database, and sets $node->rebuild_images if a
- * rebuild of derivatives is needed.
  */
 function image_load(&$node) {
   $result = db_query("SELECT i.image_size, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d", $node->nid);
@@ -521,6 +508,12 @@ function image_load(&$node) {
     elseif (filemtime($node->images[$key]) < variable_get('image_updated', 0)) {
       $node->rebuild_images = TRUE;
     }
+  }
+
+  // Correct any problems with the derivative images.
+  if ($node->rebuild_images) {
+    image_update($node);
+    watchdog('image', 'Derivative images were regenerated for %title.', array('%title' => $node->title), WATCHDOG_INFO, l(t('view'), 'node/'. $node->nid));
   }
 }
 

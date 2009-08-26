@@ -320,9 +320,6 @@ class ImageTestCase extends DrupalWebTestCase {
     // Rebuild derivative images.
     $node_api = node_load($node_api->nid, NULL, TRUE);
 
-    $node_post = image_view($node_post);
-    $node_api = image_view($node_api);
-
     // Verify that both nodes are equal.
     $equality = ($node_post->title == $node_api->title);
     $this->assertTrue($equality, t('Image node titles are equal.'));
