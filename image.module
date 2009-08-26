@@ -687,7 +687,9 @@ function theme_image_body($node, $size) {
  * Theme an img tag for displaying the image.
  */
 function theme_image_display($node, $label, $url, $attributes) {
-  return theme('image', $url, $node->title, $node->title, $attributes, FALSE);
+  $title = isset($attributes['title']) ? $attributes['title'] : $node->title;
+  $alt = isset($attributes['alt']) ? $attributes['alt'] : $node->title;
+  return theme('image', $url, $alt, $title, $attributes, FALSE);
 }
 
 /**
