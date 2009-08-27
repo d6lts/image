@@ -423,6 +423,12 @@ function image_gallery_theme() {
     'image_gallery' => array(
       'arguments' => array('galleries' => NULL, 'images' => NULL),
     ),
+    'image_gallery_count' => array(
+      'arguments' => array('count' => 0),
+    ),
+    'image_gallery_updated' => array(
+      'arguments' => array('timestamp' => 0),
+    ),
     'image_gallery_img' => array(
       'arguments' => array('image' => NULL, 'size' => NULL),
     ),
@@ -502,6 +508,20 @@ function theme_image_gallery_img($image, $size) {
 }
 
 /**
+ * Theme the count of gallery items on a gallery list.
+ */
+function theme_image_gallery_count($count) {
+  return t("There are $count images in this gallery.");
+}
+
+/**
+ * Theme the gallery last updated time on a gallery list.
+ */
+function theme_image_gallery_updated($timestamp) {
+  return t('%date', array('%date' => format_date($timestamp))) . "\n";
+}
+
+/**
  * Returns (and possibly creates) a new vocabulary for Image galleries.
  */
 function _image_gallery_get_vid() {
@@ -540,4 +560,14 @@ function _image_gallery_get_vid() {
   }
 
   return $vid;
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function image_gallery_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'image_gallery') .'/views',
+  );
 }

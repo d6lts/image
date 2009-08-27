@@ -162,7 +162,24 @@ function image_views_handlers() {
  */
 function image_views_plugins() {
   return array(
-    'module' => 'views', // This just tells our themes are elsewhere.
+    'style' => array(
+      /**
+       * A fluid grid view style for gallery items.
+       */
+      'image_gallery' => array(
+        'title'  => 'Gallery',
+        'help' => t('Displays items in a fluid grid.'),
+        'parent' => 'list',
+        'handler' => 'views_plugin_style_list',
+        'theme path' => drupal_get_path('module', 'image') . '/views/theme',
+        'theme file' => 'theme.inc',
+        'theme' => 'image_view_image_gallery',
+        'uses row plugin' => TRUE,
+        'uses options' => TRUE,
+        'type' => 'normal',
+        'help topic' => 'style-list',
+      ),
+    ),
     'argument validator' => array(
       'image_size' => array(
         'title' => t('Image size'),

@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#405456 by joachim: Added views support for image gallery, including image
+  gallery style plugin in image module.
 #454290 by joachim: Added image size argument to views support.
 #555840 by blakehall: Changed theme_image_display() to allow override passed 
   attributes to override alt and title.
