@@ -8,6 +8,7 @@ NOTE: next release will require a re-run of image_attach_update_6101().
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#563988 by joachim: Fixed missing paging in image gallery default view.
 #561686 by jandd: Fixed bad query in image_attach_update_6101().
 #561854 by joachim: Fixed missing note about Views on gallery settings page. 
 
