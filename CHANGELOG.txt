@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#561854 by joachim: Fixed missing note about Views on gallery settings page. 
 
 
 Image 6.x-1.0-ALPHA6, 2009-08-27
