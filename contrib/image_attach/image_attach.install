@@ -120,7 +120,7 @@ function image_attach_update_6100() {
  */
 function image_attach_update_6101() {
   $ret = array();
-  $ret[] = update_sql("DELETE FROM {blocks} WHERE blocks.module = 'image_attach' AND blocks.delta = 0");
+  $ret[] = update_sql("DELETE FROM {blocks} WHERE module = 'image_attach' AND delta = 0");
 
   return $ret;  
 }

@@ -3,9 +3,12 @@
 Image x.x-x.x, xxxx-xx-xx
 -------------------------
 
+NOTE: next release will require a re-run of image_attach_update_6101().
+  @see http://drupal.org/node/561686
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#561686 by jandd: Fixed bad query in image_attach_update_6101().
 #561854 by joachim: Fixed missing note about Views on gallery settings page. 
 
 
