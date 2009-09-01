@@ -540,7 +540,11 @@ function theme_image_gallery_img($image, $size) {
  * Theme the count of gallery items on a gallery list.
  */
 function theme_image_gallery_count($count) {
-  return t("There are $count images in this gallery.");
+  return format_plural(
+    $count, 
+    'There is 1 image in this gallery', 
+    'There are @count images in this gallery'
+  );
 }
 
 /**
