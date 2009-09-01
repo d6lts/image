@@ -8,6 +8,8 @@ NOTE: next release will require a re-run of image_attach_update_6101().
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#470720 by joachim: Fixed (again) Image Gallery vocabulary broken after 
+  re-enabling the module.
 #562810 by datune: Fixed error messages from updates on systems that don't have
   the primary keys or indexes present.
 #563988 by joachim: Fixed missing paging in image gallery default view.

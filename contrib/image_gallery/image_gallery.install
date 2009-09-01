@@ -14,9 +14,28 @@ function image_gallery_install() {
  * Implementation of hook_enable().
  */
 function image_gallery_enable() {
-  // Ensure a proper vocabulary after re-enabling the module.
-  drupal_load('module', 'image_gallery');
-  _image_gallery_get_vid();
+  if ($vocabulary = taxonomy_vocabulary_load(variable_get('image_gallery_nav_vocabulary', 0))) {
+    // Existing install. Add back image node type, if the image
+    // vocabulary still exists. Keep all other node types intact there.
+    $vocabulary = (array) $vocabulary;
+    $vocabulary['nodes']['image'] = 1;
+    taxonomy_save_vocabulary($vocabulary);
+  }
+  else {
+    // Create the image gallery vocabulary if it does not exist.
+    $vocabulary = array(
+      'name' => t('Image Galleries'),
+      'multiple'  => 0,
+      'required'  => 0,
+      'hierarchy' => 1,
+      'relations' => 0,
+      'module' => 'image_gallery',
+      'nodes' => array('image' => 1),
+    );
+    taxonomy_save_vocabulary($vocabulary);
+
+    variable_set('image_gallery_nav_vocabulary', $vocabulary['vid']);
+  }
 }
 
 /**
