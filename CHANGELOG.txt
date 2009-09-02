@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#566040 by joachim: Changed formatting of 'None' in the attach form.
 
 
 Image 6.x-1.0-BETA1, 2009-09-02
