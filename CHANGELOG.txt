@@ -8,6 +8,7 @@ NOTE: next release will require a re-run of image_attach_update_6101().
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#166145 by joachim: Fixed checking of image path on validation not form display.
 #225014 by David Stosik: Added ability to import images into galleries 
   corresponding to the directory tree.
 #226121 by joachim, sp3boy: Changed image derivative rebuilding so it doesn't 
