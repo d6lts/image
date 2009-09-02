@@ -8,6 +8,8 @@ NOTE: next release will require a re-run of image_attach_update_6101().
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#225014 by David Stosik: Added ability to import images into galleries 
+  corresponding to the directory tree.
 #226121 by joachim, sp3boy: Changed image derivative rebuilding so it doesn't 
   happen in admin and batch operations.
 #564614 by joachim: Fixed un-t()'d image gallery count string.
