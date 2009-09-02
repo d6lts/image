@@ -1,13 +1,15 @@
 // $Id$
 
 Image x.x-x.x, xxxx-xx-xx
--------------------------
+------------------------
 
-NOTE: next release will require a re-run of image_attach_update_6101().
-  @see http://drupal.org/node/561686
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+
+
+Image 6.x-1.0-BETA1, 2009-09-02
+-------------------------------
 #166145 by joachim: Fixed checking of image path on validation not form display.
 #225014 by David Stosik: Added ability to import images into galleries 
   corresponding to the directory tree.
