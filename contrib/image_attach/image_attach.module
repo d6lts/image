@@ -457,7 +457,7 @@ function theme_image_attach_teaser($node, $iid) {
     $info = image_get_info(file_create_path($image->images[$img_size]));
 
     $output = '<div style="width: ' . $info['width'] . 'px" class="' . $class . '">';
-    $output .= l(image_display($image, $img_size), "node/$iid", array('html' => TRUE));
+    $output .= l(image_display($image, $img_size), "node/$node->nid", array('html' => TRUE));
     $output .= '</div>'."\n";
 
     return $output;
