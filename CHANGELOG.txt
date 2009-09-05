@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+by joachim: Added messages for update functions.
 #569258 by alanburke: Changed name of Gallery display to 'Gallery page'.
 #569198 by David Stosik: Fixed selecting <None> in image attach inserting a 0
   value into $node->iids. Update function cleans up any nonsense data this may 
