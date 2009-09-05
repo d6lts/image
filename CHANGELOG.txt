@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#568734 by David Stosik: Fixed escaping in update_sql queries in updates.
 #568078 by joachim: Moved gallery page code to a new image_gallery.pages.inc.
 #568078 by joachim: Moved admin code to a new image_gallery.admin.inc.
 #567170 by joachim: Fixed wrong link on attached images on teasers.

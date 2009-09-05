@@ -57,7 +57,11 @@ function image_gallery_uninstall() {
 function image_gallery_update_1() {
   $ret = array();
   if ($vid = variable_get('image_nav_vocabulary', '')) {
-    $ret[] = update_sql("UPDATE {vocabulary} SET module = 'image_gallery' WHERE vid = " . (int) $vid);
+    $args = array($vid);
+    $query = "UPDATE {vocabulary} SET module = 'image_gallery' WHERE vid = %d";
+    _db_query_callback($args, TRUE);
+    $query = preg_replace_callback(DB_QUERY_REGEXP, '_db_query_callback', $query);
+    $ret[] = update_sql($query);
   }
   else {
     $ret[] = update_sql("UPDATE {vocabulary} SET module = 'image_gallery' WHERE module = 'image'");
@@ -74,7 +78,11 @@ function image_gallery_update_6100() {
   while ($role = db_fetch_object($result)) {
     $renamed_permission = strtr($role->perm, array('administer images' => 'administer image galleries'));
     if ($renamed_permission != $role->perm) {
-      $ret[] = update_sql("UPDATE {permission} SET perm = '$renamed_permission' WHERE rid = $role->rid");
+      $args = array($renamed_permission, $role->rid);
+      $query = "UPDATE {permission} SET perm = '%s' WHERE rid = %d";
+      _db_query_callback($args, TRUE);
+      $query = preg_replace_callback(DB_QUERY_REGEXP, '_db_query_callback', $query);
+      $ret[] = update_sql($query);
     }
   }
   return $ret;
