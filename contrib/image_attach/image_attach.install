@@ -148,3 +148,12 @@ function image_attach_update_6102() {
   return $ret;
 }
 
+/**
+ * Remove erroneous data inside image_attach table, where iid = 0.
+ */
+function image_attach_update_6103() {
+  $ret = array();
+  $ret[] = update_sql("DELETE FROM {image_attach} WHERE iid = 0");
+  return $ret;
+}
+

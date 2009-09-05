@@ -332,8 +332,10 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
     case 'insert':
     case 'update':
+      // Unsetting the "- None -" entry from the form select entries
+      unset($node->iids[0]);
+      db_query("DELETE FROM {image_attach} WHERE nid = %d", $node->nid);
       if (!empty($node->iids)) {
-        db_query("DELETE FROM {image_attach} WHERE nid = %d", $node->nid);
         // Populate weight column with placeholder values.
         $weight = 0;
         foreach ($node->iids as $iid) {

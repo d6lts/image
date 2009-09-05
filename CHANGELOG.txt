@@ -6,6 +6,9 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#569198 by David Stosik: Fixed selecting <None> in image attach inserting a 0
+  value into $node->iids. Update function cleans up any nonsense data this may 
+  have created.
 #565774 by alanburke: Fixed thickbox on galleries.
 #561362 by David Stosik: Fixed attached image weights to hide if CCK present.
 #357793 by joachim: Fixed update from 5 error due to old pre-5 {image} table.
