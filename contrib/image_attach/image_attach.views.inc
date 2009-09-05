@@ -52,3 +52,19 @@ function image_attach_views_data_alter(&$data) {
     ),
   );
 }
+
+/**
+ * Implementation of hook_views_handlers().
+ */
+function image_attach_views_handlers() {
+  return array(
+    'info' => array(
+      'path' => drupal_get_path('module', 'image_attach'),
+      ),
+    'handlers' => array(
+      'image_attach_views_handler_field_attached_images' => array(
+        'parent' => 'image_handler_field_image_node_image',
+      ),
+    ),
+  );
+}

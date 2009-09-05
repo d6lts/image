@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#569138 by joachim: Moved image_attach_views_handlers() to inc file.
 #567226 by joachim: Fixed attached images views field to handle multiple images.
 #566642 by joachim: Fixed new default views not getting picked up by clearing
  the view cache on update.
