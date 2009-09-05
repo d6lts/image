@@ -216,11 +216,13 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
         );
       }
       else {
-        foreach ($node->iids as $iid) {
-          $form['image_attach']['iids'][$iid] = array(
-            '#type' => 'value',
-            '#value' => $iid,
-          );
+        if (!empty($node->iids)) {        
+          foreach ($node->iids as $iid) {
+            $form['image_attach']['iids'][$iid] = array(
+              '#type' => 'value',
+              '#value' => $iid,
+            );
+          }
         }
       }
       $form['image_attach']['image'] = array(
