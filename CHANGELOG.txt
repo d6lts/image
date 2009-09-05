@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#445074 by joachim: Added a theme function for the attached images block.
 #569334 by joachim: Fixed security issue with attached images Views field.
 by joachim: Added messages for update functions.
 #569258 by alanburke: Changed name of Gallery display to 'Gallery page'.

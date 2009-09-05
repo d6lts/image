@@ -81,11 +81,10 @@ function image_attach_block($op = 'list', $delta = 0, $edit = array()) {
             foreach ($node->iids as $iid) {
               $image = node_load($iid);
               if (node_access('view', $image)) {
-                $img = image_display($image, variable_get('image_attach_block_0_size', IMAGE_THUMBNAIL));
-                $content .= '<div class="attached-image">' .l($img, "node/$iid", array('html' => TRUE)). '</div>';
+                $image_nodes[] = $image;
               }
             }
-            $output['content'] = '<div class="all-attached-images">' .$content. '</div>';
+            $output['content'] = theme('image_attach_block_attached', $nid, $image_nodes);
             return $output;
           }
         }
@@ -427,6 +426,9 @@ function image_attach_theme() {
     'image_attach_body' => array(
       'arguments' => array('node' => new stdClass()),
     ),
+    'image_attach_block_attached' => array(
+      'arguments' => array('nid' => 0, 'image_nodes' => array()),
+    ),
   );
 }
 
@@ -490,6 +492,26 @@ function theme_image_attach_body($node, $iid) {
     $output .= '</div>'."\n";
 
     return $output;
+  }
+}
+
+/**
+ * Theme the attached images block.
+ *
+ * @param $nid
+ *  The attaching node's id.
+ * @param $image_nodes
+ *  The attached image nodes.
+ */
+function theme_image_attach_block_attached($nid, $image_nodes = array()) {
+  // Only return block content if there are images.
+  if (is_array($image_nodes) && count($image_nodes)) {
+    foreach ($image_nodes as $image) {
+      // Render each image from the node.
+      $img = image_display($image, variable_get('image_attach_block_0_size', IMAGE_THUMBNAIL));
+      $content .= '<div class="attached-image">' .l($img, "node/$iid", array('html' => TRUE)). '</div>';
+    }
+    return '<div class="all-attached-images">' .$content. '</div>';
   }
 }
 
