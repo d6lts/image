@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#72579 by David Stosik: Added more granular permissions to image attach, and
+  fixed attaching images when 'Attach existing images' is disabled.
 #445074 by joachim: Added a theme function for the attached images block.
 #569334 by joachim: Fixed security issue with attached images Views field.
 by joachim: Added messages for update functions.

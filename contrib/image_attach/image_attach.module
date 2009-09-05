@@ -40,6 +40,13 @@ function image_attach_menu() {
   return $items;
 }
 
+/**
+ * Implementation of hook_perm()
+ */
+function image_attach_perm() {
+  return array('attach images');
+}
+
 
 function image_attach_admin_settings() {
   $form = array();
@@ -187,70 +194,73 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
       _image_check_settings();
       $value = !empty($node->new_image) ? '#value' : '#default_value';
       $form['#attributes'] = array("enctype" => "multipart/form-data");
-
-      $form['image_attach'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('Attached images'),
-        '#collapsible' => TRUE,
-        '#collapsed' => empty($node->iids),
-      );
       // Add a custom submit handler so we can handle image creation on-the-fly
       $form['#validate'][] = 'image_attach_validate'; 
 
-      if (!empty($node->iids)) {
-        foreach ($node->iids as $iid) {
-          $image = node_load($iid);
-          $form['image_attach']['image_thumbnail'][$iid] = array(
-            '#type' => 'item',
-            '#title' => t('Thumbnail'),
-            '#value' => image_display($image, 'thumbnail')
-          );
-        }
-      }
-      if (variable_get('image_attach_existing', 1) && user_access('access content')) {
-        $form['image_attach']['iids'] = array(
-          '#type' => 'select',
-          '#title' => t('Existing image'),
-          '#options' => _image_attach_get_image_nodes(),
-          $value => empty($node->iids) ? NULL : $node->iids,
-          '#description' => t('Choose an image already existing on the server if you do not upload a new one.'),
-          '#multiple' => TRUE,
-          '#size' => 6,
+      // Display the image attach form only if user can attach images, AND
+      // it is allowed to attach existing images or the user is allowed to create new images 
+      if (user_access('attach images') && (variable_get('image_attach_existing', 1) || user_access('create images'))) {
+        $form['image_attach'] = array(
+          '#type' => 'fieldset',
+          '#title' => t('Attached images'),
+          '#collapsible' => TRUE,
+          '#collapsed' => empty($node->iids),
         );
-        $form['image_attach'][] = array(
-          '#type' => 'item',
-          '#value' => t('-or-'),
-          '#attributes' => array('class' => 'either-choice')
-        );
-      }
-      else {
-        if (!empty($node->iids)) {        
+
+        if (!empty($node->iids)) {
           foreach ($node->iids as $iid) {
-            $form['image_attach']['iids'][$iid] = array(
-              '#type' => 'value',
-              '#value' => $iid,
+            $image = node_load($iid);
+            $form['image_attach']['image_thumbnail'][$iid] = array(
+              '#type' => 'item',
+              '#title' => t('Thumbnail'),
+              '#value' => image_display($image, 'thumbnail')
             );
           }
         }
+
+        $form['image_attach']['iids'] = array(
+          '#type' => 'select',
+          $value => empty($node->iids) ? NULL : $node->iids,
+          '#multiple' => TRUE,
+          '#size' => 6,
+          // Title, options and description are set just below.
+        );
+
+        // User may attach already existing images: show a selection box containing all images.
+        if (variable_get('image_attach_existing', 1)) {
+          $form['image_attach']['iids']['#title'] = t('Existing images');
+          $form['image_attach']['iids']['#options'] = _image_attach_get_image_nodes();
+          $form['image_attach']['iids']['#description'] = t('Choose an image already existing on the server if you do not upload a new one.');
+        }
+        // User may only upload new images: show a selection box containing only attached images.
+        else {
+          $form['image_attach']['iids']['#title'] = t('Attached images');
+          $form['image_attach']['iids']['#options'] = _image_attach_get_image_nodes($node->iids);
+          $form['image_attach']['iids']['#description'] = t('You can remove a previously attached image by unselecting it.');
+        }
+
+        // User may create images, add upload form elements.
+        if (user_access('create images')) {
+          $form['image_attach']['image'] = array(
+            '#type' => 'file',
+            '#title' => t('Upload image')
+          );
+          $form['image_attach']['image_title'] = array(
+            '#type' => 'textfield',
+            '#title' => t('Image title'),
+            $value => '',
+            '#description' => t('The title the image will be shown with.')
+          );
+          // Provide an additional submit button, which adds an image and redirects
+          // the user to the node edit form.
+          $form['image_attach']['image_attach_multiple'] = array(
+            '#type' => 'submit',
+            '#value' => t('Attach'),
+            '#validate' => array('image_attach_validate'),
+            '#submit' => array('image_attach_image_add_submit'),
+          );
+        }
       }
-      $form['image_attach']['image'] = array(
-        '#type' => 'file',
-        '#title' => t('Upload image')
-      );
-      $form['image_attach']['image_title'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Image title'),
-        $value => '',
-        '#description' => t('The title the image will be shown with.')
-      );
-      // Provide an additional submit button, which adds an image and redirects
-      // the user to the node edit form.
-      $form['image_attach']['image_attach_multiple'] = array(
-        '#type' => 'submit',
-        '#value' => t('Attach'),
-        '#validate' => array('image_attach_validate'),
-        '#submit' => array('image_attach_image_add_submit'),
-      );
     }
   }
 }
@@ -391,14 +401,26 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
 }
 
 /**
- * Fetch an array of all candidate referenced nodes, for use in presenting the selection form to the user.
+ * Fetch an array of all candidate referenced nodes, for use in presenting the 
+ * selection form to the user.
+ *
+ * @param $nids
+ *  A list of nids to filter on. If not passed, all image nids are returned. 
  */
-function _image_attach_get_image_nodes() {
-  $result = db_query(db_rewrite_sql("SELECT n.nid, n.title, n.sticky FROM {node} n WHERE n.status = 1 AND n.type = 'image' ORDER BY n.sticky DESC, n.title ASC"));
+function _image_attach_get_image_nodes($nids = array()) {
+  $placeholder = '';
+  // If $nids was passed, build placeholders to put in the query
+  if (count($nids)) {
+    $placeholder = 'AND n.nid IN ('. implode(', ', array_fill(0, sizeof($nids), '%d')) .') ';
+  }
+
   $rows = array(0 => t('- None -'));
+
+  $result = db_query(db_rewrite_sql("SELECT n.nid, n.title, n.sticky FROM {node} n WHERE n.status = 1 AND n.type = 'image' ". $placeholder ."ORDER BY n.sticky DESC, n.title ASC"), $nids);
   while ($node = db_fetch_object($result)) {
     $rows[$node->nid] = $node->title;
   }
+
   return $rows;
 }
 
