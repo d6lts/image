@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#567226 by joachim: Fixed attached images views field to handle multiple images.
 #566642 by joachim: Fixed new default views not getting picked up by clearing
  the view cache on update.
 #207557 by Ibn al-Hazardous: Fixed update errors due to duplicate data in 

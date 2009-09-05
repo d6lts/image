@@ -4,6 +4,10 @@
 /**
  * Implementation of hook_views_data().
  */
+/* 
+// The field is defined in hook_views_data_alter below.
+// But this code is likely to be needed for relationships or filters
+// So commenting out for now.
 function image_attach_views_data() {
   // Basic table information.
   $data = array();
@@ -25,13 +29,26 @@ function image_attach_views_data() {
   // changed field
   $data['image_attach']['iid'] = array(
     'title' => t('Attached image'), // The item it appears as on the UI,
-    'field' => array(
-      'handler' => 'image_attach_views_handler_field_iid',
-      'click sortable' => TRUE,
-    ),
+    // TODO: relationship to attached image nodes.
     'help' => t('An image attached to a node.'),
   );
 
   return $data;
 }
+*/
 
+/**
+ * Implementation of hook_views_data_alter().
+ */
+function image_attach_views_data_alter(&$data) {
+  // {node} table, prefixed with 'image_attach' to avoid potential clashes.
+  // The images for attached image nodes.
+  $data['node']['image_attach_images'] = array(
+    'group' => t('Image attach'),
+    'field' => array(
+      'title' => t('Attached images'),
+      'help' => t('The attached images, shown at a chosen size. This field can be added without a relationship.'),
+      'handler' => 'image_attach_views_handler_field_attached_images',
+    ),
+  );
+}
