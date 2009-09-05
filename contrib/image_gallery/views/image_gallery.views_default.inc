@@ -206,7 +206,7 @@ function image_gallery_views_default_views() {
     'grouping' => '',
     'type' => 'ul',
   ));
-  $handler = $view->new_display('image_gallery', 'Gallery', 'image_gallery_1');
+  $handler = $view->new_display('image_gallery', 'Gallery page', 'image_gallery_1');
   $handler->override_option('path', 'image');
   $handler->override_option('menu', array(
     'type' => 'none',
