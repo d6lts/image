@@ -234,6 +234,12 @@ function image_update_5() {
  */
 function image_update_5200() {
   $ret = array();
+  
+  // Versions prior to 5 had an {image} table which is no longer used on 5.1
+  // but not removed.
+  if (db_table_exists('image')) {
+    db_rename_table($ret, 'image', 'image_old');    
+  }  
 
   switch ($GLOBALS['db_type']) {
     case 'mysql':
