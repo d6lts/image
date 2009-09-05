@@ -150,12 +150,15 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
       '#options' => $image_sizes,
       '#description' => t("This determines the size of the image that appears when the node is displayed as a teaser. 'Hidden' will not show the image.")
     );
-    $form['image_attach']['image_attach_weight_teaser'] = array(
-      '#type' => 'weight',
-      '#title' => t('Teaser image weight'),
-      '#default_value' => variable_get('image_attach_weight_teaser_'. $form['#node_type']->type, 0),
-      '#description' => t('This value determines the order of the image when displayed in the teaser.'),
-    );
+    // Hide the weight if CCK is doing the weight for us.
+    if (!module_exists('content')) {
+      $form['image_attach']['image_attach_weight_teaser'] = array(
+        '#type' => 'weight',
+        '#title' => t('Teaser image weight'),
+        '#default_value' => variable_get('image_attach_weight_teaser_'. $form['#node_type']->type, 0),
+        '#description' => t('This value determines the order of the image when displayed in the teaser.'),
+      );
+    }
     $form['image_attach']['image_attach_size_body'] = array(
       '#type' => 'select',
       '#title' => t('Full node image size'),
@@ -163,12 +166,18 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
       '#options' => $image_sizes,
       '#description' => t("This determines the size of the image that appears when the full node is displayed. 'Hidden' will not show the image.")
     );
-    $form['image_attach']['image_attach_weight_body'] = array(
-      '#type' => 'weight',
-      '#title' => t('Full node image weight'),
-      '#default_value' => variable_get('image_attach_weight_body_'. $form['#node_type']->type, 0),
-      '#description' => t('This value determines the order of the image when displayed in the body.'),
-    );
+    if (!module_exists('content')) {
+      $form['image_attach']['image_attach_weight_body'] = array(
+        '#type' => 'weight',
+        '#title' => t('Full node image weight'),
+        '#default_value' => variable_get('image_attach_weight_body_'. $form['#node_type']->type, 0),
+        '#description' => t('This value determines the order of the image when displayed in the body.'),
+      );
+    }
+    if (module_exists('content')) {
+      $link = l(t('Manage fields'), $_GET['q'] .'/fields');
+      $form['image_attach']['#description'] = t('Since you installed CCK module, you can change the image weight in the !link page.', array('!link' => $link));
+    }
   }
   // Node edit form.
   else if (isset($form['type']['#value']) && $form['type']['#value'] != 'image') {
