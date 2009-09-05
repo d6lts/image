@@ -87,3 +87,13 @@ function image_gallery_update_6100() {
   }
   return $ret;
 }
+
+/**
+ * Clear the Views cache so our new default views are picked up.
+ */
+function image_gallery_update_6101() {
+  $ret = array();  
+  drupal_load('module', 'views');
+  views_invalidate_cache();
+  return $ret;  
+}
