@@ -327,9 +327,10 @@ function image_update_6100() {
   @db_drop_primary_key($ret, 'image');
   db_add_primary_key($ret, 'image', array('nid', 'image_size'));
   @db_drop_index($ret, 'image', 'image_fid');
-  // Notify the user that they may get harmless fail messages here.
-  $ret[] = array('success' => TRUE, 'query' => t('If you see a message of the form "Failed: ALTER TABLE {image} DROP PRIMARY KEY" here it is harmless.'));
   db_add_index($ret, 'image', 'fid', array('fid'));
+  
+  // Notify the user that they may get harmless fail messages here.
+  $ret[] = array('success' => TRUE, 'query' => t('If you see a message of the form "Failed: ALTER TABLE {image} DROP PRIMARY KEY" or "DROP INDEX image_fid" here it is harmless.'));
   return $ret;
 }
 
