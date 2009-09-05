@@ -64,12 +64,14 @@ class image_attach_views_handler_field_attached_images
   function pre_render(&$values) {
     foreach ($values as $v) {
       if (isset($v->{$this->aliases['image_attach_nid']})) {
+        // Make the nid safe.
+        $nid = intval($v->{$this->aliases['image_attach_nid']});
         // Use the nid as the key to make the values unique.
-        $nids[$v->{$this->aliases['image_attach_nid']}] = $v->{$this->aliases['image_attach_nid']};
+        $nids[$nid] = $nid;
       }
     }
     $nids_string = implode(',', $nids);
-    $result = db_query("SELECT nid, iid FROM {image_attach} WHERE nid IN (%s) ORDER BY weight", $nids_string);
+    $result = db_query("SELECT nid, iid FROM {image_attach} WHERE nid IN (" . $nids_string . ") ORDER BY weight");
     while ($data = db_fetch_object($result)) {
       // Store all the attached image nids (iid) keyed by attaching nid.
       $attached_images[$data->nid][] = $data->iid;
