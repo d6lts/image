@@ -93,7 +93,8 @@ function image_gallery_update_6100() {
  */
 function image_gallery_update_6101() {
   $ret = array();  
-  drupal_load('module', 'views');
-  views_invalidate_cache();
+  if (drupal_load('module', 'views')) {
+    views_invalidate_cache();
+  }
   return $ret;  
 }
