@@ -6,6 +6,10 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+
+
+Image 6.x-1.0-BETA2, 2009-09-05
+-------------------------------
 #564488 by joachim: Fixed missing variables in Views image gallery template.
 #72579 by David Stosik: Added more granular permissions to image attach, and
   fixed attaching images when 'Attach existing images' is disabled.
