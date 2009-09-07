@@ -369,7 +369,20 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
     case 'view':
       if (!empty($node->iids)) {
         $teaser_or_body = $teaser ? 'teaser' : 'body';
-        $node->content['image_attach'] = array('#weight' => variable_get("image_attach_weight_{$teaser_or_body}_{$node->type}", 0));
+        // Set weight, either from CCK or our own settings. Cribbed from signup!
+        if (module_exists('content')) {
+          // Due to a bug in CCK (http://drupal.org/node/363456), we need 
+          // to call this function twice to ensure we get the real value.
+          // The bug is present when you first enable the setting to
+          // display in the node instead of a separate tab, or when you
+          // first upgrade to the version that contains this code.
+          content_extra_field_weight($node->type, 'image_attach');
+          $weight = content_extra_field_weight($node->type, 'image_attach');
+        }
+        else {
+          $weight = variable_get("image_attach_weight_{$teaser_or_body}_{$node->type}", 0);
+        }        
+        $node->content['image_attach'] = array('#weight' => $weight);
         if ($teaser_or_body == 'teaser') {
           $node->content['image_attach'][$node->iids[0]]['#value'] = theme("image_attach_{$teaser_or_body}", $node, $node->iids[0]);
         }
