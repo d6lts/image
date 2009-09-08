@@ -554,7 +554,7 @@ function theme_image_attach_block_attached($nid, $image_nodes = array()) {
 function image_attach_content_extra_fields($type_name) {
   if (variable_get('image_attach_' . $type_name, 0)) {
     $extra['image_attach'] = array(
-      'label' => t('Attached image'),
+      'label' => t('Attached images'),
       'description' => t('Image Attach module form.'),
       'weight' => 0,
     );
