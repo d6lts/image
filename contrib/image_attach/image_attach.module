@@ -12,8 +12,6 @@ define('IMAGE_ATTACH_HIDDEN', 'hidden');
  */
 function image_attach_help($path, $arg) {
   switch ($path) {
-    case 'admin/settings/modules#description':
-      return t('Allows easy attaching of image nodes to other content types.');
   }
 }
 
