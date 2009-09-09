@@ -6,10 +6,10 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#571434 by joachim: Fixed views gallery count label showing for empty galleries.
 #569526 by 2noame: Fixed mistaken commit to image.module from #569258.
 by joachim: Changed image attach CCK label to plural.
 by joachim: Removed obsolete hook_help module description key.
-#571434 by joachim: Fixed views gallery count label showing for empty galleries.
 #561686 by roderik: Fixed VARCHAR in image attach database update.
 #569766 by patryk: Fixed views module not loaded in image gallery update.
 #561362 by joachim: Fixed attached image CCK weight not being used.

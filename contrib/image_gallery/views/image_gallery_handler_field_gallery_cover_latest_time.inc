@@ -23,11 +23,25 @@ class image_gallery_handler_field_gallery_cover_latest_time extends image_galler
    */
   function render($values) {
     $nid = $this->get_cover_node_nid($values);
-
-    $latest_node = node_load($nid);
-    if ($latest_node->changed) {
+    
+    // If there is no node (ie gallery empty), suppress the label.
+    // Because this is called for each row, but $this->options['label'] applies
+    // to everything, we have to muck about and stash the original, user-set
+    // value so we can restore it when needed.
+    // @todo: views 6.x-2.7 will make all the label stuff superfluous.
+    static $original_label;
+    if (!isset($original_label)) {
+      $original_label = $this->options['label'];
+    }
+    
+    if (isset($nid)) {
+      $this->options['label'] = $original_label;
+      $latest_node = node_load($nid);
       $output = theme('image_gallery_updated', $latest_node->changed);
       return $this->render_link($output, $values);
     }
+    else {
+      $this->options['label'] = '';
+    }    
   }
 }
