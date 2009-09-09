@@ -23,15 +23,11 @@ class image_gallery_handler_field_gallery_cover_latest_time extends image_galler
    */
   function render($values) {
     $nid = $this->get_cover_node_nid($values);
-    
-    if (isset($nid)) {
-      $latest_node = node_load($nid);
+
+    $latest_node = node_load($nid);
+    if ($latest_node->changed) {
       $output = theme('image_gallery_updated', $latest_node->changed);
       return $this->render_link($output, $values);
-    }
-    else {
-      // If there is no node (ie gallery empty), suppress the label.
-      $this->options['label'] = '';
     }
   }
 }
