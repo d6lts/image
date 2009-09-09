@@ -637,18 +637,7 @@ function image_display(&$node, $label = IMAGE_PREVIEW, $attributes = array()) {
   }
 
   $image_info = image_get_info(file_create_path($node->images[$label]));
-  
-  $image_attributes = array_merge($image_info, $attributes);
-  // Remove empty attributes
-  $image_attributes = array_filter($image_attributes);
-  return theme('image_display', $node, $label, file_create_url($node->images[$label]), $image_attributes);    
-  
-  
   $attributes['class'] = "image image-$label ". (isset($attributes['class']) ? $attributes['class'] : "");
-  
-
-  
-  
   // Only output width/height attributes if image_get_info() was able to detect
   // the image dimensions, since certain browsers interpret an empty attribute
   // value as zero.
