@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#544970 by joachim: Added image attach views relationships.
 #571434 by joachim: Fixed views gallery count label showing for empty galleries.
 #569526 by 2noame: Fixed mistaken commit to image.module from #569258.
 by joachim: Changed image attach CCK label to plural.

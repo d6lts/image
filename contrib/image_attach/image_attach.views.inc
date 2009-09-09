@@ -4,10 +4,6 @@
 /**
  * Implementation of hook_views_data().
  */
-/* 
-// The field is defined in hook_views_data_alter below.
-// But this code is likely to be needed for relationships or filters
-// So commenting out for now.
 function image_attach_views_data() {
   // Basic table information.
   $data = array();
@@ -26,16 +22,55 @@ function image_attach_views_data() {
     ),
   );
 
-  // changed field
+  // Attached images relationship: gets us the attached nodes.
+  // {node} --> {image_attach} --> {node}.
+  // In other words, given the node, what attached images does it have?
   $data['image_attach']['iid'] = array(
-    'title' => t('Attached image'), // The item it appears as on the UI,
-    // TODO: relationship to attached image nodes.
-    'help' => t('An image attached to a node.'),
+    'title' => t('Attached images'), // The item it appears as on the UI,
+    'help' => t('The images attached to a node.'),
+    'relationship' => array(
+      'title' => t('Attached image nodes'),
+      'label' => t('Attached images'),
+      'help' => t('The image nodes attached to the given node. May produce multiple rows. To filter out nodes with no attached images, set this relationship to be required.'),
+      'base' => 'node',
+      'base field' => 'nid',
+      'relationship table' => 'image_attach',
+      'relationship field' => 'iid',
+      'handler' => 'views_handler_relationship',
+    ),
+  );
+
+  // 'Reverse' relationship for attached images.
+  // This goes from attached image nodes to image attach and thence to nodes,
+  // but joining first on iid, and only then on nid.
+  // In other words, given the image, what node(s) have it as an attached image?
+  $data['image_attach_reverse']['table']['group']  = t('Image attach');
+
+  $data['image_attach_reverse']['table']['join'] = array(
+    'node' => array(
+      'table' => 'image_attach', // real table name
+      'left_field' => 'nid',
+      'field' => 'iid',
+      'type' => 'LEFT',
+    ),
+  );
+  $data['image_attach_reverse']['nid'] = array(
+    'title' => t('Attaching nodes'), // The item it appears as on the UI,
+    'help' => t('The nodes that have attached images.'),
+    'relationship' => array(
+      'title' => t('Attaching nodes'),
+      'label' => t('Attaching nodes'),
+      'help' => t("The nodes that have attached images. This relationship should be used on a view of image nodes, to get to their attaching 'parent' nodes."),
+      'base' => 'node',
+      'base field' => 'nid',
+      'relationship table' => 'image_attach_reverse',
+      'relationship field' => 'nid',
+      'handler' => 'views_handler_relationship',
+    ),
   );
 
   return $data;
 }
-*/
 
 /**
  * Implementation of hook_views_data_alter().
