@@ -6,6 +6,10 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+
+
+Image 6.x-1.0-BETA3, 2009-09-13
+-------------------------------
 #567630 by joachim: Fixed bad call to url() on image gallery settings page.
 #544970 by joachim: Added image attach views relationships.
 #571434 by joachim: Fixed views gallery count label showing for empty galleries.
