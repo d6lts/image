@@ -27,7 +27,7 @@ function image_gallery_admin_settings() {
     }
     else {
       // The view is enabled: explain why there are no settings here and leave.
-  	  $form['info'] = array(
+      $form['info'] = array(
         '#type' => 'item',
         '#title' => t('Image galleries are being made with the Views module'),
       );
@@ -35,7 +35,7 @@ function image_gallery_admin_settings() {
         $form['info']['#value'] = t('To change the way galleries are displayed, edit the image_gallery view on the <a href="!views-link">Views administration page</a>.', array('!views-link' => url('admin/build/views')));
       }
       else {
-        $form['info']['#value'] = t('To change the way galleries are displayed, enable the <strong>Views UI</strong> module on the <a href="!modules-link">Modules administration page</a>, then override the default image_gallery view.', array('!modules-link' => url('admin/build/modules', NULL, 'edit-status-views-ui')));
+        $form['info']['#value'] = t('To change the way galleries are displayed, enable the <strong>Views UI</strong> module on the <a href="!modules-link">Modules administration page</a>, then override the default image_gallery view.', array('!modules-link' => url('admin/build/modules')));
       }      
       return $form;
     }
