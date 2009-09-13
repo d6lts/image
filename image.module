@@ -477,7 +477,7 @@ function image_load(&$node) {
     return;
   }
   
-  if ((arg(0) != 'batch') || (strpos($_GET['q'], 'admin/content/node') === FALSE)) {
+  if ((arg(0) != 'batch') && (strpos($_GET['q'], 'admin/content/node') === FALSE)) {
     _image_build_derivatives_if_needed($node);
   }
 }

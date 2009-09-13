@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#226121 by sp3boy: Fixed bad logic from previous patch to this issue.
 
 
 Image 6.x-1.0-BETA3, 2009-09-13
