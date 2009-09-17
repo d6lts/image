@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#579320 by joachim: Fixed link to node in attached images block.
 #226121 by sp3boy: Fixed bad logic from previous patch to this issue.
 
 

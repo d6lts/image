@@ -542,7 +542,7 @@ function theme_image_attach_block_attached($nid, $image_nodes = array()) {
     foreach ($image_nodes as $image) {
       // Render each image from the node.
       $img = image_display($image, variable_get('image_attach_block_0_size', IMAGE_THUMBNAIL));
-      $content .= '<div class="attached-image">' .l($img, "node/$iid", array('html' => TRUE)). '</div>';
+      $content .= '<div class="attached-image">' .l($img, 'node/' . $image->nid, array('html' => TRUE)). '</div>';
     }
     return '<div class="all-attached-images">' .$content. '</div>';
   }
