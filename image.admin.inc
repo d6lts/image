@@ -184,7 +184,7 @@ function image_admin_settings_submit($form, &$form_state) {
   }
 }
 
-function theme_image_settings_sizes_form(&$form) {
+function theme_image_settings_sizes_form($form) {
   $header = array(t('Label'), t('Operation'), t('Width'), t('Height'), t('Link'));
   foreach (element_children($form) as $key) {
     $row = array();
