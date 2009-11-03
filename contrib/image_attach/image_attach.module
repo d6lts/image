@@ -423,10 +423,10 @@ function image_attach_views_handler_filter_iid_exist($op, $filter, $filterdata, 
     case 'handler':
       $query->ensure_table('image_attach');
       if ($filter['value']) {
-        $query->add_where('image_attach.iid');
+        $query->add_where('image_attach.iid IS NOT NULL');
       }
       else {
-        $query->add_where('ISNULL(image_attach.iid)');
+        $query->add_where('image_attach.iid IS NULL');
       }
       break;
   }
