@@ -108,13 +108,13 @@ class image_attach_views_handler_field_attached_images
         
         switch($this->options['as_link']) {
           case 'node':
-            $output .= l($image_img, 'node/' . $values->{$this->aliases['nid']}, array('html' => true));
+            $output = l($image_img, 'node/' . $values->{$this->aliases['nid']}, array('html' => true));
             break;
           case 'image':
-            $output .= l($image_img, 'node/' . $node->nid, array('html' => true));
+            $output = l($image_img, 'node/' . $node->nid, array('html' => true));
             break;
           default:
-            $output .= $image_img;
+            $output = $image_img;
             break;
         }
       }
