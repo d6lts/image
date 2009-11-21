@@ -382,7 +382,10 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
         }        
         $node->content['image_attach'] = array('#weight' => $weight);
         if ($teaser_or_body == 'teaser') {
-          $node->content['image_attach'][$node->iids[0]]['#value'] = theme("image_attach_{$teaser_or_body}", $node, $node->iids[0]);
+          // Reliably get the first element: this array is keyed by id rather 
+          // than from 0 when we are showing a node preview.
+          $first_iid = reset($node->iids);
+          $node->content['image_attach'][$first_iid]['#value'] = theme("image_attach_{$teaser_or_body}", $node, $first_iid);
         }
         else {
           $content = '';
