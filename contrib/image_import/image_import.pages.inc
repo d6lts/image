@@ -1,6 +1,12 @@
 <?php
 // $Id$
 
+/**
+ * Verify a candidate file for import.
+ *
+ * @param $file
+ *  A file object to check, of the format returned by file_scan_directory().
+ */
 function image_import_validate_file($file) {
   $errors = array();
   $info = image_get_info($file->filename);
@@ -15,6 +21,9 @@ function image_import_validate_file($file) {
   return $errors;
 }
 
+/**
+ * Form generating function for the image import page.
+ */
 function image_import_form() {
   $form = array();
 
@@ -148,6 +157,9 @@ function image_import_form() {
   return $form;
 }
 
+/**
+ * Theme function for the image import form.
+ */
 function theme_image_import_form($form) {
   $output = drupal_render($form['token_help']);
 
@@ -179,6 +191,9 @@ function theme_image_import_form($form) {
   return $output . drupal_render($form);
 }
 
+/**
+ * Submit handler for the image import form.
+ */
 function image_import_form_submit($form, &$form_state) {
   $batch = array(
     'title' => t('Importing image'),
@@ -210,6 +225,9 @@ function image_import_form_submit($form, &$form_state) {
   batch_set($batch);
 }
 
+/**
+ * Batch operation callback for image import.
+ */
 function _image_import_batch_op($args, &$context) {
   $error = FALSE;
   // if user choses to reproduce directories structure, save the chosen gallery,
@@ -250,6 +268,9 @@ function _image_import_batch_op($args, &$context) {
   $context['finished'] = 1;
 }
 
+/**
+ * Batch finished callback for image import.
+ */
 function _image_import_batch_finished($success, $results, $operations) {
   if (!$success) {
     if (count($results['bad'])) {
@@ -365,6 +386,9 @@ function _image_import_recursive_delete_empty_directories($basepath, $dir='') {
   return $deleted;
 }
 
+/**
+ * Batch operation callback for deletion of empty directories after the import.
+ */
 function _image_import_recursive_delete_empty_directories_batch_op($args, &$context) {
   $deleted = _image_import_recursive_delete_empty_directories($args['basepath']);
   if (!empty($deleted)) {
