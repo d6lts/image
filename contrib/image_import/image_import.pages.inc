@@ -165,13 +165,14 @@ function theme_image_import_form($form) {
 
   if (!empty($form['file_list']['#value'])) {
     $type = node_get_types('type', $form['#node_type']);
-    $header = array(theme('table_select_header_cell'), t('Name'), t('Size'), t('Dimensions'), check_plain($type->title_label), check_plain($type->body_label));
+    $header = array(theme('table_select_header_cell'), t('Image'), t('Name'), t('Size'), t('Dimensions'), check_plain($type->title_label), check_plain($type->body_label));
     $rows = array();
     foreach (element_children($form['files']['import']) as $key) {
       $filename = $form['files']['import'][$key]['#title'];
       unset($form['files']['import'][$key]['#title']);
       $row = array(
         array('data' => drupal_render($form['files']['import'][$key])),
+        array('data' => '<img width="40" src="' . url($form['#dirpath']  . '/' .  $filename) . '">'),
         array('data' => $filename),
         array('data' => drupal_render($form['files']['filesize'][$key])),
         array('data' => drupal_render($form['files']['dimensions'][$key])),
