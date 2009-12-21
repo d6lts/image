@@ -194,6 +194,8 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
       $form['#attributes'] = array("enctype" => "multipart/form-data");
       // Add a custom submit handler so we can handle image creation on-the-fly
       $form['#validate'][] = 'image_attach_validate'; 
+      // Add a custom submit handler so we can clean up the selection box items.
+      $form['#submit'][] = 'image_attach_node_form_submit'; 
 
       // Display the image attach form only if user can attach images, AND
       // it is allowed to attach existing images or the user is allowed to create new images 
@@ -322,6 +324,15 @@ function image_attach_validate(&$form, &$form_state) {
 }
 
 /**
+ * Extra submit handler for node forms.
+ */
+function image_attach_node_form_submit(&$form, &$form_state) {
+  // Clear the 0 key in the iids array that arises from selecting the 'None' 
+  // option. We do this here so image_attach_nodeapi() gets clean data.
+  unset($form_state['values']['iids'][0]);
+}
+
+/**
  * Implementation of hook_nodeapi().
  */
 function image_attach_nodeapi(&$node, $op, $teaser, $page) {
@@ -339,8 +350,6 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
     case 'insert':
     case 'update':
-      // Unsetting the "- None -" entry from the form select entries
-      unset($node->iids[0]);
       db_query("DELETE FROM {image_attach} WHERE nid = %d", $node->nid);
       if (!empty($node->iids)) {
         // Populate weight column with placeholder values.

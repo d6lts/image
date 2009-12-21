@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#659182 by jonathan1055, joachim: Fixed removal of first attached image on
+  programmatic node save.
 #232557 by joachim: Added thumbnails to list on image import page.
 #630546 by jonathan1055: Fixed attached image not appearing in teaser preview.
 #620234 by unjello: Fixed undefined variable in Views image attach handler.
