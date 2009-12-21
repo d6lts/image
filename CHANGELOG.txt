@@ -6,6 +6,10 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+
+
+Image 6.x-1.0-BETA4, 2009-12-21
+-------------------------------
 #659182 by jonathan1055, joachim: Fixed removal of first attached image on
   programmatic node save.
 #232557 by joachim: Added thumbnails to list on image import page.
