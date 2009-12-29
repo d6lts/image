@@ -230,7 +230,7 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
         if (variable_get('image_attach_existing', 1)) {
           $form['image_attach']['iids']['#title'] = t('Existing images');
           $form['image_attach']['iids']['#options'] = _image_attach_get_image_nodes();
-          $form['image_attach']['iids']['#description'] = t('Choose an image already existing on the server if you do not upload a new one.');
+          $form['image_attach']['iids']['#description'] = t('Choose existing images if you do not upload a new one.');
         }
         // User may only upload new images: show a selection box containing only attached images.
         else {

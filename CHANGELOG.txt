@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#662252 by joachim: Changed description text in image attach form to be plural.
 
 
 Image 6.x-1.0-BETA4, 2009-12-21
