@@ -18,6 +18,13 @@ function image_import_validate_file($file) {
     $errors[] = t('Not a JPG, GIF or PNG file.');
     $file->height = $file->width = 0;
   }
+
+  // Check files are not too large to import.
+  $file->filesize = filesize($file->filename);
+  if ($file->filesize > variable_get('image_max_upload_size', 800) * 1024) {
+    $errors[] = t('File too big.');
+  }
+
   return $errors;
 }
 
