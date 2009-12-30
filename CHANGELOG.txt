@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#273426 by joachim: Added test for image thumbnails in teasers.
 #575374 by joachim: Fixed image import allowing selection of too big images. 
 #662252 by joachim: Changed description text in image attach form to be plural.
 

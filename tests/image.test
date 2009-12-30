@@ -93,6 +93,12 @@ class ImageTestCase extends DrupalWebTestCase {
     $this->assertPattern('@<img[^>]+?' . $node->images['thumbnail'] . '[^>]+?>@', t('Image thumbnail displayed on the page.'));
     $this->assertTrue(file_exists($node->images['thumbnail']), t('Image thumbnail exists.'));
 
+    // Promote the node so we can test the thumbnail appears in the teaser.
+    $node->promote = TRUE;
+    node_save($node);
+    $this->drupalGet('node');
+    $this->assertPattern('@<img[^>]+?' . $node->images['thumbnail'] . '[^>]+?>@', t('Image thumbnail displayed on the front page teaser.'));    
+    
     // Edit an image.
     $another_edit = array(
       'title' => $edit['title'],
