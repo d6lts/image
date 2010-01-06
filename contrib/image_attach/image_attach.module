@@ -217,26 +217,30 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
             );
           }
         }
-
-        $form['image_attach']['iids'] = array(
-          '#type' => 'select',
-          $value => empty($node->iids) ? NULL : $node->iids,
-          '#multiple' => TRUE,
-          '#size' => 6,
-          // Title, options and description are set just below.
-        );
-
-        // User may attach already existing images: show a selection box containing all images.
-        if (variable_get('image_attach_existing', 1)) {
-          $form['image_attach']['iids']['#title'] = t('Existing images');
-          $form['image_attach']['iids']['#options'] = _image_attach_get_image_nodes();
-          $form['image_attach']['iids']['#description'] = t('Choose existing images if you do not upload a new one.');
-        }
-        // User may only upload new images: show a selection box containing only attached images.
-        else {
-          $form['image_attach']['iids']['#title'] = t('Attached images');
-          $form['image_attach']['iids']['#options'] = _image_attach_get_image_nodes($node->iids);
-          $form['image_attach']['iids']['#description'] = t('You can remove a previously attached image by unselecting it.');
+        
+        // Only show selection box of image nodes if the user may attach some,
+        // or if there are existings ones that may be removed.
+        if (variable_get('image_attach_existing', 1) || count($node->iids)) {
+          $form['image_attach']['iids'] = array(
+            '#type' => 'select',
+            $value => empty($node->iids) ? NULL : $node->iids,
+            '#multiple' => TRUE,
+            '#size' => 6,
+            // Title, options and description are set just below.
+          );
+  
+          // User may attach already existing images: show a selection box containing all images.
+          if (variable_get('image_attach_existing', 1)) {
+            $form['image_attach']['iids']['#title'] = t('Existing images');
+            $form['image_attach']['iids']['#options'] = _image_attach_get_image_nodes();
+            $form['image_attach']['iids']['#description'] = t('Choose existing images if you do not upload a new one.');
+          }
+          // User may only upload new images: show a selection box containing only attached images.
+          else {
+              $form['image_attach']['iids']['#title'] = t('Attached images');
+              $form['image_attach']['iids']['#options'] = _image_attach_get_image_nodes($node->iids);
+              $form['image_attach']['iids']['#description'] = t('You can remove a previously attached image by unselecting it.');
+          }
         }
 
         // User may create images, add upload form elements.
