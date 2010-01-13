@@ -122,11 +122,12 @@ function image_attach_block($op = 'list', $delta = 0, $edit = array()) {
 }
 
 /**
- * implementation of hook_form_alter()
+ * Implementation of hook_form_FORM_ID_alter().
+ *
+ * Add settings to the content type settings form.
  */
-function image_attach_form_alter(&$form, $form_state, $form_id) {
-  // Content type settings form.
-  if ($form_id == 'node_type_form' && $form['#node_type']->type != 'image') {
+function image_attach_form_node_type_form_alter(&$form, $form_state) {
+  if($form['#node_type']->type != 'image') {
     _image_check_settings();
 
     $image_sizes = array(IMAGE_ATTACH_HIDDEN => t('<Hidden>'));
@@ -181,10 +182,16 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
     if (module_exists('content')) {
       $link = l(t('Manage fields'), $_GET['q'] .'/fields');
       $form['image_attach']['#description'] = t('Since you installed CCK module, you can change the image weight in the !link page.', array('!link' => $link));
-    }
+    } 
   }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function image_attach_form_alter(&$form, $form_state, $form_id) {
   // Node edit form.
-  else if (isset($form['type']['#value']) && $form['type']['#value'] != 'image') {
+  if (isset($form['type']['#value']) && $form['type']['#value'] != 'image') {
     $type = $form['type']['#value'];
     // If enabled adjust the form.
     if ($form_id == $type .'_node_form' && variable_get('image_attach_'. $type, 0)) {
@@ -196,10 +203,16 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
       $form['#validate'][] = 'image_attach_validate'; 
       // Add a custom submit handler so we can clean up the selection box items.
       $form['#submit'][] = 'image_attach_node_form_submit'; 
+      
+      // Check permissions and settings
+      $may_attach           = user_access('attach images');
+      $may_attach_existing  = variable_get('image_attach_existing', 1);
+      $may_upload           = user_access('create images');
+      $has_existing_images  = !empty($node->iids);
 
       // Display the image attach form only if user can attach images, AND
       // it is allowed to attach existing images or the user is allowed to create new images 
-      if (user_access('attach images') && (variable_get('image_attach_existing', 1) || user_access('create images'))) {
+      if ($may_attach && ($may_attach_existing || $may_upload)) {
         $form['image_attach'] = array(
           '#type' => 'fieldset',
           '#title' => t('Attached images'),
@@ -207,7 +220,7 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
           '#collapsed' => empty($node->iids),
         );
 
-        if (!empty($node->iids)) {
+        if ($has_existing_images) {
           foreach ($node->iids as $iid) {
             $image = node_load($iid);
             $form['image_attach']['image_thumbnail'][$iid] = array(
@@ -220,7 +233,7 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
         
         // Only show selection box of image nodes if the user may attach some,
         // or if there are existings ones that may be removed.
-        if (variable_get('image_attach_existing', 1) || count($node->iids)) {
+        if ($may_attach_existing || $has_existing_images) {
           $form['image_attach']['iids'] = array(
             '#type' => 'select',
             $value => empty($node->iids) ? NULL : $node->iids,
@@ -230,7 +243,7 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
           );
   
           // User may attach already existing images: show a selection box containing all images.
-          if (variable_get('image_attach_existing', 1)) {
+          if ($may_attach_existing) {
             $form['image_attach']['iids']['#title'] = t('Existing images');
             $form['image_attach']['iids']['#options'] = _image_attach_get_image_nodes();
             $form['image_attach']['iids']['#description'] = t('Choose existing images if you do not upload a new one.');
@@ -244,7 +257,7 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
         }
 
         // User may create images, add upload form elements.
-        if (user_access('create images')) {
+        if ($may_upload) {
           $form['image_attach']['image'] = array(
             '#type' => 'file',
             '#title' => t('Upload image')
