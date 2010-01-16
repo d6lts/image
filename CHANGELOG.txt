@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#625666 by joachim: Added node about what happens when no image title is given.
 #581174 by jonathan1055, joachim | skyredwang: Added ability to limit the number
   of attached images.
 #680672 by joachim: Fixed mention of 'upload' when user can't create images.

@@ -287,7 +287,7 @@ function image_attach_form_alter(&$form, $form_state, $form_id) {
             '#type' => 'textfield',
             '#title' => t('Image title'),
             $value => '',
-            '#description' => t('The title the image will be shown with.')
+            '#description' => t('The title the image will be shown with. Leave blank to use the filename.')
           );
           // Provide an additional submit button, which adds an image and redirects
           // the user to the node edit form.
