@@ -6,6 +6,8 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#581174 by jonathan1055, joachim | skyredwang: Added ability to limit the number
+  of attached images.
 #680672 by joachim: Fixed mention of 'upload' when user can't create images.
 #680644 by joachim: Cleaned up code in image attach's hook_form_alter().
 by joachim: Added tests for image attach.
