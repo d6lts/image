@@ -6,6 +6,9 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 5.x-2.x, xxxx-xx-xx
 -------------------------
+#207557 by joachim: (Revisited) Fixed out of sync image_update_5200() with
+  commits from DRUPAL-6--1 branch; fixed update errors due to duplicate data in
+  Drupal 5 files table.
 #619150 by kotoponus: Fixed image attach views filters SQL for PostgreSQL.
 
 Image 5.x-2.0-ALPHA4, 2009-08-23
