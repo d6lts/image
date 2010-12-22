@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#1004608 by sun, joachim: Fixed image_update_6104().
 
 
 Image 6.x-1.1, 2010-12-22
