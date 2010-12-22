@@ -6,6 +6,7 @@ Image x.x-x.x, xxxx-xx-xx
 
 Image 6.x-1.x, xxxx-xx-xx
 -------------------------
+#993042 by sun, joachim: Added setting for number of images to import per page.
 #1004608 by sun, joachim: Fixed image_update_6104().
 
 

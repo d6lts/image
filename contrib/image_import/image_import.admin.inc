@@ -13,6 +13,15 @@ function image_import_admin_settings() {
       . t("<strong>Note:</strong> a path begining with a <kbd>/</kbd> indicates the path is relative to the server's root, one starting without specifies a path relative to Drupal's root. I.e. <kbd>/tmp/image</kbd> would be the temp directory off the root while <kbd>tmp/image</kbd> would be inside Drupal's directory."),
     '#required' => TRUE,
   );
+  $form['image_import_page_size'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Number of images to list per page'),
+    '#default_value' => variable_get('image_import_page_size', 50),
+    // To set a value longer than 3 digits (i.e., > 999) use settings.php.
+    '#size' => 3,
+    '#maxlength' => 3,
+    '#required' => TRUE,
+  );
   $form = system_settings_form($form);
   // Apply our validation and submit handlers to the submit button.
   $form['buttons']['submit']['#validate'][] = 'image_import_admin_settings_submit_validate';
