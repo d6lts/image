@@ -249,7 +249,7 @@ function image_gallery_page($type = NULL, $tid = 0) {
     }
     $breadcrumb[] = array('path' => 'image', 'title' => t('Image galleries'));
     $breadcrumb = array_reverse($breadcrumb);
-    drupal_set_title($gallery->name);
+    drupal_set_title(check_plain($gallery->name));
   }
 
   $breadcrumb[] = array('path' => $_GET['q']);

@@ -7,6 +7,10 @@ Image x.x-x.x, xxxx-xx-xx
 Image 5.x-2.x, xxxx-xx-xx
 -------------------------
 
+Image 5.x-2.0, 2010-12-22
+--------------------------------
+by sun: Fixed output of image gallery title.
+
 Image 5.x-2.0-ALPHA5, 2010-09-06
 --------------------------------
 #207557 by joachim: (Revisited) Fixed out of sync image_update_5200() with
