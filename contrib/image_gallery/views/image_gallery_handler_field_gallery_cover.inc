@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Parent class for field handlers that gives us a gallery cover.

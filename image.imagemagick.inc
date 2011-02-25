@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Return information about the imagemagick toolkit.

@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Verify a candidate file for import.

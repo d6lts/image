@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 define('IMAGE_GALLERY_SORT_CREATE_DESC', 0);
 define('IMAGE_GALLERY_SORT_CREATE_ASC', 1);

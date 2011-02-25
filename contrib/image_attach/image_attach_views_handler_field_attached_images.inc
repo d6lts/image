@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Field handler to display the attached images on a node.

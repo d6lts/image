@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 define('IMAGE_ORIGINAL', '_original');
 define('IMAGE_PREVIEW', 'preview');

@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file
  * Template for a list of gallery terms.

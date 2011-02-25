@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * A display plugin for image galleries.

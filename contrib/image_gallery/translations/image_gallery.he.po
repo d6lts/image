@@ -1,5 +1,4 @@
 # translation of he.po to Hebrew
-# $Id$
 # LANGUAGE translation of Drupal (image_gallery.module)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:

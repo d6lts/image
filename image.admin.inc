@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Menu callback; Form builder function for image settings.

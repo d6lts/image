@@ -1,6 +1,5 @@
 # translation of image_gallery-module.po to
 # translation of image_gallery.po to
-# $Id$
 # LANGUAGE translation of Drupal (image_gallery.module)
 # Copyright 2007 dexterka <martina.majorova@fem.uniag.sk>
 # Generated from files:

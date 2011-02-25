@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Views handler for Image gallery count field. This counts all the nodes in
