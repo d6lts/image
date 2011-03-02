@@ -78,10 +78,12 @@ class image_attach_views_handler_field_attached_images extends image_handler_fie
         $attached_images[$data->nid][] = $data->iid;
       }
 
-      // Place the data into the $values array for each result.
+      // Place the data into the $values array for each result, beneath a
+      // unique key in case this field is on the view several times.
+      $this->handler_key = $this->options['id'];
       foreach ($values as $id => $v) {
         if (isset($attached_images[$v->{$this->aliases['image_attach_nid']}])) {
-          $values[$id]->image_attach_iids = $attached_images[$v->{$this->aliases['image_attach_nid']}];
+          $values[$id]->image_attach_iids[$this->handler_key] = $attached_images[$v->{$this->aliases['image_attach_nid']}];
         }
       }
     }
@@ -91,9 +93,9 @@ class image_attach_views_handler_field_attached_images extends image_handler_fie
    * Render the field.
    */
   function render($values) {
-    if (isset($values->image_attach_iids)) {
+    if (isset($values->image_attach_iids[$this->handler_key])) {
       // Images need to loaded as full nodes to check node_access() for each of them.
-      foreach ($values->image_attach_iids as $iid) {
+      foreach ($values->image_attach_iids[$this->handler_key] as $iid) {
         $image_nodes[$iid] = node_load($iid);
       }
 
