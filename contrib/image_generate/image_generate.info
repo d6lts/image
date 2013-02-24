@@ -1,0 +1,6 @@
+name = Image Devel Generate
+description = Adds support to bulk generate image nodes and attachments.
+package = Image
+dependencies[] = image
+dependencies[] = devel_generate
+core = 6.x

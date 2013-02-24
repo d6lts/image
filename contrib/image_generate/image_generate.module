@@ -1,0 +1,116 @@
+<?php
+/**
+ * @file image_generate.module
+ *
+ * Adds an image and builds derivatives when devel generate creates image nodes.
+ * Attaches image to node types with image attach enabled.
+ */
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function image_generate_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  if (isset($node->devel_generate)) {
+    if ($op == 'presave') {
+      if ($node->type == 'image') {
+        $size = image_get_sizes(IMAGE_ORIGINAL);
+        if (empty($size['width']) || empty($size['height'])) {
+          // If we don't have a max size, make one up.
+          $max_width  = 800;
+          $max_height = 800;
+        }
+        else {
+          $max_width  = $size['width'];
+          $max_height = $size['height'];
+        }
+
+        $width  = rand((int) 100, (int) $max_width);
+        $height = rand((int) 100, (int) $max_height);
+
+        $temp_image = _image_generate_image('png', $width, $height);
+        $size = IMAGE_ORIGINAL;
+
+        // Add the tempfile to the node, which is what image does when an image
+        // is uploaded. This will be deleted when image generates derivatives.
+        $node->images[$size] = $temp_image;
+      }
+    }
+
+    if ($op == 'insert') {
+      if (module_exists('image_attach')) {
+        if (variable_get('image_attach_' . $node->type, 0)) {
+
+          // Load an array of images to attach. Unset the "None" option.
+          $images = _image_attach_get_image_nodes();
+          unset($images[0]);
+
+          if (count($images)) {
+            // Get a random number of attachments up to the maximum possible for
+            // this node type.
+            $attachments = rand(1, variable_get('image_attach_maximum_' . $node->type, 1));
+            $weight = 0;
+
+            // Insert a random image node id and increment the weight.
+            for ($i = 1; $i <= $attachments; $i++) {
+              db_query("INSERT INTO {image_attach} (nid, iid, weight) VALUES (%d, %d, %d)", $node->nid, array_rand($images), $weight++);
+            }
+          }
+          else {
+            drupal_set_message(t('No images were attached to generated nodes because there are no image nodes to attach.'));
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Private function for creating a random image.
+ *
+ * This function only works with the GD toolkit. ImageMagick is not supported.
+ *
+ * Based on _filefield_generate_image().
+ */
+function _image_generate_image($extension = 'png', $min_resolution, $max_resolution) {
+  static $images = array();
+
+  // Generate a max of 5 different images.
+  if (!isset($images[$extension][$min_resolution][$max_resolution]) || count($images[$extension][$min_resolution][$max_resolution]) < 5) {
+    if ($temp_file = tempnam(file_directory_temp(), 'filefield_')) {
+      dsm($temp_file);
+      file_move($temp_file, $temp_file .'.'. $extension);
+
+      $min = explode('x', $min_resolution);
+      $max = explode('x', $max_resolution);
+
+      $width = rand((int)$min[0], (int)$max[0]);
+      $height = rand((int)$min[0], (int)$max[0]);
+
+      // Make a image split into 4 sections with random colors.
+      $im = imagecreate($width, $height);
+      for ($n = 0; $n < 4; $n++) {
+        $color = imagecolorallocate($im, rand(0, 255), rand(0, 255), rand(0, 255));
+        $x = $width/2 * ($n % 2);
+        $y = $height/2 * (int) ($n >= 2);
+        imagefilledrectangle($im, $x, $y, $x + $width/2, $y + $height/2, $color);
+      }
+
+      // Make a perfect circle in the image middle.
+      $color = imagecolorallocate($im, rand(0, 255), rand(0, 255), rand(0, 255));
+      $smaller_dimension = min($width, $height);
+      $smaller_dimension = ($smaller_dimension % 2) ? $smaller_dimension : $smaller_dimension;
+      imageellipse($im, $width/2, $height/2, $smaller_dimension, $smaller_dimension, $color);
+
+      $save_function = 'image' . ($extension == 'jpg' ? 'jpeg' : $extension);
+      $save_function($im, $temp_file);
+
+      $images[$extension][$min_resolution][$max_resolution][$temp_file] = $temp_file;
+    }
+  }
+  // Select one of the images we've already generated for this field.
+  else {
+    $temp_file = array_rand($images[$extension][$min_resolution][$max_resolution]);
+  }
+
+  return $temp_file;
+}
