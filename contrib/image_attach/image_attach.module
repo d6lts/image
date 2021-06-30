@@ -358,10 +358,10 @@ function image_attach_image_add_submit(&$form, &$form_state) {
   if (isset($form_state['values']['iids'])) {
     db_query("DELETE FROM {image_attach} WHERE nid = %d", $form['nid']['#value']);
     // Sort the $form_state['values']['iids'] array by weight.
-    if (count($form_state['values']['image_thumbnail'])) {
+    if (!empty($form_state['values']['image_thumbnail'])) {
       $form_state['values']['iids'] = _image_attach_set_image_weight($form_state['values']['image_thumbnail'], $form_state['values']['iids']);
     }
-    if (count($form_state['values']['iids'])) {
+    if (!empty($form_state['values']['iids'])) {
       $weight = 0;
       foreach ($form_state['values']['iids'] as $iid) {
         db_query("INSERT INTO {image_attach} (nid, iid, weight) VALUES (%d, %d, %d)", $form['nid']['#value'], $iid, $weight++);
@@ -425,7 +425,7 @@ function image_attach_validate(&$form, &$form_state) {
   }
 
   // Validate and save the uploaded image, providing that there are no errors set.
-  if (!count(form_get_errors())) {
+  if (!form_get_errors()) {
     $validators = array(
       'file_validate_is_image' => array(),
     );
@@ -565,7 +565,7 @@ function image_attach_nodeapi(&$node, $op, $teaser, $page) {
  */
 function _image_attach_node_load_attached($attached_nids, $teaser = FALSE) {
   if ($teaser) {
-    // For the teaser we only want the first image from $attached_nids. 
+    // For the teaser we only want the first image from $attached_nids.
     // During normal node viewing the array is zero-keyed but during edit
     // preview it is keyed by iid. Therefore using array_shift() will return the
     // first image for either of these situations.
@@ -588,7 +588,7 @@ function _image_attach_node_load_attached($attached_nids, $teaser = FALSE) {
 function _image_attach_get_image_nodes($nids = array()) {
   $placeholder = '';
   // If $nids was passed, build placeholders to put in the query
-  if (count($nids)) {
+  if (!empty($nids)) {
     $placeholder = 'AND n.nid IN (' . implode(', ', array_fill(0, sizeof($nids), '%d')) . ') ';
   }
 
@@ -718,7 +718,7 @@ function theme_image_attach_attached_images_node($nid, $image_nodes, $img_size, 
  */
 function theme_image_attach_attached_images_block($nid, $image_nodes = array()) {
   // Only return block content if there are images.
-  if (is_array($image_nodes) && count($image_nodes)) {
+  if (is_array($image_nodes) && !empty($image_nodes)) {
     $options = array(
       'size' => variable_get('image_attach_block_0_size', IMAGE_THUMBNAIL),
       'link' => 'image',

@@ -280,14 +280,14 @@ function _image_import_batch_op($args, &$context) {
  */
 function _image_import_batch_finished($success, $results, $operations) {
   if (!$success) {
-    if (count($results['bad'])) {
+    if (!empty($results['bad'])) {
       drupal_set_message(t('There was a problem importing files: !bad-list', array('!bad-list' => theme('item_list', $results['bad']))), 'error');
     }
     else {
       drupal_set_message(t('There was a problem importing the files.'), 'error');
     }
   }
-  if (count($results['good'])) {
+  if (!empty($results['good'])) {
     drupal_set_message(t('Successfully imported: !good-list', array('!good-list' => theme('item_list', $results['good']))));
   }
   watchdog('image_import', 'Completed image import.');

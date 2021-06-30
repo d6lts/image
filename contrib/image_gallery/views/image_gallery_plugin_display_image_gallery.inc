@@ -37,7 +37,7 @@ class image_gallery_plugin_display_image_gallery extends views_plugin_display_pa
       // No argument means we are at the top-level gallery.
       // We need to pass an argument of 0 to the gallery terms view so it
       // shows only the top level.
-      if (count($args) == 0) {
+      if (empty($args)) {
         // Have to pass as string, otherwise it gets eaten by views validation.
         $args = array(0 => '0');
       }
@@ -66,7 +66,7 @@ class image_gallery_plugin_display_image_gallery extends views_plugin_display_pa
   function render_empty() {
     drupal_set_title(filter_xss_admin($this->view->get_title()));
 
-    if (count($this->gallery_terms_view->result) == 0) {
+    if (empty($this->gallery_terms_view->result)) {
       return $this->render_textarea('empty');
     }
   }
