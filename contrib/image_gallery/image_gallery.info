@@ -4,9 +4,3 @@ package = Image
 dependencies[] = image
 dependencies[] = taxonomy
 core = 6.x
-
-; Information added by Drupal 6 LTS vendors on 2021-07-12
-version = "6.x-1.3"
-core = "6.x"
-project = "image"
-datestamp = "1626122011"
